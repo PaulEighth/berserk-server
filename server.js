@@ -229,7 +229,7 @@ app.post("/api/register", async (req, res) => {
 
     const { username, email, password } = req.body;
 
-    const nicknamePattern = /^[A-Za-zА-Яа-яЁё0-9_]{2,24}#[0-9]{5}$/;
+    const nicknamePattern = /^[A-Za-zА-Яа-яЁё0-9_]{2,24}#[0-9]{4,5}$/;
 
 
 
