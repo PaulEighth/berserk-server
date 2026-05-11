@@ -3162,7 +3162,7 @@ let approvedTournaments = [];
     const tournamentId = room.tournamentId || currentTrackTournamentId;
     if(!tournamentId) return;
 
-    const response = await fetch(`http://localhost:3000/api/tournaments/${tournamentId}/match-room`, {
+    const response = await fetch(`http://https://berserk-server.onrender.com/api/tournaments/${tournamentId}/match-room`, {
       method: "PATCH",
       headers: authHeaders(),
       body: JSON.stringify({
@@ -3188,7 +3188,7 @@ let approvedTournaments = [];
 }
     async function loadTournamentsFromServer(){
   try{
-    const response = await fetch("http://localhost:3000/api/tournaments");
+    const response = await fetch("http://https://berserk-server.onrender.com/api/tournaments");
     const data = await response.json();
 
     if(!data.ok){
@@ -3454,7 +3454,7 @@ function roleNickHtml(nick){
       if(!current || current.username !== ADMIN_USERNAME) return;
 
       try{
-        const response = await fetch("http://localhost:3000/admin/users", {
+        const response = await fetch("http://https://berserk-server.onrender.com/admin/users", {
           headers: {"x-admin-username": current.username}
         });
         if(!response.ok) return;
@@ -3846,7 +3846,7 @@ function roleNickHtml(nick){
       try{
   console.log("SELECTED DECKS", selectedDecks);
 
-  const response = await fetch(`http://localhost:3000/api/tournaments/${id}/join`, {
+  const response = await fetch(`http://https://berserk-server.onrender.com/api/tournaments/${id}/join`, {
   method: "POST",
   headers: {
     ...authHeaders(),
@@ -3886,7 +3886,7 @@ document.getElementById("forceJoinCancel").onclick = () => {
 };
 
 document.getElementById("forceJoinOk").onclick = async () => {
-      const secondResponse = await fetch(`http://localhost:3000/api/tournaments/${id}/join`, {
+      const secondResponse = await fetch(`http://https://berserk-server.onrender.com/api/tournaments/${id}/join`, {
         method: "POST",
         headers: {
           ...authHeaders(),
@@ -4535,7 +4535,7 @@ function injectSwordsEverywhere(){
       };
 
       try{
-  const response = await fetch("http://localhost:3000/api/tournaments", {
+  const response = await fetch("http://https://berserk-server.onrender.com/api/tournaments", {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify({
@@ -4750,7 +4750,7 @@ async function saveTournamentPlayToServer(id){
     const t = tournaments.find(x => String(x.id) === String(id));
     if(!t) return;
 
-    const response = await fetch(`http://localhost:3000/api/tournaments/${id}/play`, {
+    const response = await fetch(`http://https://berserk-server.onrender.com/api/tournaments/${id}/play`, {
       method: "PATCH",
       headers: authHeaders(),
       body: JSON.stringify({
@@ -6202,7 +6202,7 @@ const players = getPlayers(id);
   const key = String(id);
 
   try{
-    const response = await fetch(`http://localhost:3000/api/tournaments/${key}`, {
+    const response = await fetch(`http://https://berserk-server.onrender.com/api/tournaments/${key}`, {
       method: "DELETE",
       headers: authHeaders()
     });
