@@ -880,7 +880,7 @@ async function loadNewsComments(){
   if(!news || !box || !news.id) return;
 
   try{
-    const response = await fetch(`http://localhost:3000/api/news/${news.id}/comments`);
+    const response = await fetch(`https://berserk-server.onrender.com/api/news/${news.id}/comments`);
     const data = await response.json();
 
     if(!data.ok){
@@ -970,7 +970,7 @@ async function addNewsComment(){
   const news = NEWS[currentOpenNewsIndex];
 
   try{
-    const response = await fetch(`http://localhost:3000/api/news/${news.id}/comments`, {
+    const response = await fetch(`https://berserk-server.onrender.com/api/news/${news.id}/comments`, {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({
@@ -1011,7 +1011,7 @@ async function deleteNewsComment(index){
   }
 
   try{
-    const response = await fetch(`http://localhost:3000/api/news/${news.id}/comments/${comment.id}`, {
+    const response = await fetch(`https://berserk-server.onrender.com/api/news/${news.id}/comments/${comment.id}`, {
   method: "DELETE",
   headers: authHeaders()
 });
@@ -1033,7 +1033,7 @@ async function loadNewsFromServer(){
 
   try{
 
-    const response = await fetch("http://localhost:3000/api/news");
+    const response = await fetch("https://berserk-server.onrender.com/api/news");
 
     const data = await response.json();
 
@@ -1271,7 +1271,7 @@ const item = {
       const oldItem = NEWS[editingNewsIndex];
 
       try{
-        const response = await fetch(`http://localhost:3000/api/news/${oldItem.id}`, {
+        const response = await fetch(`https://berserk-server.onrender.com/api/news/${oldItem.id}`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json"
@@ -1310,7 +1310,7 @@ const item = {
   } else if(formMode === 'create'){
 
     try{
-      const response = await fetch("http://localhost:3000/api/news", {
+      const response = await fetch("https://berserk-server.onrender.com/api/news", {
         method: "POST",
         headers: authHeaders(),
         body: JSON.stringify({
@@ -1342,7 +1342,7 @@ const item = {
   } else {
 
     try{
-      const response = await fetch("http://localhost:3000/api/news-requests", {
+      const response = await fetch("https://berserk-server.onrender.com/api/news-requests", {
         method: "POST",
         headers: authHeaders(),
         body: JSON.stringify({
@@ -1382,7 +1382,7 @@ const item = {
 
   try{
 
-    const response = await fetch("http://localhost:3000/api/news-requests");
+    const response = await fetch("https://berserk-server.onrender.com/api/news-requests");
     const data = await response.json();
 
     if(!data.ok){
@@ -1459,7 +1459,7 @@ function renderRequests(){
   if(!request) return;
 
   try{
-    const response = await fetch("http://localhost:3000/api/news", {
+    const response = await fetch("https://berserk-server.onrender.com/api/news", {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({
@@ -1479,7 +1479,7 @@ function renderRequests(){
       throw new Error(data.error || "Не удалось опубликовать заявку");
     }
 
-    await fetch(`http://localhost:3000/api/news-requests/${request.id}`, {
+    await fetch(`https://berserk-server.onrender.com/api/news-requests/${request.id}`, {
       method: "DELETE"
     });
 
@@ -1504,7 +1504,7 @@ function renderRequests(){
   if(!request) return;
 
   try{
-    const response = await fetch(`http://localhost:3000/api/news-requests/${request.id}`, {
+    const response = await fetch(`https://berserk-server.onrender.com/api/news-requests/${request.id}`, {
   method: "DELETE",
   headers: authHeaders()
 });
@@ -1572,7 +1572,7 @@ function renderRequests(){
   const news = NEWS[currentOpenNewsIndex];
 
   try{
-    const response = await fetch(`http://localhost:3000/api/news/${news.id}`, {
+    const response = await fetch(`https://berserk-server.onrender.com/api/news/${news.id}`, {
   method: "DELETE",
   headers: authHeaders()
 });
