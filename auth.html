@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Berserk Heroes Online — Вход и регистрация</title>
+<meta name="theme-color" content="#07090f">
+
+<style>
+:root{
+  --bg:#07090f;
+  --text:#f4efe6;
+  --muted:#b8ae9f;
+  --gold:#d6a84f;
+  --gold2:#f0d28b;
+  --line:rgba(232,194,112,.18);
+  --r:28px;
+  --shadow:0 30px 90px rgba(0,0,0,.46);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 82% 7%,rgba(124,108,255,.18),transparent 32%),
+    radial-gradient(circle at 18% 16%,rgba(224,120,48,.18),transparent 30%),
+    linear-gradient(180deg,#05060a,#0a0d15 45%,#07090f);
+  overflow-x:hidden;
+}
+
+.grain{
+  position:fixed;
+  inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.13) 1px,transparent 1px);
+  background-size:22px 22px;
+  opacity:.14;
+  pointer-events:none;
+}
+
+.wrap{
+  width:min(1180px,calc(100% - 40px));
+  margin:auto;
+  position:relative;
+  z-index:1;
+}
+
+.nav{
+  position:sticky;
+  top:14px;
+  z-index:50;
+  margin:14px auto 0;
+  width:min(1400px,calc(100% - 28px));
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:11px 13px 11px 16px;
+  background:rgba(9,12,19,.76);
+  backdrop-filter:blur(18px);
+  border:1px solid var(--line);
+  border-radius:999px;
+  box-shadow:0 16px 45px rgba(0,0,0,.34);
+}
+
+.brand{
+  display:flex;
+  gap:11px;
+  align-items:center;
+  color:var(--text);
+  text-decoration:none;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.brand-mark{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,#23190d,#d6a84f);
+  color:#07090f;
+  overflow:hidden;
+}
+
+.brand-mark img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:50%;
+}
+
+.nav-links{
+  display:flex;
+  gap:16px;
+  align-items:center;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+.nav a{
+  color:var(--text);
+  text-decoration:none;
+  font-size:14px;
+  font-weight:750;
+}
+
+.nav-links a{opacity:.74}
+
+.nav-links a:hover,
+.nav-links a.active{
+  opacity:1;
+  color:var(--gold2);
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:14px 20px;
+  border-radius:999px;
+  border:1px solid transparent;
+  text-decoration:none;
+  font-weight:900;
+  transition:.28s;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.btn.gold{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#171008;
+  box-shadow:0 16px 42px rgba(214,168,79,.26);
+}
+
+.btn.ghost{
+  background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.13);
+  color:var(--text);
+}
+
+.btn:hover{transform:translateY(-3px)}
+
+.auth-section{
+  min-height:calc(100vh - 90px);
+  display:grid;
+  place-items:center;
+  padding:72px 0 60px;
+}
+
+.auth-grid{
+  display:grid;
+  grid-template-columns:1fr 460px;
+  gap:36px;
+  align-items:center;
+}
+
+.auth-text{
+  padding-right:20px;
+}
+
+.logo-img{
+  width:min(520px,100%);
+  display:block;
+  margin:0 0 22px;
+  filter:drop-shadow(0 22px 55px rgba(0,0,0,.58));
+}
+
+.eyebrow{
+  display:inline-flex;
+  padding:8px 12px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:rgba(214,168,79,.08);
+  font-size:13px;
+  font-weight:900;
+  color:var(--gold2);
+  margin-bottom:20px;
+}
+
+h1{
+  font-size:clamp(44px,6vw,84px);
+  line-height:1.05;
+  margin:0 0 20px;
+  letter-spacing:-.065em;
+}
+
+h1 span{
+  display:inline-block;
+  background:linear-gradient(135deg,#fff 15%,#f0d28b 58%,#b16b2c);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.lead{
+  font-size:clamp(18px,2vw,22px);
+  line-height:1.58;
+  color:#d7cec0;
+  max-width:650px;
+}
+
+.auth-box{
+  width:100%;
+  padding:30px;
+  border-radius:32px;
+  background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.045));
+  border:1px solid rgba(232,194,112,.18);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(16px);
+}
+
+.auth-box h2{
+  margin:0 0 8px;
+  font-size:30px;
+  letter-spacing:-.04em;
+}
+
+.auth-box p{
+  margin:0 0 22px;
+  color:var(--muted);
+  line-height:1.55;
+}
+
+.tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:18px 0 22px;
+}
+
+.tab{
+  padding:14px 14px;
+  border-radius:999px;
+  border:1px solid rgba(232,194,112,.18);
+  background:rgba(255,255,255,.06);
+  color:var(--text);
+  font-weight:900;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.tab.active{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#171008;
+  border-color:transparent;
+}
+
+.form{
+  display:none;
+}
+
+.form.active{
+  display:block;
+}
+
+.field{
+  width:100%;
+  padding:15px 16px;
+  margin-bottom:12px;
+  border-radius:17px;
+  border:1px solid rgba(232,194,112,.18);
+  background:rgba(255,255,255,.06);
+  color:var(--text);
+  font-size:15px;
+  outline:none;
+}
+
+.field::placeholder{
+  color:#8f8678;
+}
+
+.field:focus{
+  border-color:rgba(240,210,139,.55);
+  box-shadow:0 0 0 3px rgba(240,210,139,.08);
+}
+
+.submit{
+  width:100%;
+  margin-top:8px;
+  padding:15px 18px;
+  border-radius:999px;
+  border:none;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#171008;
+  font-weight:950;
+  font-size:15px;
+  cursor:pointer;
+  box-shadow:0 16px 42px rgba(214,168,79,.20);
+}
+
+.status{
+  min-height:24px;
+  margin-top:18px;
+  color:var(--gold2);
+  font-weight:800;
+  text-align:center;
+}
+
+.back{
+  display:block;
+  text-align:center;
+  color:var(--gold2);
+  text-decoration:none;
+  margin-top:20px;
+  font-weight:850;
+}
+
+.footer{
+  padding:18px 0 24px;
+  border-top:1px solid rgba(232,194,112,.10);
+  background:transparent;
+  color:#bfb5a7;
+}
+
+.footer .wrap{
+  font-size:14px;
+  line-height:1.65;
+  opacity:.9;
+}
+
+@media(max-width:1000px){
+  .nav-links{display:none}
+  .auth-grid{grid-template-columns:1fr}
+  .auth-text{padding-right:0}
+}
+
+@media(max-width:560px){
+  .wrap{width:min(100% - 26px,1180px)}
+  .auth-box{padding:22px}
+  h1{font-size:44px}
+}
+</style>
+</head>
+
+<body>
+<div class="grain"></div>
+
+<nav class="nav">
+  <a class="brand" href="BerserHeroesOnline.html">
+    <span class="brand-mark">
+      <img src="Logo.png" alt="BHO">
+    </span>
+    <span>Berserk Heroes Online</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="BerserHeroesOnline.html">О сайте</a>
+    <a href="deck-builder_checked.html">База карт</a>
+    <a href="decks_select_publish.html#deck">Колоды</a>
+    <a href="meta.html#meta">(Мета тех.работа)</a>
+    <a href="tournaments.html">Турниры</a>
+    <a href="news.html">Новости</a>
+    <a href="BerserHeroesOnline.html#contacts">Контакты</a>
+  </div>
+
+  <a class="btn gold" href="BerserHeroesOnline.html">На главную</a>
+</nav>
+
+<main class="auth-section">
+  <div class="wrap auth-grid">
+
+    <div class="auth-text">
+      <div class="eyebrow">Аккаунт игрока</div>
+
+      <img src="berserk.webp" class="logo-img" alt="Berserk Logo">
+
+      <h1>
+        Berserk Heroes<br>
+        <span>Online</span>
+      </h1>
+
+      <p class="lead">
+        Создай аккаунт, чтобы в будущем сохранять колоды, участвовать в турнирах,
+        публиковать сборки и иметь свой профиль игрока.
+      </p>
+    </div>
+
+    <section class="auth-box">
+      <h2>Вход в аккаунт</h2>
+      <p>Войди или зарегистрируйся через сервер Berserk Heroes Online.</p>
+
+      <div class="tabs">
+        <button class="tab active" id="loginTab" type="button">Вход</button>
+        <button class="tab" id="registerTab" type="button">Регистрация</button>
+      </div>
+
+      <form class="form active" id="loginForm">
+        <input class="field" type="text" id="loginUsername" placeholder="Eighth#2020" required>
+        <input class="field" type="password" id="loginPassword" placeholder="Пароль" required>
+        <button class="submit" type="submit">Войти</button>
+      </form>
+
+      <form class="form" id="registerForm">
+        <input class="field" type="text" id="registerUsername" placeholder="Имя пользователя" required>
+        <input class="field" type="email" id="registerEmail" placeholder="Email" required>
+        <input class="field" type="password" id="registerPassword" placeholder="Пароль" required>
+        <button class="submit" type="submit">Создать аккаунт</button>
+      </form>
+
+      <div class="status" id="status"></div>
+
+      <a class="back" href="BerserHeroesOnline.html">← Вернуться на сайт</a>
+    </section>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    Данный сайт является неофициальным фанатским проектом и не имеет никакого отношения к правообладателю игры Берсерк Герои Онлайн, ее лицензиатам или официальным партнерам. Все права на игру Берсерк Герои Онлайн, включая название, торговые марки, графические элементы и другие объекты интеллектуальной собственности, принадлежат их законным правообладателям
+  </div>
+</footer>
+
+<script>
+const API_URL = "http://localhost:3000";
+
+const loginTab = document.getElementById("loginTab");
+const registerTab = document.getElementById("registerTab");
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+const statusEl = document.getElementById("status");
+
+loginTab.addEventListener("click", () => {
+  loginTab.classList.add("active");
+  registerTab.classList.remove("active");
+  loginForm.classList.add("active");
+  registerForm.classList.remove("active");
+  statusEl.textContent = "";
+});
+
+registerTab.addEventListener("click", () => {
+  registerTab.classList.add("active");
+  loginTab.classList.remove("active");
+  registerForm.classList.add("active");
+  loginForm.classList.remove("active");
+  statusEl.textContent = "";
+});
+
+registerForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const username = document.getElementById("registerUsername").value.trim();
+  const email = document.getElementById("registerEmail").value.trim();
+  const password = document.getElementById("registerPassword").value;
+
+  statusEl.textContent = "Создаём аккаунт...";
+
+  try {
+    const response = await fetch(API_URL + "/api/register", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({username,email,password})
+    });
+
+    const data = await response.json();
+
+    if(data.ok){
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      statusEl.textContent = "Регистрация успешна";
+      statusEl.style.color = "var(--gold2)";
+
+      setTimeout(() => {
+        window.location.href = "BerserHeroesOnline.html";
+      }, 1000);
+    } else {
+      statusEl.textContent = data.error || "Ошибка регистрации";
+    }
+  } catch (error) {
+    statusEl.textContent = "Сервер не отвечает. Запусти node server.js";
+  }
+});
+
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const username = document.getElementById("loginUsername").value.trim();
+  const password = document.getElementById("loginPassword").value;
+
+  statusEl.textContent = "Входим...";
+
+  try {
+    const response = await fetch(API_URL + "/api/login", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({username,password})
+    });
+
+    const data = await response.json();
+
+    if(data.ok){
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      statusEl.textContent = "Вход выполнен";
+      statusEl.style.color = "var(--gold2)";
+
+      setTimeout(() => {
+        window.location.href = "BerserHeroesOnline.html";
+      }, 1000);
+    } else {
+      statusEl.textContent = data.error || "Ошибка входа";
+      if (data.error === "Аккаунт заблокирован") {
+  statusEl.style.color = "#ff4d4d";
+} else {
+  statusEl.style.color = "var(--gold2)";
+}
+    }
+  } catch (error) {
+    statusEl.textContent = "Сервер не отвечает. Запусти node server.js";
+  }
+});
+</script>
+</body>
+</html>

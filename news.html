@@ -1,0 +1,2059 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Berserk Heroes Online — Новости</title>
+  <meta name="description" content="Новости Berserk Heroes Online: обновления базы карт, колоды, мета, турниры и события комьюнити.">
+  <meta name="theme-color" content="#07090f">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307090f'/%3E%3Ctext x='50' y='66' text-anchor='middle' font-size='56'%3E%F0%9F%93%B0%3C/text%3E%3C/svg%3E">
+  <style>
+    :root{--bg:#07090f;--bg2:#0b0f18;--panel:#111622;--panel2:#151b2a;--text:#f4efe6;--muted:#b8ae9f;--gold:#d6a84f;--gold2:#f0d28b;--ember:#e07830;--violet:#7c6cff;--line:rgba(232,194,112,.18);--r:28px;--shadow:0 30px 90px rgba(0,0,0,.46)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at 82% 7%,rgba(124,108,255,.18),transparent 32%),radial-gradient(circle at 18% 16%,rgba(224,120,48,.18),transparent 30%),linear-gradient(180deg,#05060a,#0a0d15 45%,#07090f);min-height:100vh;overflow-x:hidden}.grain{position:fixed;inset:0;background-image:radial-gradient(rgba(255,255,255,.13) 1px,transparent 1px);background-size:22px 22px;opacity:.14;pointer-events:none}.wrap{width:min(1440px,calc(100% - 36px));margin:auto;position:relative;z-index:1}.nav{position:sticky;top:14px;z-index:50;margin:14px auto 0;width:min(1440px,calc(100% - 28px));display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 13px 11px 16px;background:rgba(9,12,19,.76);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:999px;box-shadow:0 16px 45px rgba(0,0,0,.34)}.brand{display:flex;gap:11px;align-items:center;color:var(--text);text-decoration:none;font-weight:950;white-space:nowrap;letter-spacing:-.03em}.brand-mark{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#23190d,#d6a84f);color:#07090f;overflow:hidden}.brand-mark img{width:100%;height:100%;object-fit:cover}.nav-links{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center}.nav a{color:var(--text);text-decoration:none;font-size:14px;font-weight:750}.nav-links a{opacity:.74}.nav-links a:hover,
+.nav-links a.active {
+  opacity:1;
+  color:var(--gold2);
+},.nav-links a.active{opacity:1;color:var(--gold2)}.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 18px;border-radius:999px;border:1px solid transparent;text-decoration:none;font-weight:900;transition:.25s;cursor:pointer;white-space:nowrap;font-size:14px}.btn.gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#171008;box-shadow:0 16px 42px rgba(214,168,79,.22)}.btn.ghost{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.13);color:var(--text)}.btn:hover{transform:translateY(-2px)}.hero{padding:64px 0 34px}.eyebrow{display:inline-flex;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(214,168,79,.08);font-size:13px;font-weight:900;color:var(--gold2)}h1{font-size:clamp(46px,7vw,92px);line-height:.92;margin:18px 0 16px;letter-spacing:-.075em;background:linear-gradient(135deg,#fff 15%,#f0d28b 58%,#b16b2c);-webkit-background-clip:text;background-clip:text;color:transparent}.lead{font-size:clamp(17px,2vw,21px);line-height:1.58;color:#d7cec0;max-width:900px}.section{padding:34px 0 90px}.section-top{display:flex;align-items:end;justify-content:space-between;gap:22px;margin-bottom:24px}.kicker{color:var(--gold);font-weight:950;text-transform:uppercase;font-size:12px;letter-spacing:.16em}.section h2{font-size:clamp(32px,4.5vw,56px);line-height:1;margin:10px 0 0;letter-spacing:-.055em}.news-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}.news-card{position:relative;overflow:hidden;border-radius:var(--r);background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.045));border:1px solid rgba(232,194,112,.15);box-shadow:0 22px 60px rgba(0,0,0,.22);backdrop-filter:blur(10px);padding:14px;cursor:pointer;transition:.25s;text-align:left;color:var(--text);font:inherit}.news-card:hover{transform:translateY(-6px);border-color:rgba(240,210,139,.42);box-shadow:0 28px 80px rgba(0,0,0,.34)}.news-thumb{width:8cm;height:8cm;max-width:100%;display:block;margin:0 auto 14px;border-radius:22px;object-fit:cover;background:radial-gradient(circle at 35% 25%,rgba(240,210,139,.32),transparent 22%),linear-gradient(135deg,#141a28,#2b1e12 58%,#090b11);border:1px solid rgba(232,194,112,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}.news-date{display:inline-flex;height:30px;align-items:center;padding:0 10px;border-radius:999px;background:rgba(214,168,79,.14);border:1px solid rgba(214,168,79,.24);color:var(--gold2);font-size:12px;font-weight:950}.news-card h3{font-size:20px;line-height:1.12;margin:12px 0 9px;letter-spacing:-.04em}.news-card p{margin:0;color:var(--muted);line-height:1.55;font-size:14px}.tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.tag{font-size:12px;color:#ded2be;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.055);padding:6px 9px;border-radius:999px}.modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.82);backdrop-filter:blur(12px)}.modal.show{display:flex}.modal-box{position:relative;width:min(1180px,100%);max-height:92vh;overflow:auto;border-radius:34px;background:linear-gradient(180deg,rgba(17,22,34,.97),rgba(9,12,19,.97));border:1px solid rgba(232,194,112,.24);box-shadow:0 35px 110px rgba(0,0,0,.62);padding:26px}.modal-close{position:sticky;float:right;top:0;width:44px;height:44px;border-radius:50%;border:1px solid rgba(232,194,112,.24);background:rgba(255,255,255,.07);color:#fff;font-size:28px;cursor:pointer;line-height:1;z-index:2}.modal-layout{display:grid;grid-template-columns:420px 1fr;gap:28px;align-items:start;clear:both}.cover{width:100%;aspect-ratio:1/1;border-radius:28px;object-fit:cover;background:radial-gradient(circle at 35% 25%,rgba(240,210,139,.32),transparent 22%),linear-gradient(135deg,#141a28,#2b1e12 58%,#090b11);border:1px solid rgba(232,194,112,.18);box-shadow:0 24px 70px rgba(0,0,0,.42)}.article-meta{display:flex;gap:9px;flex-wrap:wrap;margin:4px 0 16px}.modal h2{font-size:clamp(34px,5vw,62px);line-height:.95;margin:12px 0 16px;letter-spacing:-.06em;color:#fff}.article-text{font-size:17px;line-height:1.7;color:#d8ccbb}.article-text p{margin:0 0 16px}.slots-title{margin:26px 0 12px;font-size:22px;letter-spacing:-.04em}.photo-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.photo-slot{position:relative;min-height:140px;border-radius:20px;overflow:hidden;background:rgba(255,255,255,.055);border:1px dashed rgba(232,194,112,.25);display:grid;place-items:center;color:var(--muted);font-size:13px;text-align:center;padding:12px}.photo-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.photo-slot input{position:absolute;inset:0;opacity:0;cursor:pointer}.slot-note{font-size:13px;color:var(--muted);line-height:1.55;margin-top:12px}.footer{padding:30px 0 45px;color:#bfb5a7;background:#05060a;border-top:1px solid rgba(232,194,112,.12)}.footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}.footer a{color:#f0d28b;text-decoration:none}@media(max-width:1180px){.news-grid{grid-template-columns:repeat(2,1fr)}.modal-layout{grid-template-columns:1fr}.cover{max-width:520px}.nav-links{display:none}}@media(max-width:680px){.wrap{width:min(100% - 24px,1440px)}.hero{padding-top:42px}.news-grid{grid-template-columns:1fr}.news-thumb{width:100%;height:auto;aspect-ratio:1/1}.photo-slots{grid-template-columns:1fr 1fr}.btn{width:100%}.nav{border-radius:24px;align-items:flex-start}.brand{white-space:normal}}@media(max-width:420px){.photo-slots{grid-template-columns:1fr}}
+  
+.admin-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.empty-state{padding:42px;border-radius:var(--r);border:1px dashed rgba(232,194,112,.24);background:rgba(255,255,255,.035);color:var(--muted);text-align:center;line-height:1.55}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.form-grid label.full{grid-column:1/-1}
+.label{display:block;color:var(--gold2);font-size:12px;font-weight:950;text-transform:uppercase;letter-spacing:.12em;margin:0 0 7px}
+.field,.textarea{width:100%;padding:14px 15px;border-radius:16px;border:1px solid rgba(232,194,112,.18);background:rgba(255,255,255,.06);color:var(--text);outline:none;font-size:15px}
+.textarea{min-height:180px;resize:vertical;line-height:1.55}
+.file-field{padding:14px;border-radius:16px;border:1px dashed rgba(232,194,112,.28);background:rgba(255,255,255,.045);color:var(--muted)}
+.file-field input{width:100%;color:var(--muted)}
+.request-card{padding:18px;border-radius:22px;background:rgba(255,255,255,.055);border:1px solid rgba(232,194,112,.15);margin:12px 0}
+.request-card h3{margin:0 0 8px;font-size:22px;letter-spacing:-.04em}
+.request-card p{color:var(--muted);line-height:1.55;margin:8px 0}
+.request-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.news-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.news-gallery img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:18px;border:1px solid rgba(232,194,112,.16)}
+.preview-cover{width:160px;height:160px;border-radius:22px;object-fit:cover;border:1px solid rgba(232,194,112,.18);display:none;margin-top:10px}
+.btn.danger{background:rgba(255,107,107,.14);border-color:rgba(255,107,107,.35);color:#ffd3d3}
+@media(max-width:680px){.form-grid{grid-template-columns:1fr}.admin-actions{display:grid}.news-gallery{grid-template-columns:1fr 1fr}}
+
+  
+.news-modal-top{z-index:15000!important}
+.custom-alert{
+  position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.72);
+  backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:22px
+}
+.custom-alert.show{display:flex}
+.custom-alert-box{
+  width:min(460px,100%);padding:28px;border-radius:28px;
+  background:linear-gradient(180deg,rgba(17,22,34,.98),rgba(9,12,19,.98));
+  border:1px solid rgba(232,194,112,.24);box-shadow:0 35px 110px rgba(0,0,0,.62);text-align:center
+}
+.custom-alert-box h3{margin:0 0 10px;font-size:28px;color:var(--gold2);letter-spacing:-.04em}
+.custom-alert-box p{margin:0 0 20px;color:var(--muted);line-height:1.55}
+.news-admin-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.news-card-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+
+  
+.custom-confirm{
+  position:fixed;inset:0;z-index:21000;background:rgba(0,0,0,.75);
+  backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:20px
+}
+.custom-confirm.show{display:flex}
+.custom-confirm-box{
+  width:min(460px,100%);
+  padding:28px;border-radius:28px;
+  background:linear-gradient(180deg,rgba(17,22,34,.98),rgba(9,12,19,.98));
+  border:1px solid rgba(232,194,112,.24);
+  box-shadow:0 35px 110px rgba(0,0,0,.62);
+  text-align:center
+}
+.custom-confirm-box h3{margin:0 0 10px;color:var(--gold2)}
+.custom-confirm-actions{display:flex;gap:12px;justify-content:center;margin-top:18px}
+
+
+/* FIX NEWS MODAL: галерея под основной картинкой, текст справа, без обрезки */
+.modal-layout{
+  grid-template-columns:minmax(280px,420px) 1fr !important;
+  align-items:start !important;
+}
+.cover{
+  object-fit:contain !important;
+  background:rgba(255,255,255,.04) !important;
+}
+.left-gallery-title{
+  margin:16px 0 10px;
+  font-size:16px;
+  color:var(--gold2);
+  letter-spacing:-.02em;
+}
+.news-gallery{
+  display:grid !important;
+  grid-template-columns:repeat(3,1fr) !important;
+  gap:8px !important;
+  margin-top:0 !important;
+}
+.news-gallery img{
+  width:100% !important;
+  aspect-ratio:1/1 !important;
+  object-fit:contain !important;
+  background:rgba(255,255,255,.045) !important;
+  border-radius:14px !important;
+  border:1px solid rgba(232,194,112,.16) !important;
+  cursor:pointer !important;
+  padding:4px !important;
+}
+.news-gallery img:hover{
+  border-color:rgba(240,210,139,.55) !important;
+  transform:translateY(-2px);
+}
+.slots-title{display:none !important;}
+.news-image-viewer{
+  position:fixed;
+  inset:0;
+  z-index:25000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(0,0,0,.88);
+  backdrop-filter:blur(12px);
+}
+.news-image-viewer.show{display:flex;}
+.news-image-viewer img{
+  max-width:min(1100px,94vw);
+  max-height:88vh;
+  object-fit:contain;
+  border-radius:22px;
+  border:1px solid rgba(232,194,112,.22);
+  background:rgba(255,255,255,.04);
+  box-shadow:0 35px 110px rgba(0,0,0,.65);
+}
+.news-image-viewer-close{
+  position:fixed;
+  top:24px;
+  right:24px;
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  border:1px solid rgba(232,194,112,.24);
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  font-size:30px;
+  cursor:pointer;
+}
+@media(max-width:1180px){
+  .modal-layout{grid-template-columns:1fr !important;}
+  .cover{max-width:520px;}
+  .news-gallery{max-width:520px;}
+}
+
+
+/* FINAL FIX: media gallery under cover, no crop, GIF/video support */
+.news-gallery .media-thumb,
+.news-gallery img{
+  width:100% !important;
+  aspect-ratio:1/1 !important;
+  object-fit:contain !important;
+  background:rgba(255,255,255,.045) !important;
+  border-radius:14px !important;
+  border:1px solid rgba(232,194,112,.16) !important;
+  cursor:pointer !important;
+  padding:4px !important;
+}
+.media-thumb-wrap{position:relative}
+.media-play-badge{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(0,0,0,.58);border:1px solid rgba(240,210,139,.45);
+  color:#f0d28b;pointer-events:none;font-weight:950
+}
+.news-image-viewer video{
+  max-width:min(1100px,94vw);
+  max-height:88vh;
+  object-fit:contain;
+  border-radius:22px;
+  border:1px solid rgba(232,194,112,.22);
+  background:#000;
+  box-shadow:0 35px 110px rgba(0,0,0,.65);
+}
+.news-card{display:block;width:100%}
+.news-admin-actions .btn{width:auto}
+
+
+/* FINAL FIX: hide footer and keep edit form above news modal */
+
+#formModal{z-index:26000!important}
+#formModal.show{display:flex!important}
+#newsModal{z-index:9999}
+#requestsModal{z-index:9999}
+#customConfirm{z-index:30000!important}
+#customAlert{z-index:31000!important}
+.news-image-viewer{z-index:32000!important}
+
+
+/* FINAL SAVE FIX */
+
+#formModal{z-index:26000!important}
+#customConfirm{z-index:30000!important}
+#customAlert{z-index:31000!important}
+
+
+/* FIX: news card images not cropped */
+.news-thumb{
+  width:100%;
+  height:auto !important;
+  object-fit:contain !important;
+  background:rgba(255,255,255,.04);
+  border-radius:20px;
+}
+.news-card img{
+  object-fit:contain !important;
+}
+
+
+/* FIX: text stays inside article column and expands modal downward */
+.modal-box{
+  overflow:auto !important;
+  overflow-x:hidden !important;
+}
+.modal-layout{
+  grid-template-columns:minmax(260px,420px) minmax(0,1fr) !important;
+  align-items:start !important;
+}
+.modal-layout article{
+  min-width:0 !important;
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
+}
+.article-text{
+  max-width:100% !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
+}
+.article-text p{
+  max-width:100% !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
+}
+#modalText{
+  max-width:100% !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
+}
+#modalTitle{
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
+}
+.news-comment-author{
+  font-weight:950;
+  margin-bottom:4px;
+}
+
+.news-comment-delete{
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  border:1px solid rgba(255,107,107,.35);
+  background:rgba(255,107,107,.16);
+  color:#ffd3d3;
+  font-weight:950;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<script>
+(function(){
+  function ensureNiceDialog(){
+    let root = document.getElementById('niceNativeDialog');
+    if(root) return root;
+
+    root = document.createElement('div');
+    root.id = 'niceNativeDialog';
+    root.style.cssText = `
+      position:fixed;
+      inset:0;
+      z-index:30000;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      background:rgba(0,0,0,.72);
+      backdrop-filter:blur(10px);
+    `;
+    root.innerHTML = `
+      <div style="
+        width:min(460px,100%);
+        padding:28px;
+        border-radius:28px;
+        background:linear-gradient(180deg,rgba(17,22,34,.98),rgba(9,12,19,.98));
+        border:1px solid rgba(232,194,112,.24);
+        box-shadow:0 35px 110px rgba(0,0,0,.62);
+        text-align:center;
+        color:#f4efe6;
+        font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      ">
+        <h3 id="niceNativeTitle" style="
+          margin:0 0 10px;
+          font-size:28px;
+          color:#f0d28b;
+          letter-spacing:-.04em;
+        ">Сообщение</h3>
+        <p id="niceNativeText" style="
+          margin:0 0 22px;
+          color:#b8ae9f;
+          line-height:1.55;
+          font-size:17px;
+        "></p>
+        <div id="niceNativeActions" style="
+          display:flex;
+          justify-content:center;
+          gap:12px;
+          flex-wrap:wrap;
+        "></div>
+      </div>
+    `;
+    document.body.appendChild(root);
+    return root;
+  }
+
+  window.alert = function(message){
+    const root = ensureNiceDialog();
+    document.getElementById('niceNativeTitle').textContent = 'Информация';
+    document.getElementById('niceNativeText').textContent = String(message || '');
+    document.getElementById('niceNativeActions').innerHTML = `
+      <button type="button" id="niceNativeOk" style="
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        padding:12px 28px;
+        border-radius:999px;
+        border:1px solid transparent;
+        background:linear-gradient(135deg,#d6a84f,#f0d28b);
+        color:#171008;
+        font-weight:900;
+        font-size:14px;
+        cursor:pointer;
+      ">OK</button>
+    `;
+    root.style.display = 'flex';
+    document.getElementById('niceNativeOk').onclick = () => {
+      root.style.display = 'none';
+    };
+  };
+
+  window.niceConfirm = function(message, onYes){
+    const root = ensureNiceDialog();
+    document.getElementById('niceNativeTitle').textContent = 'Подтверждение';
+    document.getElementById('niceNativeText').textContent = String(message || '');
+    document.getElementById('niceNativeActions').innerHTML = `
+      <button type="button" id="niceNativeYes" style="
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        padding:12px 24px;
+        border-radius:999px;
+        border:1px solid transparent;
+        background:linear-gradient(135deg,#d6a84f,#f0d28b);
+        color:#171008;
+        font-weight:900;
+        font-size:14px;
+        cursor:pointer;
+      ">Да</button>
+      <button type="button" id="niceNativeNo" style="
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        padding:12px 24px;
+        border-radius:999px;
+        border:1px solid rgba(255,255,255,.13);
+        background:rgba(255,255,255,.06);
+        color:#f4efe6;
+        font-weight:900;
+        font-size:14px;
+        cursor:pointer;
+      ">Отмена</button>
+    `;
+    root.style.display = 'flex';
+    document.getElementById('niceNativeYes').onclick = () => {
+      root.style.display = 'none';
+      if(typeof onYes === 'function') onYes();
+    };
+    document.getElementById('niceNativeNo').onclick = () => {
+      root.style.display = 'none';
+    };
+  };
+})();
+</script>
+
+  <div class="grain"></div>
+  <nav class="nav">
+  <a class="brand" href="BerserHeroesOnline.html">
+    <span class="brand-mark">
+      <img src="Logo.png" alt="BHO" style="width:100%;height:100%;object-fit:cover;border-radius:50%">
+    </span>
+    <span>Berserk Heroes Online</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="BerserHeroesOnline.html">О сайте</a>
+    <a href="deck-builder_checked.html">База карт</a>
+    <a href="decks_select_publish.html#deck">Колоды</a>
+    <a href="meta.html#meta">(Мета тех.работа)</a>
+    <a href="tournaments.html">Турниры</a>
+    <a class="active" href="news.html">Новости</a>
+    <a id="adminPanelLink" href="admin.html" style="display:none">Админ</a>
+    <a href="BerserHeroesOnline.html#contacts">Контакты</a>
+  </div>
+
+  <div style="display:flex; gap:14px; align-items:center;">
+
+  <a class="btn ghost"
+     href="https://t.me/Paul_Eighth"
+     target="_blank"
+     style="
+       border:1px solid #d6a84f;
+       color:#d6a84f;
+       background:transparent;
+     ">
+    @Paul_Eighth
+  </a>
+
+  <a class="btn gold" href="auth.html">
+  Войти
+</a>
+
+</div>
+</nav>
+
+  <header class="hero wrap" id="top">
+    <span class="eyebrow">✦ Новости БГО</span>
+    <h1>Новости и обновления</h1>
+    <p class="lead">Короткие карточки новостей для Berserk Heroes Online. Нажми на любую новость — откроется большое окно с полной статьёй, обложкой и девятью дополнительными слотами под изображения.</p>
+  </header>
+
+
+  <main class="section wrap">
+    <div class="section-top">
+      <div><div class="kicker">Лента</div><h2>Новости</h2></div>
+      <div class="admin-actions">
+        <button type="button" class="btn gold" id="openCreateNews">Создать новость</button>
+        <button type="button" class="btn ghost" id="openSuggestNews">Предложить новость</button>
+        <button type="button" class="btn ghost" id="openRequests">Заявки</button>
+      </div>
+    </div>
+    <div class="news-grid" id="newsGrid"></div>
+    <div class="empty-state" id="emptyNews">Новостей пока нет. Создай первую новость через кнопку “Создать новость”.</div>
+  </main>
+
+  <div class="modal" id="newsModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Полная новость">
+      <button class="modal-close" id="modalClose" title="Закрыть">×</button>
+      <div class="modal-layout">
+        <div>
+          <img class="cover" id="modalCover" alt="Обложка новости">
+          <h3 class="left-gallery-title">Дополнительные изображения</h3>
+          <div class="news-gallery" id="modalGallery"></div>
+        </div>
+        <article>
+          <div class="article-meta" id="modalTags"></div>
+          <h2 id="modalTitle"></h2>
+          <div class="article-text" id="modalText"></div>
+          <div class="news-admin-actions" id="modalAdminActions"></div>
+          <div class="news-comments">
+  <h3>Комментарии</h3>
+  <div class="news-comment-list" id="newsCommentsList"></div>
+
+  <div class="news-comment-form">
+    <input class="field" id="newsCommentInput" placeholder="Написать комментарий...">
+    <button class="btn gold" onclick="addNewsComment()">Отправить</button>
+  </div>
+</div>
+        </article>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="news-image-viewer" id="newsImageViewer" aria-hidden="true">
+    <button class="news-image-viewer-close" id="newsImageViewerClose" title="Закрыть">×</button>
+    <img id="newsImageViewerImg" alt="Изображение новости">
+    <video id="newsImageViewerVideo" controls playsinline style="display:none"></video>
+  </div>
+
+  <div class="modal" id="formModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Форма новости">
+      <button class="modal-close" id="formClose" title="Закрыть">×</button>
+      <span class="eyebrow" id="formEyebrow">✦ Новость</span>
+      <h2 id="formTitle" style="font-size:clamp(34px,5vw,62px);line-height:.95;margin:12px 0 16px;letter-spacing:-.06em">Создать новость</h2>
+
+      <div class="form-grid">
+        <label class="full">
+          <span class="label">Заглавная фотография</span>
+          <div class="file-field"><input type="file" id="newsCoverInput" accept="image/*"></div>
+          <img class="preview-cover" id="coverPreview" alt="Предпросмотр обложки">
+        </label>
+
+        <label>
+          <span class="label">Название новости</span>
+          <input class="field" id="newsTitleInput" placeholder="Например: Новый турнир уже скоро">
+        </label>
+
+        <label>
+          <span class="label">Кто выпустил новость</span>
+          <input class="field" id="newsAuthorInput" placeholder="Например: Eighth#2020" readonly title="Автор берётся из профиля игрока">
+        </label>
+
+        <label class="full">
+          <span class="label">Текст новости</span>
+          <textarea class="textarea" id="newsTextInput" placeholder="Опиши новость полностью..."></textarea>
+        </label>
+
+        <label class="full">
+          <span class="label">Дополнительные медиа — до 9 штук</span>
+          <div class="file-field"><input type="file" id="newsExtraInput" accept="image/*,video/*" multiple></div>
+          <div class="slot-note">Можно выбрать до 9 изображений, GIF или видео до 5 минут. Видео в HTML-версии хранится временно до перезагрузки страницы.</div>
+        </label>
+      </div>
+
+      <div class="request-actions">
+        <button class="btn gold" id="submitNewsForm">Сохранить</button>
+        <button class="btn ghost" id="cancelNewsForm">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="requestsModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Заявки новостей">
+      <button class="modal-close" id="requestsClose" title="Закрыть">×</button>
+      <span class="eyebrow">✦ Заявки</span>
+      <h2 style="font-size:clamp(34px,5vw,62px);line-height:.95;margin:12px 0 16px;letter-spacing:-.06em">Заявки на новости</h2>
+      <p class="slot-note">Предложенные новости хранятся локально в этом браузере. После подключения сервера заявки будут видны всем админам.</p>
+      <div id="requestsList"></div>
+    </div>
+  </div>
+
+
+  
+
+<div class="custom-confirm" id="customConfirm">
+  <div class="custom-confirm-box">
+    <h3>Удалить новость?</h3>
+    <p style="margin:0;color:var(--muted);line-height:1.5">Новость будет удалена из ленты.</p>
+    <div class="custom-confirm-actions">
+      <button class="btn gold" id="confirmYes">Удалить</button>
+      <button class="btn ghost" id="confirmNo">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<div class="custom-alert" id="customAlert" aria-hidden="true">
+    <div class="custom-alert-box">
+      <h3 id="customAlertTitle">Готово</h3>
+      <p id="customAlertText">Действие выполнено.</p>
+      <button class="btn gold" id="customAlertOk">OK</button>
+    </div>
+  </div></main>
+
+  <script>
+    history.scrollRestoration = "manual";
+
+    const NEWS_KEY = 'bhoNewsPublishedV1';
+    const REQUESTS_KEY = 'bhoNewsRequestsV1';
+
+    let NEWS = [];
+    let NEWS_REQUESTS = [];
+    let formMode = 'create';
+    let editingNewsIndex = null;
+    let selectedCover = '';
+    let selectedExtras = [];
+    let currentOpenNewsIndex = null;
+    let previewingRequest = false;
+    let currentOpenMediaList = [];
+    let pendingDeleteRequestIndex = null;
+    let confirmMode = 'news';
+
+
+    function getLoggedUser(){
+      try { return JSON.parse(localStorage.getItem("user")); }
+      catch(e){ return null; }
+    }
+
+    function getUserRole(){
+      const user = getLoggedUser();
+      return user?.role || "user";
+    }
+
+    function isBanned(){
+      return getUserRole() === "banned";
+    }
+
+    function canCreateNews(){
+      return ["admin", "developer", "moderator", "creator"].includes(getUserRole());
+    }
+
+    function canEditNews(){
+      return ["admin", "developer", "moderator"].includes(getUserRole());
+    }
+
+    function canDeleteNews(){
+      return ["admin", "developer", "moderator"].includes(getUserRole());
+    }
+
+    function canSuggestNews(){
+      return isLoggedIn() && !isBanned();
+    }
+
+    function canOpenNewsRequests(){
+      const user = getLoggedUser();
+      return !!user && user.username === "Eighth#2020";
+    }
+
+    function authHeaders(){
+  return {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${localStorage.getItem("token")}`
+  };
+}
+
+function isLoggedIn(){
+  return !!localStorage.getItem("token") && !!getLoggedUser();
+}
+
+    const ADMIN_USERNAME = "Eighth#2020";
+
+    function isAdmin(){
+      const user = getLoggedUser();
+      return !!user && user.username === ADMIN_USERNAME;
+    }
+
+    function showAuthRequiredModal(text){
+      const modal = document.getElementById("authRequiredModal");
+      const message = document.getElementById("authRequiredText");
+      if(message) message.textContent = text || "Чтобы выполнить это действие, войдите в аккаунт.";
+      if(modal) modal.style.display = "flex";
+    }
+
+    function closeAuthRequiredModal(){
+      const modal = document.getElementById("authRequiredModal");
+      if(modal) modal.style.display = "none";
+    }
+
+    function goToAuth(){
+      window.location.href = "auth.html";
+    }
+
+
+    const placeholder = (title, emoji='📰') => `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#151b2a"/><stop offset=".55" stop-color="#2b1e12"/><stop offset="1" stop-color="#090b11"/></linearGradient><radialGradient id="r" cx="35%" cy="25%" r="45%"><stop stop-color="#f0d28b" stop-opacity=".45"/><stop offset="1" stop-color="#f0d28b" stop-opacity="0"/></radialGradient></defs><rect width="800" height="800" rx="70" fill="url(#g)"/><rect width="800" height="800" rx="70" fill="url(#r)"/><text x="400" y="345" text-anchor="middle" font-size="120">${emoji}</text><text x="400" y="445" text-anchor="middle" font-family="Arial" font-size="42" font-weight="700" fill="#f0d28b">${title}</text><text x="400" y="505" text-anchor="middle" font-family="Arial" font-size="26" fill="#b8ae9f">Berserk Heroes Online</text></svg>`)}`;
+
+    const grid = document.getElementById('newsGrid');
+    const emptyNews = document.getElementById('emptyNews');
+    const newsModal = document.getElementById('newsModal');
+    const formModal = document.getElementById('formModal');
+    const requestsModal = document.getElementById('requestsModal');
+
+    function saveNews(){
+      try{
+        localStorage.setItem(NEWS_KEY, JSON.stringify(NEWS));
+      }catch(error){
+        showAlert(
+          'Слишком тяжёлые файлы',
+          'Браузер не смог сохранить новость. Видео сохраняются только до перезагрузки страницы. Для постоянного хранения роликов нужен сервер.'
+        );
+        throw error;
+      }
+    }
+    function saveRequests(){ localStorage.setItem(REQUESTS_KEY, JSON.stringify(NEWS_REQUESTS)); }
+    function escapeHtml(str){ return String(str ?? '').replace(/[&<>'"]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[s])); }
+    function showAlert(title, text){
+      document.getElementById('customAlertTitle').textContent = title || 'Готово';
+      document.getElementById('customAlertText').textContent = text || '';
+      const alertBox = document.getElementById('customAlert');
+      alertBox.classList.add('show');
+      alertBox.setAttribute('aria-hidden','false');
+    }
+    function closeAlert(){
+      const alertBox = document.getElementById('customAlert');
+      alertBox.classList.remove('show');
+      alertBox.setAttribute('aria-hidden','true');
+    }
+
+    function today(){ return new Date().toLocaleDateString('ru-RU'); }
+
+    function readFileAsDataURL(file){
+      return new Promise(resolve => {
+        if(!file){ resolve(''); return; }
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    
+
+    function isDataUrlVideo(src){
+      return String(src || '').startsWith('data:video/');
+    }
+
+    function normalizeMediaItem(item){
+      if(!item) return null;
+      if(typeof item === 'string'){
+        return {type:isDataUrlVideo(item) ? 'video' : 'image', src:item};
+      }
+      return item;
+    }
+
+    function normalizeMediaList(list){
+      return (list || []).map(normalizeMediaItem).filter(Boolean);
+    }
+
+    function readVideoAsDataURL(file){
+      return new Promise((resolve, reject)=>{
+        const url = URL.createObjectURL(file);
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+
+        video.onloadedmetadata = ()=>{
+          if(video.duration > 300){
+            URL.revokeObjectURL(url);
+            reject(new Error('Видео должно быть не длиннее 5 минут.'));
+            return;
+          }
+
+          // ВАЖНО: видео не кладём в localStorage как base64.
+          // Иначе браузер превышает лимит хранилища и кнопка сохранения "не работает".
+          resolve({
+            type:'video',
+            src:url,
+            name:file.name || 'video',
+            temporary:true
+          });
+        };
+
+        video.onerror = ()=>{
+          URL.revokeObjectURL(url);
+          reject(new Error('Не удалось прочитать видео.'));
+        };
+
+        video.src = url;
+      });
+    }
+
+    async function readMediaFile(file){
+      if(!file) return null;
+
+      if(file.type && file.type.startsWith('video/')){
+        return await readVideoAsDataURL(file);
+      }
+
+      if(file.type === 'image/gif'){
+        const data = await readFileAsDataURL(file);
+        return {type:'image', src:data, name:file.name || 'gif'};
+      }
+
+      const data = await compressImage(file);
+      return {type:'image', src:data, name:file.name || 'image'};
+    }
+
+
+async function compressImage(file, maxSize = 900){
+  return new Promise(resolve=>{
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = e => img.src = e.target.result;
+
+    img.onload = ()=>{
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      if(width > height){
+        if(width > maxSize){
+          height *= maxSize / width;
+          width = maxSize;
+        }
+      } else {
+        if(height > maxSize){
+          width *= maxSize / height;
+          height = maxSize;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      resolve(dataUrl);
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+async function readManyFiles(files){
+      const arr = Array.from(files || []).slice(0,9);
+      const result = [];
+
+      for(const file of arr){
+        try{
+          const data = await readMediaFile(file);
+          if(data) result.push(data);
+        }catch(error){
+          alert(error.message || 'Не удалось добавить файл.');
+        }
+      }
+
+      return result;
+    }
+
+    function imgError(img, title, emoji){ img.onerror=null; img.src=placeholder(title, emoji); }
+
+
+    function setupNewsRoleButtons(){
+      const createBtn = document.getElementById('openCreateNews');
+      const suggestBtn = document.getElementById('openSuggestNews');
+      const requestsBtn = document.getElementById('openRequests');
+
+      if(createBtn) createBtn.style.display = canCreateNews() ? "inline-flex" : "none";
+      if(suggestBtn) suggestBtn.style.display = canSuggestNews() ? "inline-flex" : "none";
+      if(requestsBtn) requestsBtn.style.display = canOpenNewsRequests() ? "inline-flex" : "none";
+    }
+function getNewsAuthorColor(news){
+  const newsRoleColors = {
+    user: "#ffffff",
+    admin: "#6f3cff",
+    developer: "#0f7b43",
+    moderator: "#57d46a",
+    vip: "#59c8ff",
+    creator: "#ff9d42",
+    banned: "#ff4d4d"
+  };
+
+  return newsRoleColors[news.author_role || "user"] || "#ffffff";
+}
+
+function newsAuthorStarHtml(news){
+  const author = String(news.author || "").trim().toLowerCase();
+
+  if(author === "eighth#2020"){
+    return '<span style="color:#6f3cff;filter:drop-shadow(0 0 8px #6f3cff)">⭐</span> ';
+  }
+
+  if(news.author_is_partner){
+    return '<span style="color:#f0d28b;filter:drop-shadow(0 0 8px #f0d28b)">⭐</span> ';
+  }
+
+  return "";
+}
+
+function newsAuthorHtml(news){
+  return `<span style="color:${escapeHtml(getNewsAuthorColor(news))}">${newsAuthorStarHtml(news)}${escapeHtml(news.author || "Автор")}</span>`;
+}
+
+function canDeleteComment(news, comment){
+  const user = getLoggedUser();
+  if(!user) return false;
+
+  const role = user.role || "user";
+  const username = String(user.username || "").toLowerCase();
+  const newsAuthor = String(news.author || "").toLowerCase();
+
+  return (
+    username === "eighth#2020" ||
+    username === newsAuthor ||
+    ["admin", "developer", "moderator", "creator"].includes(role)
+  );
+}
+
+async function loadNewsComments(){
+  if(currentOpenNewsIndex === null) return;
+
+  const news = NEWS[currentOpenNewsIndex];
+  const box = document.getElementById("newsCommentsList");
+
+  if(!news || !box || !news.id) return;
+
+  try{
+    const response = await fetch(`http://localhost:3000/api/news/${news.id}/comments`);
+    const data = await response.json();
+
+    if(!data.ok){
+      throw new Error(data.error || "Не удалось загрузить комментарии");
+    }
+
+    news.comments = data.comments.map(comment => ({
+      id: comment.id,
+      author: comment.author_name,
+      author_role: comment.author_role || "user",
+      author_is_partner: !!comment.author_is_partner,
+      text: comment.text,
+      date: new Date(comment.created_at).toLocaleString("ru-RU")
+    }));
+
+    renderNewsComments();
+
+  }catch(error){
+    console.error(error);
+    box.innerHTML = '<div class="slot-note">Не удалось загрузить комментарии.</div>';
+  }
+}
+
+function renderNewsComments(){
+  if(currentOpenNewsIndex === null) return;
+
+  const news = NEWS[currentOpenNewsIndex];
+  const box = document.getElementById("newsCommentsList");
+  if(!news || !box) return;
+
+  const comments = Array.isArray(news.comments) ? news.comments : [];
+
+  if(!comments.length){
+    box.innerHTML = '<div class="slot-note">Комментариев пока нет.</div>';
+    return;
+  }
+
+  box.innerHTML = comments.map((comment, index) => `
+    <div class="news-comment">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;">
+          <div class="news-comment-author" style="color:${escapeHtml(getNewsAuthorColor({
+            author_role: comment.author_role || "user"
+          }))}">
+            ${newsAuthorStarHtml({
+              author: comment.author,
+              author_is_partner: comment.author_is_partner
+            })}${escapeHtml(comment.author || "Игрок")}
+          </div>
+
+          ${
+            canDeleteComment(news, comment)
+              ? `<button class="news-comment-delete" onclick="deleteNewsComment(${index})">×</button>`
+              : ``
+          }
+        </div>
+
+        <div class="news-comment-text">${escapeHtml(comment.text || "")}</div>
+        <div class="news-comment-date">${escapeHtml(comment.date || "")}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function addNewsComment(){
+  if(currentOpenNewsIndex === null) return;
+
+  if(!isLoggedIn()){
+    showAuthRequiredModal("Чтобы писать комментарии, войдите в аккаунт.");
+    return;
+  }
+
+  if(isBanned()){
+    showAuthRequiredModal("Заблокированный аккаунт не может писать комментарии.");
+    return;
+  }
+
+  const input = document.getElementById("newsCommentInput");
+  const text = String(input?.value || "").trim();
+
+  if(!text){
+    alert("Напишите комментарий");
+    return;
+  }
+
+  const user = getLoggedUser();
+  const news = NEWS[currentOpenNewsIndex];
+
+  try{
+    const response = await fetch(`http://localhost:3000/api/news/${news.id}/comments`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        user_id: user.id || null,
+        author_name: user.username,
+        author_role: user.role || "user",
+        author_is_partner: !!user.is_partner,
+        text
+      })
+    });
+
+    const data = await response.json();
+
+    if(!data.ok){
+      throw new Error(data.error || "Не удалось отправить комментарий");
+    }
+
+    input.value = "";
+    await loadNewsComments();
+
+  }catch(error){
+    console.error(error);
+    showAlert("Ошибка", error.message || "Не удалось отправить комментарий");
+  }
+}
+
+async function deleteNewsComment(index){
+  if(currentOpenNewsIndex === null) return;
+
+  const news = NEWS[currentOpenNewsIndex];
+  if(!news || !Array.isArray(news.comments)) return;
+
+  const comment = news.comments[index];
+
+  if(!canDeleteComment(news, comment)){
+    showAuthRequiredModal("Недостаточно прав для удаления комментария.");
+    return;
+  }
+
+  try{
+    const response = await fetch(`http://localhost:3000/api/news/${news.id}/comments/${comment.id}`, {
+  method: "DELETE",
+  headers: authHeaders()
+});
+
+    const data = await response.json();
+
+    if(!data.ok){
+      throw new Error(data.error || "Не удалось удалить комментарий");
+    }
+
+    await loadNewsComments();
+
+  }catch(error){
+    console.error(error);
+    showAlert("Ошибка", error.message || "Не удалось удалить комментарий");
+  }
+}
+async function loadNewsFromServer(){
+
+  try{
+
+    const response = await fetch("http://localhost:3000/api/news");
+
+    const data = await response.json();
+
+    if(!data.ok){
+      throw new Error(data.error || "Не удалось загрузить новости");
+    }
+
+    NEWS = data.news.map(n => ({
+
+      id: n.id,
+      title: n.title,
+      text: n.text,
+
+      author: n.author_name,
+      author_role: n.author_role || "user",
+      author_is_partner: !!n.author_is_partner,
+
+      cover: n.cover,
+
+      extraImages: Array.isArray(n.extra_images)
+        ? n.extra_images
+        : JSON.parse(n.extra_images || "[]"),
+
+      date: new Date(n.created_at).toLocaleDateString("ru-RU"),
+
+      comments: []
+
+    }));
+
+    console.log("NEWS FROM SERVER:", NEWS);
+
+    renderCards();
+
+  }catch(error){
+
+    console.error(error);
+
+    showAlert(
+      "Ошибка",
+      "Не удалось загрузить новости с сервера"
+    );
+
+  }
+
+}
+    function renderCards(){
+      emptyNews.style.display = NEWS.length ? 'none' : 'block';
+      grid.innerHTML = NEWS.map((n,i)=>`
+        <article class="news-card" role="button" tabindex="0" onclick="openNews(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openNews(${i});}">
+          <img class="news-thumb" src="${n.cover || placeholder(n.title)}" alt="${escapeHtml(n.title)}" onerror="imgError(this,'${escapeHtml(n.title)}','📰')">
+          <span class="news-date">${escapeHtml(n.date || '')}</span>
+          <h3>${escapeHtml(n.title)}</h3>
+          <p>${escapeHtml((n.text || '').slice(0,130))}${(n.text || '').length > 130 ? '...' : ''}</p>
+          <div class="tag-row"><span class="tag">${newsAuthorHtml(n)}</span></div>
+          <div class="news-card-actions">
+  <button type="button" class="btn gold" onclick="event.stopPropagation(); openNews(${i});">Открыть</button>
+  <button type="button" class="btn ghost" onclick="event.stopPropagation(); openNews(${i});">Обсуждение</button>
+</div>
+        </article>
+      `).join('');
+    }
+
+
+    function renderMediaGallery(mediaList){
+      return normalizeMediaList(mediaList).map((media, index)=>{
+        const src = escapeHtml(media.src || '');
+        if(media.type === 'video'){
+          return `<div class="media-thumb-wrap" data-media-index="${index}"><video class="media-thumb" src="${src}" muted playsinline></video><span class="media-play-badge">▶</span></div>`;
+        }
+        return `<img class="media-thumb" data-media-index="${index}" src="${src}" alt="Дополнительное изображение">`;
+      }).join('');
+    }
+
+    function openNews(index, fromRequest=false){
+      index = Number(index);
+      const n = NEWS[index];
+      if(!n) return;
+
+      currentOpenNewsIndex = index;
+      previewingRequest = !!fromRequest;
+      currentOpenMediaList = normalizeMediaList(n.extraImages || []);
+
+      document.getElementById('modalCover').src = n.cover || placeholder(n.title);
+      document.getElementById('modalTitle').textContent = n.title;
+      document.getElementById('modalTags').innerHTML = `<span class="news-date">${escapeHtml(n.date || '')}</span><span class="tag">${newsAuthorHtml(n)}</span>`;
+      document.getElementById('modalText').innerHTML = String(n.text || '').split('\n').filter(Boolean).map(p=>`<p>${escapeHtml(p)}</p>`).join('');
+      document.getElementById('modalGallery').innerHTML = renderMediaGallery(currentOpenMediaList) || '<p class="slot-note">Дополнительных изображений нет.</p>';
+      let modalActions = '';
+
+      if(!previewingRequest && canEditNews()){
+        modalActions += '<button class="btn gold" onclick="editPublishedNews()">Редактировать</button>';
+      }
+
+      if(!previewingRequest && canDeleteNews()){
+        modalActions += '<button class="btn danger" onclick="deletePublishedNews()">Удалить новость</button>';
+      }
+
+      document.getElementById('modalAdminActions').innerHTML = modalActions;
+loadNewsComments();
+
+      newsModal.classList.add('show');
+      newsModal.classList.add('news-modal-top');
+      newsModal.setAttribute('aria-hidden','false');
+      document.body.style.overflow='hidden';
+    }
+
+    function closeModal(modal){
+      modal.classList.remove('show');
+      modal.classList.remove('news-modal-top');
+      modal.style.zIndex = '';
+      modal.setAttribute('aria-hidden','true');
+      document.body.style.overflow='';
+    }
+
+    function clearForm(){
+      document.getElementById('newsTitleInput').value = '';
+      document.getElementById('newsAuthorInput').value = '';
+      document.getElementById('newsTextInput').value = '';
+      document.getElementById('newsCoverInput').value = '';
+      document.getElementById('newsExtraInput').value = '';
+      document.getElementById('coverPreview').style.display = 'none';
+      document.getElementById('coverPreview').src = '';
+      selectedCover = '';
+      selectedExtras = [];
+    }
+
+    function openForm(mode, editIndex = null){
+      if(!isLoggedIn()){
+        showAuthRequiredModal(mode === "suggest" ? "Чтобы предложить новость, войдите в аккаунт." : "Чтобы создавать или редактировать новости, войдите в аккаунт.");
+        return;
+      }
+
+      if(mode === "suggest" && !canSuggestNews()){
+        showAuthRequiredModal("Чтобы предложить новость, войдите в аккаунт.");
+        return;
+      }
+
+      if(mode === "create" && !canCreateNews()){
+        showAuthRequiredModal("Недостаточно прав. Создавать новости могут admin, developer, moderator и creator.");
+        return;
+      }
+
+      if(mode === "edit" && !canEditNews()){
+        showAuthRequiredModal("Недостаточно прав. Редактировать новости могут admin, developer и moderator.");
+        return;
+      }
+
+      formMode = mode;
+      editingNewsIndex = editIndex;
+      clearForm();
+
+      const loggedUser = getLoggedUser();
+      if(loggedUser && loggedUser.username){
+        document.getElementById('newsAuthorInput').value = loggedUser.username;
+      }
+
+      const isEdit = mode === 'edit';
+      const item = isEdit ? NEWS[editIndex] : null;
+
+      document.getElementById('formTitle').textContent = isEdit ? 'Редактировать новость' : (mode === 'create' ? 'Создать новость' : 'Предложить новость');
+      document.getElementById('formEyebrow').textContent = isEdit ? '✦ Редактирование' : (mode === 'create' ? '✦ Админ-публикация' : '✦ Предложение новости');
+      document.getElementById('submitNewsForm').textContent = isEdit ? 'Сохранить изменения' : (mode === 'create' ? 'Разместить новость' : 'Отправить заявку');
+
+      if(item){
+        document.getElementById('newsTitleInput').value = item.title || '';
+        document.getElementById('newsAuthorInput').value = item.author || '';
+        document.getElementById('newsTextInput').value = item.text || '';
+        selectedCover = item.cover || '';
+        selectedExtras = normalizeMediaList(item.extraImages || []);
+
+        const img = document.getElementById('coverPreview');
+        if(selectedCover){
+          img.src = selectedCover;
+          img.style.display = 'block';
+        }
+      }
+
+      formModal.classList.add('show');
+      formModal.classList.add('news-modal-top');
+      formModal.style.zIndex = '26000';
+      formModal.setAttribute('aria-hidden','false');
+      document.body.style.overflow='hidden';
+    }
+
+    async function submitForm(){
+      if(!isLoggedIn()){
+        showAuthRequiredModal("Чтобы сохранить новость, войдите в аккаунт.");
+        return;
+      }
+
+      if(formMode === "suggest" && !canSuggestNews()){
+        showAuthRequiredModal("Чтобы предложить новость, войдите в аккаунт.");
+        return;
+      }
+
+      if(formMode === "create" && !canCreateNews()){
+        showAuthRequiredModal("Недостаточно прав. Публиковать новости могут admin, developer, moderator и creator.");
+        return;
+      }
+
+      if(formMode === "edit" && !canEditNews()){
+        showAuthRequiredModal("Недостаточно прав. Редактировать новости могут admin, developer и moderator.");
+        return;
+      }
+
+      const title = document.getElementById('newsTitleInput').value.trim();
+      const author = document.getElementById('newsAuthorInput').value.trim();
+      const text = document.getElementById('newsTextInput').value.trim();
+
+      if(!title){ alert('Введите название новости'); return; }
+      if(!author){ alert('Укажите, кто выпустил новость'); return; }
+      if(!text){ alert('Напишите текст новости'); return; }
+
+      const loggedUser = getLoggedUser();
+
+const item = {
+  id: Date.now(),
+  date: today(),
+  title,
+
+  author,
+  author_role: loggedUser?.role || "user",
+  author_is_partner: !!loggedUser?.is_partner,
+
+  text,
+  cover: selectedCover || placeholder(title),
+  extraImages: selectedExtras
+};
+
+      try{
+
+  if(formMode === 'edit'){
+
+    if(editingNewsIndex !== null && NEWS[editingNewsIndex]){
+      const oldItem = NEWS[editingNewsIndex];
+
+      try{
+        const response = await fetch(`http://localhost:3000/api/news/${oldItem.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            title: item.title,
+            text: item.text,
+            cover: item.cover,
+            extra_images: item.extraImages || [],
+            author_role: item.author_role || "user",
+            author_is_partner: !!item.author_is_partner
+          })
+        });
+
+        const data = await response.json();
+
+        if(!data.ok){
+          throw new Error(data.error || "Не удалось обновить новость");
+        }
+
+        closeModal(formModal);
+        await loadNewsFromServer();
+
+        if(newsModal.classList.contains('show')){
+          openNews(editingNewsIndex);
+        }
+
+        showAlert('Готово', 'Новость обновлена на сервере.');
+
+      }catch(error){
+        console.error(error);
+        showAlert("Ошибка", error.message || "Не удалось обновить новость");
+      }
+    }
+
+  } else if(formMode === 'create'){
+
+    try{
+      const response = await fetch("http://localhost:3000/api/news", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({
+          title: item.title,
+          text: item.text,
+          cover: item.cover,
+          extra_images: item.extraImages || [],
+          author_name: item.author,
+          author_role: item.author_role || "user",
+          author_is_partner: !!item.author_is_partner
+        })
+      });
+
+      const data = await response.json();
+
+      if(!data.ok){
+        throw new Error(data.error || "Ошибка сохранения");
+      }
+
+      showAlert('Готово', 'Новость опубликована');
+      await loadNewsFromServer();
+      closeModal(formModal);
+
+    }catch(error){
+      console.error(error);
+      showAlert('Ошибка', error.message || 'Не удалось сохранить новость');
+    }
+
+  } else {
+
+    try{
+      const response = await fetch("http://localhost:3000/api/news-requests", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({
+          title: item.title,
+          text: item.text,
+          cover: item.cover,
+          extra_images: item.extraImages || [],
+          author_name: item.author,
+          author_role: item.author_role || "user",
+          author_is_partner: !!item.author_is_partner
+        })
+      });
+
+      const data = await response.json();
+
+      if(!data.ok){
+        throw new Error(data.error || "Не удалось отправить заявку");
+      }
+
+      closeModal(formModal);
+      alert("Заявка отправлена на сервер");
+
+    }catch(error){
+      console.error(error);
+      showAlert("Ошибка", error.message || "Не удалось отправить заявку");
+    }
+
+  }
+
+}catch(error){
+  console.error(error);
+}
+
+}
+
+    async function loadNewsRequests(){
+
+  try{
+
+    const response = await fetch("http://localhost:3000/api/news-requests");
+    const data = await response.json();
+
+    if(!data.ok){
+      throw new Error(data.error || "Не удалось загрузить заявки");
+    }
+
+    NEWS_REQUESTS = data.requests.map(r => ({
+
+      id: r.id,
+      title: r.title,
+      text: r.text,
+
+      author: r.author_name,
+      author_role: r.author_role || "user",
+      author_is_partner: !!r.author_is_partner,
+
+      cover: r.cover,
+
+      extraImages: Array.isArray(r.extra_images)
+        ? r.extra_images
+        : JSON.parse(r.extra_images || "[]"),
+
+      date: new Date(r.created_at).toLocaleDateString("ru-RU")
+
+    }));
+
+    renderRequests();
+
+  }catch(error){
+
+    console.error(error);
+
+    showAlert(
+      "Ошибка",
+      "Не удалось загрузить заявки"
+    );
+
+  }
+
+}
+
+function renderRequests(){
+  const list = document.getElementById('requestsList');
+
+  if(!NEWS_REQUESTS.length){
+    list.innerHTML = '<div class="empty-state">Заявок пока нет.</div>';
+    return;
+  }
+
+  list.innerHTML = NEWS_REQUESTS.map((n,i)=>`
+    <div class="request-card">
+      <span class="news-date">${escapeHtml(n.date || '')}</span>
+      <h3>${escapeHtml(n.title)}</h3>
+
+      <p><strong>Автор:</strong> ${newsAuthorHtml(n)}</p>
+
+      <p>${escapeHtml((n.text || '').slice(0,220))}${(n.text || '').length > 220 ? '...' : ''}</p>
+
+      <div class="request-actions">
+        <button class="btn gold" onclick="previewRequest(${i})">Открыть</button>
+        <button class="btn ghost" onclick="approveRequest(${i})">Опубликовать</button>
+        <button class="btn danger" onclick="deleteRequest(${i})">Удалить</button>
+      </div>
+    </div>
+  `).join('');
+}
+    async function approveRequest(index){
+  if(!canOpenNewsRequests()){
+    showAuthRequiredModal("Недостаточно прав. Размещать заявки может только Eighth#2020.");
+    return;
+  }
+
+  const request = NEWS_REQUESTS[index];
+  if(!request) return;
+
+  try{
+    const response = await fetch("http://localhost:3000/api/news", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        title: request.title,
+        text: request.text,
+        cover: request.cover,
+        extra_images: request.extraImages || [],
+        author_name: request.author,
+        author_role: request.author_role || "user",
+        author_is_partner: !!request.author_is_partner
+      })
+    });
+
+    const data = await response.json();
+
+    if(!data.ok){
+      throw new Error(data.error || "Не удалось опубликовать заявку");
+    }
+
+    await fetch(`http://localhost:3000/api/news-requests/${request.id}`, {
+      method: "DELETE"
+    });
+
+    await loadNewsRequests();
+    await loadNewsFromServer();
+
+    showAlert("Готово", "Заявка опубликована в новости.");
+
+  }catch(error){
+    console.error(error);
+    showAlert("Ошибка", error.message || "Не удалось опубликовать заявку");
+  }
+}
+
+    async function deleteRequest(index){
+  if(!canOpenNewsRequests()){
+    showAuthRequiredModal("Недостаточно прав. Удалять заявки может только Eighth#2020.");
+    return;
+  }
+
+  const request = NEWS_REQUESTS[index];
+  if(!request) return;
+
+  try{
+    const response = await fetch(`http://localhost:3000/api/news-requests/${request.id}`, {
+  method: "DELETE",
+  headers: authHeaders()
+});
+
+    const data = await response.json();
+
+    if(!data.ok){
+      throw new Error(data.error || "Не удалось удалить заявку");
+    }
+
+    await loadNewsRequests();
+
+  }catch(error){
+    console.error(error);
+    showAlert("Ошибка", error.message || "Не удалось удалить заявку");
+  }
+}
+
+    function previewRequest(index){
+      const item = NEWS_REQUESTS[index];
+      NEWS.unshift(item);
+      openNews(0, true);
+      NEWS.shift();
+    }
+
+    
+    let confirmCallback = null;
+
+    function openConfirm(title='Удалить новость?', text='Новость будет удалена из ленты.'){
+      const box = document.getElementById('customConfirm');
+      box.querySelector('h3').textContent = title;
+      const p = box.querySelector('p');
+      if(p) p.textContent = text;
+      document.getElementById('customConfirm').classList.add('show');
+    }
+
+    function closeConfirm(){
+      document.getElementById('customConfirm').classList.remove('show');
+    }
+
+    document.getElementById('confirmYes')?.addEventListener('click',()=>{
+      closeConfirm();
+      if(confirmMode === 'request'){
+        if(pendingDeleteRequestIndex !== null){
+          NEWS_REQUESTS.splice(pendingDeleteRequestIndex,1);
+          saveRequests();
+          renderRequests();
+          pendingDeleteRequestIndex = null;
+        }
+      } else {
+        actuallyDeleteNews();
+      }
+    });
+
+    document.getElementById('confirmNo')?.addEventListener('click',closeConfirm);
+
+    async function actuallyDeleteNews(){
+  if(!canDeleteNews()){
+    showAuthRequiredModal("Недостаточно прав. Удалять новости могут admin, developer и moderator.");
+    return;
+  }
+
+  if(currentOpenNewsIndex === null || previewingRequest) return;
+
+  const news = NEWS[currentOpenNewsIndex];
+
+  try{
+    const response = await fetch(`http://localhost:3000/api/news/${news.id}`, {
+  method: "DELETE",
+  headers: authHeaders()
+});
+
+    const data = await response.json();
+
+    if(!data.ok){
+      throw new Error(data.error || "Не удалось удалить новость");
+    }
+
+    closeModal(newsModal);
+    currentOpenNewsIndex = null;
+    await loadNewsFromServer();
+
+  }catch(error){
+    console.error(error);
+    showAlert("Ошибка", error.message || "Не удалось удалить новость");
+  }
+}
+function editPublishedNews(){
+      if(!canEditNews()){
+        showAuthRequiredModal("Недостаточно прав. Редактировать новости могут admin, developer и moderator.");
+        return;
+      }
+
+      if(currentOpenNewsIndex === null || previewingRequest) return;
+      openForm('edit', currentOpenNewsIndex);
+      formModal.style.zIndex = '26000';
+    }
+
+function deletePublishedNews(){
+      if(!canDeleteNews()){
+        showAuthRequiredModal("Недостаточно прав. Удалять новости могут admin, developer и moderator.");
+        return;
+      }
+ confirmMode = 'news'; openConfirm('Удалить новость?', 'Новость будет удалена из ленты.'); }
+
+    document.getElementById('openCreateNews').addEventListener('click',()=>openForm('create'));
+    document.getElementById('openSuggestNews').addEventListener('click',()=>openForm('suggest'));
+    document.getElementById('openRequests').addEventListener('click', async ()=>{
+
+  if(!canOpenNewsRequests()){
+    showAuthRequiredModal("Недостаточно прав. Заявки может открывать только Eighth#2020.");
+    return;
+  }
+
+  await loadNewsRequests();
+
+  requestsModal.classList.add('show');
+  requestsModal.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+
+});
+
+    document.getElementById('newsCoverInput').addEventListener('change', async e=>{
+      selectedCover = await readFileAsDataURL(e.target.files[0]);
+      const img = document.getElementById('coverPreview');
+      if(selectedCover){
+        img.src = selectedCover;
+        img.style.display = 'block';
+      }
+    });
+
+    document.getElementById('newsExtraInput').addEventListener('change', async e=>{
+      selectedExtras = await readManyFiles(e.target.files);
+      if(selectedExtras.length){
+        showAlert('Готово', 'Медиа добавлены: ' + selectedExtras.length);
+      }
+    });
+
+    document.getElementById('submitNewsForm').addEventListener('click',submitForm);
+    document.getElementById('customAlertOk')?.addEventListener('click',closeAlert);
+    document.getElementById('cancelNewsForm').addEventListener('click',()=>closeModal(formModal));
+    document.getElementById('modalClose').addEventListener('click',()=>closeModal(newsModal));
+    document.getElementById('formClose').addEventListener('click',()=>closeModal(formModal));
+    document.getElementById('requestsClose').addEventListener('click',()=>closeModal(requestsModal));
+
+    [newsModal, formModal, requestsModal].forEach(m=>{
+      m.addEventListener('click',e=>{ if(e.target===m) closeModal(m); });
+    });
+
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){
+        [newsModal, formModal, requestsModal].forEach(m=>m.classList.contains('show') && closeModal(m));
+        closeNewsImage();
+      }
+    });
+
+
+    function openNewsImage(src, type='image'){
+      const viewer = document.getElementById('newsImageViewer');
+      const img = document.getElementById('newsImageViewerImg');
+      const video = document.getElementById('newsImageViewerVideo');
+      if(!viewer || !img || !video) return;
+
+      img.style.display = 'none';
+      video.style.display = 'none';
+      img.src = '';
+      video.pause();
+      video.removeAttribute('src');
+
+      if(type === 'video' || String(src).startsWith('data:video/')){
+        video.src = src;
+        video.style.display = 'block';
+      } else {
+        img.src = src;
+        img.style.display = 'block';
+      }
+
+      viewer.classList.add('show');
+      viewer.setAttribute('aria-hidden','false');
+    }
+
+    function closeNewsImage(){
+      const viewer = document.getElementById('newsImageViewer');
+      const img = document.getElementById('newsImageViewerImg');
+      const video = document.getElementById('newsImageViewerVideo');
+      if(!viewer || !img || !video) return;
+      viewer.classList.remove('show');
+      viewer.setAttribute('aria-hidden','true');
+      img.src = '';
+      video.pause();
+      video.removeAttribute('src');
+    }
+
+
+    document.getElementById('modalGallery')?.addEventListener('click', e=>{
+      const target = e.target.closest('[data-media-index]');
+      if(!target) return;
+      const media = currentOpenMediaList[Number(target.dataset.mediaIndex)];
+      if(!media) return;
+      openNewsImage(media.src, media.type);
+    });
+
+    document.getElementById('newsImageViewerClose')?.addEventListener('click', closeNewsImage);
+    document.getElementById('newsImageViewer')?.addEventListener('click', e=>{
+      if(e.target.id === 'newsImageViewer') closeNewsImage();
+    });
+
+    window.openNewsImage = openNewsImage;
+    window.openNews = openNews;
+    window.imgError = imgError;
+    window.approveRequest = approveRequest;
+    window.deleteRequest = deleteRequest;
+    window.previewRequest = previewRequest;
+    window.deletePublishedNews = deletePublishedNews;
+    window.editPublishedNews = editPublishedNews;
+
+    loadNewsFromServer();
+  </script><script>
+history.scrollRestoration = "manual";
+
+window.addEventListener("load", function() {
+  const hash = window.location.hash;
+
+  if (hash) {
+    setTimeout(function() {
+      const target = document.querySelector(hash);
+      if (target) {
+        target.scrollIntoView({ behavior: "auto", block: "start" });
+      }
+    }, 100);
+  } else {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  }
+});
+</script>
+
+</div>
+
+<audio id="bgMusic" loop>
+  <source src="BGO.mp3" type="audio/mpeg">
+</audio>
+
+<button id="musicToggle" style="
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:9999;
+  padding:12px 18px;
+  border-radius:999px;
+  border:1px solid rgba(232,194,112,.2);
+  background:rgba(7,9,15,.8);
+  color:#f0d28b;
+  font-weight:900;
+  cursor:pointer;
+">
+  🔇 Звук: ВЫКЛ
+</button>
+
+<script>
+const music = document.getElementById("bgMusic");
+const btn = document.getElementById("musicToggle");
+
+let savedTime = localStorage.getItem("musicTime");
+
+// громкость
+music.volume = 1;
+
+// музыка изначально выключена
+music.muted = true;
+btn.textContent = "🔇 Звук: ВЫКЛ";
+
+// если есть время — продолжаем с него
+if (savedTime) {
+  music.currentTime = savedTime;
+}
+
+// кнопка включает / выключает музыку
+btn.addEventListener("click", () => {
+  if (music.paused) {
+    music.play();
+    music.muted = false;
+    btn.textContent = "🔊 Звук: ВКЛ";
+  } else {
+    music.muted = !music.muted;
+    btn.textContent = music.muted
+      ? "🔇 Звук: ВЫКЛ"
+      : "🔊 Звук: ВКЛ";
+  }
+});
+
+// сохраняем время каждую секунду
+setInterval(() => {
+  localStorage.setItem("musicTime", music.currentTime);
+}, 1000);
+</script>
+
+<footer class="footer" style="
+margin-top:18px;
+padding:18px 0 24px;
+border-top:1px solid rgba(232,194,112,.10);
+background:transparent;
+">
+  <div class="wrap">
+    <div style="
+      color:#bfb5a7;
+      font-size:15px;
+      line-height:1.7;
+      opacity:.9;
+    ">
+      Данный сайт является неофициальным фанатским проектом и не имеет никакого отношения к правообладателю игры Берсерк Герои Онлайн, ее лицензиатам или официальным партнерам.
+Все права на игру Берсерк Герои Онлайн, включая название, торговые марки, графические элементы и другие объекты интеллектуальной собственности, принадлежат их законным правообладателям
+    </div>
+  </div>
+</footer>
+
+
+<div id="authRequiredModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.72);
+backdrop-filter:blur(10px);
+z-index:99999;
+justify-content:center;
+align-items:center;
+padding:24px;
+">
+  <div style="
+  width:min(460px,100%);
+  background:#0b1019;
+  border:1px solid rgba(232,194,112,.22);
+  border-radius:30px;
+  padding:34px;
+  text-align:center;
+  box-shadow:0 30px 90px rgba(0,0,0,.55);
+  ">
+    <h2 style="
+    margin:0 0 12px;
+    color:#f0d28b;
+    font-size:30px;
+    letter-spacing:-.04em;
+    ">Нужно войти</h2>
+
+    <p id="authRequiredText" style="
+    margin:0 0 28px;
+    color:#cfc7ba;
+    line-height:1.6;
+    ">Чтобы работать с новостями, войдите в аккаунт.</p>
+
+    <div style="
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+    ">
+      <button onclick="goToAuth()" style="
+      padding:14px 24px;
+      border:none;
+      border-radius:999px;
+      background:linear-gradient(135deg,#d6a84f,#f0d28b);
+      color:#16110a;
+      font-weight:900;
+      cursor:pointer;
+      ">Войти</button>
+
+      <button onclick="closeAuthRequiredModal()" style="
+      padding:14px 24px;
+      border-radius:999px;
+      border:1px solid #d6a84f;
+      background:transparent;
+      color:#d6a84f;
+      font-weight:900;
+      cursor:pointer;
+      ">Отмена</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="logoutModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.72);
+backdrop-filter:blur(10px);
+z-index:99999;
+justify-content:center;
+align-items:center;
+">
+
+  <div style="
+  width:420px;
+  background:#0b1019;
+  border:1px solid rgba(232,194,112,.18);
+  border-radius:30px;
+  padding:34px;
+  text-align:center;
+  box-shadow:0 30px 90px rgba(0,0,0,.55);
+  ">
+
+    <h2 style="
+    margin:0 0 12px;
+    color:#f0d28b;
+    font-size:30px;
+    ">
+      Выйти из аккаунта?
+    </h2>
+
+    <p style="
+    margin:0 0 28px;
+    color:#cfc7ba;
+    line-height:1.6;
+    ">
+      Вы действительно хотите выйти?
+    </p>
+
+    <div style="
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    ">
+
+      <button onclick="confirmLogout()" style="
+      padding:14px 24px;
+      border:none;
+      border-radius:999px;
+      background:linear-gradient(135deg,#d6a84f,#f0d28b);
+      color:#16110a;
+      font-weight:900;
+      cursor:pointer;
+      ">
+        Выйти
+      </button>
+
+      <button onclick="closeLogoutModal()" style="
+      padding:14px 24px;
+      border-radius:999px;
+      border:1px solid #d6a84f;
+      background:transparent;
+      color:#d6a84f;
+      font-weight:900;
+      cursor:pointer;
+      ">
+        Отмена
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+
+
+<script>
+const currentUser = JSON.parse(localStorage.getItem("user"));
+if (currentUser?.role === "banned") {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  alert("Ваш аккаунт заблокирован");
+
+  window.location.href = "auth.html";
+}
+const adminLink = document.getElementById("adminPanelLink");
+
+if (
+  currentUser &&
+  currentUser.username === "Eighth#2020" &&
+  adminLink
+) {
+  adminLink.style.display = "inline-flex";
+}
+
+const roleColors = {
+  user: "#ffffff",
+  admin: "#6f3cff",
+  developer: "#0f7b43",
+  moderator: "#57d46a",
+  vip: "#59c8ff",
+  creator: "#ff9d42",
+  banned: "#ff4d4d"
+};
+function userStarHtml(user){
+  if(!user) return "";
+
+  if(user.username === "Eighth#2020"){
+    return '<span style="color:#6f3cff;filter:drop-shadow(0 0 8px #6f3cff)">⭐</span> ';
+  }
+
+  if(user.is_partner){
+    return '<span style="color:#f0d28b;filter:drop-shadow(0 0 8px #f0d28b)">⭐</span> ';
+  }
+
+  return "";
+}
+function findAuthButton(){
+  const buttons = document.querySelectorAll("a.btn");
+
+  for (const btn of buttons) {
+    const text = btn.textContent.trim();
+    const href = btn.getAttribute("href");
+
+    if (
+      href === "auth.html" ||
+      text === "Войти" ||
+      (currentUser && text === currentUser.username)
+    ) {
+      return btn;
+    }
+  }
+
+  return null;
+}
+
+const authBtn = findAuthButton();
+
+if(currentUser && authBtn){
+
+  authBtn.innerHTML = userStarHtml(currentUser) + currentUser.username;
+
+  authBtn.classList.remove("gold");
+  authBtn.classList.add("ghost");
+
+  authBtn.style.background = "rgba(255,255,255,.06)";
+  authBtn.style.border = "1px solid rgba(232,194,112,.35)";
+  authBtn.style.boxShadow = "none";
+  authBtn.style.color = roleColors[currentUser.role] || "#ffffff";
+
+  authBtn.href = "#";
+
+  authBtn.onclick = function(e){
+    e.preventDefault();
+    document.getElementById("logoutModal").style.display = "flex";
+  };
+}
+
+function confirmLogout(){
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  location.reload();
+}
+
+function closeLogoutModal(){
+  document.getElementById("logoutModal").style.display = "none";
+}
+</script>
+
+
+</body>
+</html>

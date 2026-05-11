@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Berserk Heroes Online — Админ-панель</title>
+  <style>
+    :root{
+      --bg:#07090f;
+      --text:#f4efe6;
+      --muted:#b8ae9f;
+      --gold:#d6a84f;
+      --gold2:#f0d28b;
+      --line:rgba(232,194,112,.18);
+      --red:#ff6b6b;
+      --green:#7bd88f;
+      --panel:#111622;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 82% 7%,rgba(124,108,255,.18),transparent 32%),
+        radial-gradient(circle at 18% 16%,rgba(224,120,48,.16),transparent 30%),
+        linear-gradient(180deg,#05060a,#0a0d15 45%,#07090f);
+      min-height:100vh;
+    }
+
+    .wrap{
+      width:min(1200px,calc(100% - 36px));
+      margin:auto;
+      position:relative;
+      z-index:1;
+    }
+
+    .nav{
+      position:sticky;
+      top:14px;
+      z-index:50;
+      margin:14px auto 0;
+      width:min(1200px,calc(100% - 28px));
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:11px 13px 11px 16px;
+      background:rgba(9,12,19,.78);
+      backdrop-filter:blur(18px);
+      border:1px solid var(--line);
+      border-radius:999px;
+      box-shadow:0 16px 45px rgba(0,0,0,.34);
+    }
+
+    .brand{
+      display:flex;
+      gap:11px;
+      align-items:center;
+      color:var(--text);
+      text-decoration:none;
+      font-weight:950;
+      white-space:nowrap;
+    }
+
+    .brand-mark{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg,#23190d,#d6a84f);
+      color:#07090f;
+      overflow:hidden;
+    }
+
+    .brand-mark img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      border-radius:50%;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:12px 18px;
+      border-radius:999px;
+      border:1px solid transparent;
+      text-decoration:none;
+      font-weight:900;
+      transition:.25s;
+      cursor:pointer;
+      white-space:nowrap;
+      font-size:14px;
+    }
+
+    .btn.gold{
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      color:#171008;
+      box-shadow:0 16px 42px rgba(214,168,79,.22);
+    }
+
+    .btn.ghost{
+      background:rgba(255,255,255,.06);
+      border-color:rgba(255,255,255,.13);
+      color:var(--text);
+    }
+
+    .btn.red{
+      background:rgba(255,107,107,.12);
+      border-color:rgba(255,107,107,.28);
+      color:#ffd7d7;
+    }
+
+    .btn:hover{transform:translateY(-2px)}
+
+    .hero{
+      padding:64px 0 28px;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      padding:8px 12px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(214,168,79,.08);
+      font-size:13px;
+      font-weight:900;
+      color:var(--gold2);
+    }
+
+    h1{
+      font-size:clamp(42px,6vw,76px);
+      line-height:.95;
+      margin:18px 0 16px;
+      letter-spacing:-.07em;
+      background:linear-gradient(135deg,#fff 15%,#f0d28b 58%,#b16b2c);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .lead{
+      font-size:clamp(17px,2vw,21px);
+      line-height:1.55;
+      color:#d7cec0;
+      max-width:900px;
+    }
+
+    .panel{
+      background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.045));
+      border:1px solid rgba(232,194,112,.15);
+      border-radius:24px;
+      box-shadow:0 22px 60px rgba(0,0,0,.22);
+      backdrop-filter:blur(10px);
+      padding:18px;
+      margin-bottom:24px;
+    }
+
+    .topline{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .topline h2{
+      margin:0;
+      font-size:28px;
+      letter-spacing:-.04em;
+    }
+
+    .table-wrap{
+      overflow:auto;
+      border-radius:18px;
+      border:1px solid rgba(232,194,112,.14);
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:850px;
+      background:rgba(255,255,255,.025);
+    }
+
+    th,td{
+      padding:14px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      text-align:left;
+      vertical-align:middle;
+    }
+
+    th{
+      color:var(--gold2);
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.1em;
+      background:rgba(214,168,79,.08);
+    }
+
+    td{
+      color:#f4efe6;
+      font-weight:750;
+    }
+
+    tr:last-child td{border-bottom:none}
+
+    .muted{
+      color:var(--muted);
+      font-weight:650;
+      font-size:13px;
+    }
+
+    select{
+      width:160px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(232,194,112,.18);
+      background:#111622;
+      color:var(--text);
+      outline:none;
+      font-weight:800;
+    }
+
+    .role-pill{
+      display:inline-flex;
+      align-items:center;
+      height:32px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      font-weight:950;
+    }
+
+    .actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .notice{
+      margin-top:14px;
+      padding:14px 16px;
+      border-radius:18px;
+      background:rgba(214,168,79,.08);
+      border:1px solid rgba(214,168,79,.18);
+      color:#d7cec0;
+      line-height:1.5;
+    }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      z-index:99999;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:rgba(0,0,0,.72);
+      backdrop-filter:blur(10px);
+    }
+
+    .modal.show{display:flex}
+
+    .modal-box{
+      width:min(460px,100%);
+      padding:28px;
+      border-radius:28px;
+      background:linear-gradient(180deg,rgba(17,22,34,.98),rgba(9,12,19,.98));
+      border:1px solid rgba(232,194,112,.24);
+      box-shadow:0 35px 110px rgba(0,0,0,.62);
+      text-align:center;
+    }
+
+    .modal-box h3{
+      margin:0 0 10px;
+      font-size:28px;
+      color:var(--gold2);
+      letter-spacing:-.04em;
+    }
+
+    .modal-box p{
+      margin:0 0 22px;
+      color:var(--muted);
+      line-height:1.55;
+      font-size:17px;
+    }
+
+    .modal-actions{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    @media(max-width:680px){
+      .nav{border-radius:24px;align-items:flex-start}
+      .brand{white-space:normal}
+      .btn{width:100%}
+      .actions{display:grid}
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="nav">
+    <a class="brand" href="BerserHeroesOnline.html">
+      <span class="brand-mark">
+        <img src="Logo.png" alt="BHO" onerror="this.remove();this.parentElement.textContent='⚔️'">
+      </span>
+      <span>Berserk Heroes Online</span>
+    </a>
+
+    <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+      <a class="btn gold" href="BerserHeroesOnline.html">На сайт</a>
+      <a class="btn gold" href="auth.html">Войти</a>
+    </div>
+  </nav>
+
+  <header class="hero wrap">
+    <span class="eyebrow">✦ Админ-панель</span>
+    <h1>Управление ролями</h1>
+    <p class="lead">
+      Здесь админ может выдавать роли игрокам, ставить VIP, модератора, разработчика, тестера, партнёра или блокировать аккаунт ролью banned.
+    </p>
+  </header>
+
+  <main class="wrap">
+    <section class="panel">
+      <div class="topline">
+        <h2>Игроки</h2>
+        <button class="btn gold" onclick="loadUsers()">Обновить список</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Ник</th>
+              <th>Email</th>
+              <th>Роль</th>
+              <th>Новая роль</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody id="usersBody">
+            <tr>
+              <td colspan="6" class="muted">Загрузка...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="notice">
+        Если поставить роль <b>banned</b>, аккаунт считается заблокированным. Позже добавим запрет входа для banned прямо в server.js.
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="infoModal">
+    <div class="modal-box">
+      <h3 id="infoTitle">Информация</h3>
+      <p id="infoText"></p>
+      <div class="modal-actions">
+        <button class="btn gold" onclick="closeInfo()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:3000";
+    const ADMIN_USERNAME = "Eighth#2020";
+
+    const roleColors = {
+  user: "#ffffff",
+  admin: "#6f3cff",
+  developer: "#0f7b43",
+  moderator: "#57d46a",
+  vip: "#59c8ff",
+  creator: "#ff9d42",
+  banned: "#ff4d4d"
+};
+
+    const roles = [
+  "user",
+  "admin",
+  "developer",
+  "moderator",
+  "vip",
+  "creator",
+  "banned"
+];
+
+    const currentUser = JSON.parse(localStorage.getItem("user"));
+    function getUserRole(){
+  const user = JSON.parse(localStorage.getItem("user"));
+  return user?.role || "user";
+}
+
+function isOwnerAdmin(){
+  const user = JSON.parse(localStorage.getItem("user"));
+  return user?.username === "Eighth#2020";
+}
+
+function canModerateContent(){
+  return ["admin", "developer", "moderator"].includes(getUserRole());
+}
+
+function canCreateContent(){
+  return ["admin", "developer", "moderator", "creator"].includes(getUserRole());
+}
+function userStarHtml(user){
+  if(!user) return "";
+
+  if(user.username === ADMIN_USERNAME){
+    return '<span style="color:#6f3cff;filter:drop-shadow(0 0 8px #6f3cff)">⭐</span> ';
+  }
+
+  if(user.is_partner){
+    return '<span style="color:#f0d28b;filter:drop-shadow(0 0 8px #f0d28b)">⭐</span> ';
+  }
+
+  return "";
+}
+    if (currentUser?.role === "banned") {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  alert("Ваш аккаунт заблокирован");
+
+  window.location.href = "auth.html";
+}
+
+    function showInfo(title, text){
+      document.getElementById("infoTitle").textContent = title || "Информация";
+      document.getElementById("infoText").textContent = text || "";
+      document.getElementById("infoModal").classList.add("show");
+    }
+
+    function closeInfo(){
+      document.getElementById("infoModal").classList.remove("show");
+    }
+
+    function checkAdmin(){
+      if(!currentUser || currentUser.username !== ADMIN_USERNAME){
+        showInfo("Недостаточно прав", "Эта страница доступна только администратору Eighth#2020.");
+        document.getElementById("usersBody").innerHTML = `
+          <tr>
+            <td colspan="6" class="muted">Недостаточно прав.</td>
+          </tr>
+        `;
+        return false;
+      }
+
+      return true;
+    }
+
+    function renderRoleSelect(user){
+      return `
+        <select
+  class="select"
+  id="role-${user.id}"
+  ${user.username === "Eighth#2020" ? "disabled" : ""}
+>
+  ${roles.map(role => `
+    <option value="${role}" ${user.role === role ? "selected" : ""}>
+      ${role}
+    </option>
+  `).join("")}
+</select>
+      `;
+    }
+
+    function renderUsers(users){
+      const body = document.getElementById("usersBody");
+
+      if(!users.length){
+        body.innerHTML = `
+          <tr>
+            <td colspan="6" class="muted">Пользователей нет.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      body.innerHTML = users.map(user => `
+        <tr>
+          <td>${user.id}</td>
+          <td style="color:${roleColors[user.role] || "#ffffff"}">${userStarHtml(user)}${user.username}</td>
+          <td class="muted">${user.email || "—"}</td>
+          <td>
+            <span class="role-pill" style="color:${roleColors[user.role] || "#ffffff"}">
+              ${user.role || "user"}
+            </span>
+          </td>
+          <td>${renderRoleSelect(user)}</td>
+          <td>
+            <div class="actions">
+              <button class="btn gold" onclick="changeRole(${user.id})">Сохранить</button>
+
+${user.username === ADMIN_USERNAME ? "" : `
+  <button class="btn ghost" onclick="togglePartner(${user.id}, ${user.is_partner ? "false" : "true"})">
+    ${user.is_partner ? "Убрать ⭐" : "Дать ⭐"}
+  </button>
+`}
+
+${user.username === ADMIN_USERNAME ? "" : `<button class="btn ghost" onclick="quickBan(${user.id})">Бан</button>`}
+              ${user.username === ADMIN_USERNAME ? "" : `<button class="btn red" onclick="deleteUser(${user.id}, '${String(user.username).replace(/'/g, "\\'")}')">Удалить</button>`}
+            </div>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    async function loadUsers(){
+      if(!checkAdmin()) return;
+
+      try{
+        const response = await fetch(`${API_URL}/admin/users`, {
+          headers: {
+            "x-admin-username": currentUser.username
+          }
+        });
+
+        const data = await response.json();
+
+        if(!response.ok){
+          showInfo("Ошибка", data.error || "Не удалось загрузить пользователей.");
+          return;
+        }
+
+        renderUsers(data);
+      }catch(error){
+        console.error(error);
+        showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
+      }
+    }
+
+    async function changeRole(userId){
+      if(!checkAdmin()) return;
+
+      const role = document.getElementById(`role-${userId}`).value;
+
+      try{
+        const response = await fetch(`${API_URL}/admin/users/${userId}/role`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-username": currentUser.username
+          },
+          body: JSON.stringify({ role })
+        });
+
+        const data = await response.json();
+
+        if(!response.ok){
+          showInfo("Ошибка", data.error || "Не удалось изменить роль.");
+          return;
+        }
+
+        showInfo("Готово", `Роль игрока ${data.username} изменена на ${data.role}.`);
+        loadUsers();
+      }catch(error){
+        console.error(error);
+        showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
+      }
+    }
+async function togglePartner(userId, isPartner){
+  if(!checkAdmin()) return;
+
+  try{
+    const response = await fetch(`${API_URL}/admin/users/${userId}/partner`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-username": currentUser.username
+      },
+      body: JSON.stringify({ is_partner: !!isPartner })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      showInfo("Ошибка", data.error || "Не удалось изменить партнёрскую звезду.");
+      return;
+    }
+
+    showInfo("Готово", `${data.username}: ${data.is_partner ? "звезда выдана" : "звезда убрана"}.`);
+    loadUsers();
+  }catch(error){
+    console.error(error);
+    showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
+  }
+}
+    async function quickBan(userId){
+      document.getElementById(`role-${userId}`).value = "banned";
+      await changeRole(userId);
+    }
+
+    async function deleteUser(userId, username){
+      if(!checkAdmin()) return;
+
+      const ok = confirm(`Удалить аккаунт ${username}?`);
+      if(!ok) return;
+
+      try{
+        const response = await fetch(`${API_URL}/admin/users/${userId}`, {
+          method: "DELETE",
+          headers: {
+            "x-admin-username": currentUser.username
+          }
+        });
+
+        const data = await response.json();
+
+        if(!response.ok){
+          showInfo("Ошибка", data.error || "Не удалось удалить аккаунт.");
+          return;
+        }
+
+        showInfo("Готово", `Аккаунт ${data.user.username} удалён.`);
+        loadUsers();
+      }catch(error){
+        console.error(error);
+        showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
+      }
+    }
+
+    function setupAuthButton(){
+      const authBtn = document.querySelector('a[href="auth.html"]');
+
+      if(currentUser && authBtn){
+        authBtn.innerHTML = userStarHtml(currentUser) + currentUser.username;
+        authBtn.classList.remove("gold");
+        authBtn.classList.add("ghost");
+        authBtn.style.background = "rgba(255,255,255,.06)";
+        authBtn.style.border = "1px solid rgba(232,194,112,.35)";
+        authBtn.style.boxShadow = "none";
+        authBtn.style.color = roleColors[currentUser.role] || "#ffffff";
+        authBtn.href = "#";
+
+        authBtn.onclick = function(e){
+          e.preventDefault();
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          location.href = "auth.html";
+        };
+      }
+    }
+
+    setupAuthButton();
+    loadUsers();
+  </script>
+</body>
+</html>

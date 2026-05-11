@@ -1,0 +1,1494 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Berserk Heroes Online — Конструктор колоды</title>
+  <meta name="description" content="Конструктор колод Berserk Heroes Online: база карт, фильтры по стоимости, атаке, здоровью, стихиям, сетам, тексту и сохранение колоды.">
+  <meta name="theme-color" content="#07090f">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307090f'/%3E%3Ctext x='50' y='66' text-anchor='middle' font-size='58'%3E%F0%9F%83%8F%3C/text%3E%3C/svg%3E">
+  <style>
+    :root{--bg:#07090f;--bg2:#0b0f18;--panel:#111622;--panel2:#151b2a;--text:#f4efe6;--muted:#b8ae9f;--gold:#d6a84f;--gold2:#f0d28b;--ember:#e07830;--violet:#7c6cff;--red:#ff6b6b;--green:#7bd88f;--line:rgba(232,194,112,.18);--r:24px;--shadow:0 30px 90px rgba(0,0,0,.42)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at 82% 7%,rgba(124,108,255,.18),transparent 32%),radial-gradient(circle at 18% 16%,rgba(224,120,48,.16),transparent 30%),linear-gradient(180deg,#05060a,#0a0d15 45%,#07090f);min-height:100vh}.grain{position:fixed;inset:0;background-image:radial-gradient(rgba(255,255,255,.13) 1px,transparent 1px);background-size:22px 22px;opacity:.12;pointer-events:none}.wrap{width:min(1440px,calc(100% - 36px));margin:auto;position:relative;z-index:1}.nav{position:sticky;top:14px;z-index:50;margin:14px auto 0;width:min(1440px,calc(100% - 28px));display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 13px 11px 16px;background:rgba(9,12,19,.78);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:999px;box-shadow:0 16px 45px rgba(0,0,0,.34)}.brand{display:flex;gap:11px;align-items:center;color:var(--text);text-decoration:none;font-weight:950;white-space:nowrap;letter-spacing:-.03em}.brand-mark{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#23190d,#d6a84f);color:#07090f}.nav-links{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center}.nav a{color:var(--text);text-decoration:none;font-size:14px;font-weight:750}.nav-links a{opacity:.74}.nav-links a:hover,.nav-links a.active{opacity:1;color:var(--gold2)}.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 18px;border-radius:999px;border:1px solid transparent;text-decoration:none;font-weight:900;transition:.25s;cursor:pointer;white-space:nowrap;font-size:14px}.btn.gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#171008;box-shadow:0 16px 42px rgba(214,168,79,.22)}.btn.ghost{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.13);color:var(--text)}.btn.red{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.28);color:#ffd7d7}.btn:hover{transform:translateY(-2px)}.hero{padding:58px 0 24px}.eyebrow{display:inline-flex;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(214,168,79,.08);font-size:13px;font-weight:900;color:var(--gold2)}h1{font-size:clamp(42px,6vw,76px);line-height:.95;margin:18px 0 16px;letter-spacing:-.07em;background:linear-gradient(135deg,#fff 15%,#f0d28b 58%,#b16b2c);-webkit-background-clip:text;background-clip:text;color:transparent}.lead{font-size:clamp(17px,2vw,21px);line-height:1.55;color:#d7cec0;max-width:900px}.notice{margin:12px 0 0;padding:14px 16px;border-radius:18px;background:rgba(224,120,48,.08);border:1px solid rgba(224,120,48,.2);color:#e7d5c6;font-size:14px;line-height:1.5}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px auto}.stats-card,.main-panel,.deck-panel,.filters-panel{background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.045));border:1px solid rgba(232,194,112,.15);border-radius:var(--r);box-shadow:0 22px 60px rgba(0,0,0,.22);backdrop-filter:blur(10px)}.stats-card{padding:16px}.stats-card b{display:block;font-size:14px;color:var(--gold2);line-height:1}.stats-card span{font-size:13px;color:var(--muted)}.filters-panel{padding:18px;margin:0 auto 18px}.filters-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.filters-title h2{font-size:24px;margin:0;letter-spacing:-.04em}.filters-grid{display:grid;grid-template-columns:1.2fr 1.2fr .75fr .75fr .75fr .8fr;gap:12px}.field,.select,.textarea{width:100%;padding:14px 15px;border-radius:16px;border:1px solid rgba(232,194,112,.18);background:rgba(255,255,255,.06);color:var(--text);outline:none;font-size:15px}.textarea{min-height:120px;resize:vertical;line-height:1.5}.field::placeholder{color:#8f8678}.select option{background:#111622;color:#fff}.range-group{display:grid;grid-template-columns:1fr 1fr;gap:8px}.filter-label{display:block;color:var(--gold2);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;margin:0 0 7px}.chips-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.element-chip{width:42px;height:42px;border-radius:50%;border:1px solid rgba(232,194,112,.18);background:rgba(255,255,255,.06);display:grid;place-items:center;cursor:pointer;transition:.2s;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);font-size:21px;position:relative}.element-chip:hover{transform:translateY(-2px);border-color:rgba(240,210,139,.46)}.element-chip.active{background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.3),transparent 30%),linear-gradient(135deg,#6d451b,#d6a84f);border-color:var(--gold2);box-shadow:0 0 24px rgba(214,168,79,.28)}.toggle-pill{height:42px;border-radius:999px;border:1px solid rgba(232,194,112,.18);background:rgba(255,255,255,.06);color:var(--text);font-weight:900;padding:0 14px;cursor:pointer}.toggle-pill.active{background:rgba(214,168,79,.18);border-color:var(--gold2);color:var(--gold2)}.layout{display:grid;grid-template-columns:380px minmax(0,1fr);gap:18px;align-items:start}.main-panel{grid-column:2}.deck-panel{grid-column:1;grid-row:1}.main-panel{padding:18px}.deck-panel{position:sticky;top:92px;padding:18px;max-height:calc(100vh - 108px);display:flex;flex-direction:column}.panel-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.panel-top h2{margin:0;font-size:24px;letter-spacing:-.04em}.meta{color:var(--muted);font-size:14px}.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(142px,1fr));gap:14px}.card{position:relative;overflow:hidden;border-radius:18px;border:1px solid rgba(232,194,112,.16);background:#0e1320;cursor:pointer;transition:.22s ease;min-height:260px}.card:hover{transform:translateY(-5px);border-color:rgba(240,210,139,.46);box-shadow:0 24px 55px rgba(0,0,0,.35)}.card img{width:100%;height:190px;display:block;object-fit:cover;background:radial-gradient(circle at 35% 20%,rgba(240,210,139,.25),transparent 30%),linear-gradient(135deg,#141a28,#2b1e12 58%,#090b11)}.card-body{padding:10px}.card-title{font-size:14px;font-weight:950;line-height:1.2;margin:0 0 7px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.card-info{display:flex;align-items:center;justify-content:space-between;gap:6px;color:var(--muted);font-size:12px}.badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.badge{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:26px;padding:0 7px;border-radius:999px;background:rgba(214,168,79,.16);border:1px solid rgba(214,168,79,.24);color:var(--gold2);font-weight:950;font-size:12px}.copy-badge{position:absolute;top:8px;right:8px;background:rgba(7,9,15,.75);backdrop-filter:blur(10px);border:1px solid rgba(240,210,139,.24);padding:6px 8px;border-radius:999px;font-size:12px;font-weight:900}.deck-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}.deck-head h2{margin:0;font-size:25px;letter-spacing:-.04em}.deck-count{font-size:14px;color:var(--muted);margin-top:5px}.progress{height:9px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin:0 0 14px}.progress span{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:.25s}.deck-list{overflow:auto;padding-right:3px;display:grid;gap:10px}.deck-item{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:8px;border-radius:16px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08)}.deck-item img{width:44px;height:58px;object-fit:cover;border-radius:10px;background:#111}.deck-item h3{font-size:14px;margin:0 0 4px;line-height:1.2}.deck-item p{font-size:12px;color:var(--muted);margin:0}.remove{width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,107,107,.25);background:rgba(255,107,107,.12);color:#ffd7d7;cursor:pointer;font-weight:900}.empty{padding:24px;border-radius:18px;border:1px dashed rgba(232,194,112,.22);color:var(--muted);text-align:center}.pager{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:18px}.page-indicator{color:var(--muted);font-weight:800}.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);z-index:100;background:rgba(7,9,15,.94);border:1px solid rgba(232,194,112,.22);box-shadow:0 20px 70px rgba(0,0,0,.42);padding:14px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}.card-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.86);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:24px}.card-modal-box{position:relative;width:min(980px,100%);max-height:92vh;overflow:auto;display:grid;grid-template-columns:minmax(260px,420px) 1fr;gap:28px;align-items:center;padding:26px;border-radius:32px;background:linear-gradient(180deg,rgba(17,22,34,.96),rgba(9,12,19,.96));border:1px solid rgba(232,194,112,.24);box-shadow:0 35px 110px rgba(0,0,0,.62)}.card-modal-image-wrap img{width:100%;max-height:78vh;object-fit:contain;border-radius:24px;box-shadow:0 24px 70px rgba(0,0,0,.45);display:block}.card-modal-info h2{font-size:clamp(32px,5vw,56px);line-height:.95;margin:12px 0 14px;letter-spacing:-.055em;color:#fff}.card-modal-info p{font-size:17px;line-height:1.65;color:#d8ccbb}.kicker-modal{color:var(--gold2);font-weight:950;text-transform:uppercase;letter-spacing:.12em;font-size:12px}.modal-badges{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0 18px}.modal-badges span{display:inline-flex;align-items:center;height:36px;padding:0 12px;border-radius:999px;background:rgba(214,168,79,.16);border:1px solid rgba(214,168,79,.26);color:var(--gold2);font-weight:950}.card-modal-close{position:absolute;top:14px;right:14px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(232,194,112,.24);background:rgba(255,255,255,.07);color:#fff;font-size:28px;cursor:pointer;line-height:1}.card-modal-close:hover{background:rgba(255,255,255,.14)}.create-deck-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.86);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:24px}.create-deck-modal.show{display:flex}.create-deck-box{position:relative;width:min(560px,100%);padding:28px;border-radius:32px;background:linear-gradient(180deg,rgba(17,22,34,.96),rgba(9,12,19,.96));border:1px solid rgba(232,194,112,.24);box-shadow:0 35px 110px rgba(0,0,0,.62)}.create-deck-box h2{font-size:clamp(30px,4vw,46px);line-height:.95;margin:12px 0 10px;letter-spacing:-.055em;color:#fff}.create-deck-box p{color:var(--muted);line-height:1.55}.create-deck-box label{display:block;margin-top:14px}.create-deck-box .field,.create-deck-box .textarea{margin-top:7px}.create-deck-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}@media(max-width:760px){.card-modal-box{grid-template-columns:1fr;padding:18px}.card-modal-image-wrap img{max-height:58vh}.card-modal-info h2{font-size:34px}}@media(max-width:1180px){.filters-grid{grid-template-columns:1fr 1fr 1fr}.layout{grid-template-columns:1fr}.main-panel,.deck-panel{grid-column:auto;grid-row:auto}.deck-panel{position:relative;top:auto;max-height:none}.nav-links{display:none}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:680px){.wrap{width:min(100% - 24px,1440px)}.hero{padding-top:42px}.filters-grid{grid-template-columns:1fr}.cards-grid{grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}.card img{height:160px}.card{min-height:238px}.stats{grid-template-columns:1fr}.btn{width:100%}.pager{display:grid;grid-template-columns:1fr}.nav{border-radius:24px;align-items:flex-start}.brand{white-space:normal}.element-chip{width:38px;height:38px}}
+  .custom-alert{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.78);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:24px}.custom-alert.show{display:flex}.custom-alert-box{width:min(520px,100%);padding:28px;border-radius:30px;background:linear-gradient(180deg,rgba(17,22,34,.98),rgba(9,12,19,.98));border:1px solid rgba(232,194,112,.25);box-shadow:0 35px 110px rgba(0,0,0,.62);text-align:center}.custom-alert-box h3{margin:0 0 12px;color:var(--gold2);font-size:30px;letter-spacing:-.04em}.custom-alert-box p{margin:0 0 20px;color:var(--text);line-height:1.55;font-size:17px}.stats-two{grid-template-columns:repeat(2,1fr)}.rarity-chip,.type-chip{width:42px;height:42px;border-radius:50%;border:1px solid rgba(232,194,112,.18);background:rgba(255,255,255,.06);display:grid;place-items:center;cursor:pointer;transition:.2s;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);font-size:20px;position:relative;overflow:hidden}.rarity-chip:hover,.type-chip:hover{transform:translateY(-2px);border-color:rgba(240,210,139,.46)}.rarity-chip.active,.type-chip.active{border-color:var(--gold2);box-shadow:0 0 24px rgba(214,168,79,.28),inset 0 0 0 1px rgba(255,255,255,.12)}.rarity-chip.common{background:radial-gradient(circle at 35% 30%,#59616a,#171b22 64%,#050608)}.rarity-chip.uncommon{background:radial-gradient(circle at 35% 30%,#b98355,#3b2517 64%,#090604)}.rarity-chip.rare{background:radial-gradient(circle at 35% 30%,#d7e3ef,#485463 64%,#0a0d12)}.rarity-chip.ultra{background:radial-gradient(circle at 35% 30%,#fff077,#80620c 64%,#161003)}.type-chip{background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.22),transparent 32%),linear-gradient(135deg,#14202a,#5a4a31)}.chip-label{color:var(--gold2);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;margin:0 0 7px}.filter-group-wide{grid-column:span 2}@media(max-width:1180px){.stats-two{grid-template-columns:1fr}}
+.card-cost-badge{
+  margin:8px 8px 0;
+  width:fit-content;
+  position:static;
+  top:8px;
+  left:8px;
+  z-index:2;
+  min-width:34px;
+  height:34px;
+  padding:0 10px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#171008;
+  font-weight:950;
+  font-size:14px;
+  box-shadow:0 12px 32px rgba(214,168,79,.28);
+  border:1px solid rgba(255,255,255,.2);
+}
+.creature-stats{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:8px;
+}
+.stat-sword,.stat-heart{
+  min-width:34px;
+  height:28px;
+  padding:0 8px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:950;
+  font-size:12px;
+  border:1px solid rgba(255,255,255,.12);
+}
+.stat-sword{background:rgba(124,108,255,.16);color:#d9d4ff}
+.stat-heart{background:rgba(255,107,107,.16);color:#ffd7d7}
+.card-title.element-neutral{color:#ff6b6b}
+.card-title.element-mountains{color:#7ed7ff}
+.card-title.element-forest{color:#7bd88f}
+.card-title.element-swamp{color:#54e6d1}
+.card-title.element-dark{color:#b58cff}
+.card-title.element-steppes{color:#f0d28b}
+.modal-title.element-neutral{color:#ff6b6b!important}
+.modal-title.element-mountains{color:#7ed7ff!important}
+.modal-title.element-forest{color:#7bd88f!important}
+.modal-title.element-swamp{color:#54e6d1!important}
+.modal-title.element-dark{color:#b58cff!important}
+.modal-title.element-steppes{color:#f0d28b!important}
+
+
+/* FINAL: стоимость отдельной строкой над картинкой */
+.card-cost-badge{
+  position:relative !important;
+  top:auto !important;
+  left:auto !important;
+  right:auto !important;
+  z-index:1 !important;
+
+  margin:10px auto 6px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:fit-content !important;
+
+  padding:6px 12px !important;
+  border-radius:12px !important;
+
+  background:linear-gradient(135deg,#f0d28b,#d6a84f) !important;
+  color:#171008 !important;
+  font-weight:900 !important;
+  font-size:14px !important;
+
+  box-shadow:0 8px 20px rgba(214,168,79,.25) !important;
+  border:1px solid rgba(255,255,255,.2) !important;
+}
+.card > img{
+  margin-top:0 !important;
+}
+
+
+/* FINAL tweak: стоимость слева и размер как у статов */
+.card-cost-badge{
+  position:relative !important;
+  margin:10px 0 6px 10px !important; /* сдвиг влево */
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  min-width:34px !important;
+  height:28px !important;
+  padding:0 8px !important;
+
+  border-radius:999px !important;
+
+  background:linear-gradient(135deg,#f0d28b,#d6a84f) !important;
+  color:#171008 !important;
+  font-weight:900 !important;
+  font-size:12px !important;
+
+  border:1px solid rgba(255,255,255,.12) !important;
+  box-shadow:0 6px 16px rgba(214,168,79,.25) !important;
+}
+
+
+/* FINAL tweak: стоимость полупрозрачная золотая, герои без стоимости */
+.card-cost-badge{
+  position:relative !important;
+  margin:10px 0 6px 10px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+
+  min-width:34px !important;
+  height:28px !important;
+  padding:0 8px !important;
+
+  border-radius:999px !important;
+
+  background:rgba(214,168,79,.18) !important;
+  color:#f0d28b !important;
+  font-weight:950 !important;
+  font-size:12px !important;
+
+  border:1px solid rgba(214,168,79,.32) !important;
+  box-shadow:none !important;
+}
+
+
+.stat-disabled{
+  opacity:.38;
+  filter:grayscale(1);
+  background:rgba(255,255,255,.06)!important;
+  color:#8f8678!important;
+  border-color:rgba(255,255,255,.10)!important;
+}
+
+
+.custom-confirm{
+  position:fixed;
+  inset:0;
+  z-index:20000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(12px);
+}
+.custom-confirm.show{
+  display:flex;
+}
+.confirm-box{
+  width:min(520px,100%);
+  padding:28px;
+  border-radius:30px;
+  background:linear-gradient(180deg,rgba(17,22,34,.98),rgba(9,12,19,.98));
+  border:1px solid rgba(232,194,112,.25);
+  box-shadow:0 35px 110px rgba(0,0,0,.62);
+  text-align:center;
+}
+.confirm-box h3{
+  margin:0 0 12px;
+  color:var(--gold2);
+  font-size:30px;
+  letter-spacing:-.04em;
+}
+.confirm-box p{
+  margin:0 0 22px;
+  color:var(--text);
+  line-height:1.55;
+  font-size:17px;
+}
+.confirm-actions{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+
+/* Фильтр стоимости золотыми значками */
+.cost-filter-box{
+  width:100%;
+}
+.cost-chips{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:nowrap;
+  height:42px;
+}
+.cost-chip{
+  width:30px;
+  height:30px;
+  border:0;
+  cursor:pointer;
+  color:#5a3800;
+  font-weight:950;
+  font-size:15px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  opacity:.38;
+  filter:grayscale(1) brightness(.78);
+  text-shadow:none;
+  background:
+    radial-gradient(circle at 35% 28%, #fff7a8 0 22%, #f5d34d 23% 48%, #b96c08 49% 64%, #6e2600 65% 100%);
+  clip-path:polygon(50% 0%, 90% 22%, 90% 78%, 50% 100%, 10% 78%, 10% 22%);
+  box-shadow:none;
+  transition:.2s;
+}
+.cost-chip:hover{
+  transform:translateY(-1px) scale(1.04);
+  opacity:.7;
+}
+.cost-chip.active{
+  opacity:1;
+  filter:none;
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
+  box-shadow:
+    0 0 0 2px rgba(240,210,139,.9),
+    0 0 18px rgba(240,210,139,.5);
+}
+@media(max-width:680px){
+  .cost-chips{
+    flex-wrap:wrap;
+    height:auto;
+  }
+}
+
+
+
+/* FINAL UI FIX: большие цифры статистики */
+.stats-card b{
+  font-size:52px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  color:var(--gold2) !important;
+}
+
+/* FINAL UI FIX: редкость — зеленый, синий, фиолетовый, золотой */
+.rarity-chip.common{
+  background:radial-gradient(circle at 35% 30%,#7bd88f,#1e5f3a 64%,#07140c) !important;
+  box-shadow:0 0 14px rgba(123,216,143,.45) !important;
+}
+.rarity-chip.common.active{
+  box-shadow:0 0 24px rgba(123,216,143,.85),0 0 46px rgba(123,216,143,.45) !important;
+}
+
+.rarity-chip.uncommon{
+  background:radial-gradient(circle at 35% 30%,#7ed7ff,#1f4f73 64%,#07121a) !important;
+  box-shadow:0 0 14px rgba(126,215,255,.45) !important;
+}
+.rarity-chip.uncommon.active{
+  box-shadow:0 0 24px rgba(126,215,255,.85),0 0 46px rgba(126,215,255,.45) !important;
+}
+
+.rarity-chip.rare{
+  background:radial-gradient(circle at 35% 30%,#b58cff,#3c2a73 64%,#120a1f) !important;
+  box-shadow:0 0 14px rgba(181,140,255,.45) !important;
+}
+.rarity-chip.rare.active{
+  box-shadow:0 0 24px rgba(181,140,255,.85),0 0 46px rgba(181,140,255,.45) !important;
+}
+
+.rarity-chip.ultra{
+  background:radial-gradient(circle at 35% 30%,#f0d28b,#8a6a1f 64%,#1a1405) !important;
+  box-shadow:0 0 14px rgba(240,210,139,.45) !important;
+}
+.rarity-chip.ultra.active{
+  box-shadow:0 0 24px rgba(240,210,139,.9),0 0 50px rgba(240,210,139,.5) !important;
+}
+
+/* FINAL UI FIX: золото аккуратно в один уровень */
+.cost-filter-box{
+  width:100% !important;
+}
+.cost-chips{
+  display:flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  flex-wrap:nowrap !important;
+  height:42px !important;
+}
+.cost-chip{
+  width:30px !important;
+  height:30px !important;
+  min-width:30px !important;
+  border:0 !important;
+  padding:0 !important;
+  cursor:pointer !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  color:#5a3800 !important;
+  font-size:15px !important;
+  font-weight:950 !important;
+  line-height:1 !important;
+  opacity:.36 !important;
+  filter:grayscale(1) brightness(.72) !important;
+  text-shadow:none !important;
+  background:radial-gradient(circle at 35% 28%,#fff7a8 0 22%,#f5d34d 23% 48%,#b96c08 49% 64%,#6e2600 65% 100%) !important;
+  clip-path:polygon(50% 0%,90% 22%,90% 78%,50% 100%,10% 78%,10% 22%) !important;
+  box-shadow:none !important;
+  transition:.2s !important;
+}
+.cost-chip:hover{
+  opacity:.7 !important;
+  transform:translateY(-1px) scale(1.04) !important;
+}
+.cost-chip.active{
+  opacity:1 !important;
+  filter:none !important;
+  text-shadow:0 1px 0 rgba(255,255,255,.35) !important;
+  box-shadow:0 0 0 2px rgba(240,210,139,.9),0 0 18px rgba(240,210,139,.55) !important;
+}
+@media(max-width:680px){
+  .cost-chips{
+    flex-wrap:wrap !important;
+    height:auto !important;
+  }
+}
+
+
+/* FINAL FIX: цифры статистики размером как заголовок "Фильтры" */
+.stats-card b{
+  font-size:24px !important;
+  line-height:1.1 !important;
+  font-weight:950 !important;
+}
+
+/* FINAL FIX: редкость без свечения */
+.rarity-chip.common{
+  background:radial-gradient(circle at 35% 30%,#7bd88f,#1e5f3a 64%,#07140c) !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08) !important;
+}
+.rarity-chip.uncommon{
+  background:radial-gradient(circle at 35% 30%,#7ed7ff,#1f4f73 64%,#07121a) !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08) !important;
+}
+.rarity-chip.rare{
+  background:radial-gradient(circle at 35% 30%,#b58cff,#3c2a73 64%,#120a1f) !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08) !important;
+}
+.rarity-chip.ultra{
+  background:radial-gradient(circle at 35% 30%,#f0d28b,#8a6a1f 64%,#1a1405) !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08) !important;
+}
+.rarity-chip.common.active,
+.rarity-chip.uncommon.active,
+.rarity-chip.rare.active,
+.rarity-chip.ultra.active{
+  box-shadow:0 0 0 2px rgba(240,210,139,.75), inset 0 0 0 1px rgba(255,255,255,.12) !important;
+}
+
+
+/* Deck controls (count + -) */
+.deck-item{
+  grid-template-columns:44px 1fr auto;
+}
+
+.deck-controls{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.count-btn{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  border:1px solid rgba(240,210,139,.3);
+  background:rgba(214,168,79,.15);
+  color:#f0d28b;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.count-number{
+  min-width:26px;
+  text-align:center;
+  font-weight:900;
+}
+
+
+/* Deck controls simplified */
+.deck-controls{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.count-number{
+  min-width:auto;
+  font-size:14px;
+  font-weight:900;
+  color:#f0d28b;
+}
+
+</style>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <nav class="nav">
+  <a class="brand" href="BerserHeroesOnline.html">
+    <span class="brand-mark">
+      <img src="Logo.png" alt="BHO" style="width:100%;height:100%;object-fit:cover;border-radius:50%">
+    </span>
+    <span>Berserk Heroes Online</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="BerserHeroesOnline.html">О сайте</a>
+    <a class="active" href="deck-builder_checked.html">База карт</a>
+    <a href="decks_select_publish.html#deck">Колоды</a>
+    <a href="meta.html#meta">(Мета тех.работа)</a>
+    <a href="tournaments.html">Турниры</a>
+    <a href="news.html">Новости</a>
+    <a id="adminPanelLink" href="admin.html" style="display:none">Админ</a>
+    <a href="BerserHeroesOnline.html#contacts">Контакты</a>
+  </div>
+
+  <div style="display:flex; gap:14px; align-items:center;">
+
+  <a class="btn ghost"
+     href="https://t.me/Paul_Eighth"
+     target="_blank"
+     style="
+       border:1px solid #d6a84f;
+       color:#d6a84f;
+       background:transparent;
+     ">
+    @Paul_Eighth
+  </a>
+
+  <a class="btn gold" href="auth.html">
+  Войти
+</a>
+
+</div>
+</nav>
+
+  <header class="hero wrap">
+    <span class="eyebrow">✦ Конструктор колоды БГО</span>
+    <h1>Собери свою колоду</h1>
+    <p class="lead">Фильтруй карты по стоимости, атаке, здоровью, названию, мультистихийности, сетам, стихиям и тексту. Нажимай на карты, чтобы добавлять их в колоду. Для создания нужно от 40 до 60 карт + 1 герой; герой может быть только один</p>
+  </header>
+
+  <section class="wrap stats stats-two" aria-label="Статистика">
+    <div class="stats-card"><b id="totalCards">0</b><span>всего карт в базе</span></div>
+    <div class="stats-card"><b id="shownCards">0</b><span>карт в текущем обновлении</span></div>
+  </section>
+
+  <section class="wrap filters-panel" aria-label="Фильтры карт">
+    <div class="filters-title"><h2>Фильтры</h2><button class="btn ghost" id="resetFilters">Сбросить все</button></div>
+    <div class="filters-grid">
+      <label><span class="filter-label">Название</span><input class="field" id="nameFilter" type="search" placeholder="Например: дракон"></label>
+      <label><span class="filter-label">Текст</span><input class="field" id="textFilter" type="search" placeholder="Например: найм"></label>
+      <div class="cost-filter-box">
+        <span class="filter-label">Золото</span>
+        <div class="cost-chips" id="costChips" aria-label="Фильтр стоимости">
+          <button class="cost-chip" data-cost="0" title="0 золота">0</button>
+          <button class="cost-chip" data-cost="1" title="1 золото">1</button>
+          <button class="cost-chip" data-cost="2" title="2 золота">2</button>
+          <button class="cost-chip" data-cost="3" title="3 золота">3</button>
+          <button class="cost-chip" data-cost="4" title="4 золота">4</button>
+          <button class="cost-chip" data-cost="5" title="5 золота">5</button>
+          <button class="cost-chip" data-cost="6" title="6 золота">6</button>
+          <button class="cost-chip" data-cost="7+" title="7 и больше">7+</button>
+        </div>
+      </div>
+      <label><span class="filter-label">Атака</span><div class="range-group"><input class="field" id="attackMin" type="number" min="0" placeholder="от"><input class="field" id="attackMax" type="number" min="0" placeholder="до"></div></label>
+      <label><span class="filter-label">Здоровье</span><div class="range-group"><input class="field" id="healthMin" type="number" min="0" placeholder="от"><input class="field" id="healthMax" type="number" min="0" placeholder="до"></div></label>
+      <label><span class="filter-label">Сеты</span><select class="select" id="setFilter"><option value="all">Все сеты</option></select></label>
+    </div>
+
+    <div class="chips-row">
+      <div style="width:100%">
+        <div class="chip-label">Редкость</div>
+        <div class="chips-row" id="rarityChips" aria-label="Редкость карт"></div>
+      </div>
+    </div>
+
+    <div class="chips-row">
+      <div style="width:100%">
+        <div class="chip-label">Тип карты</div>
+        <div class="chips-row" id="typeChips" aria-label="Тип карты"></div>
+      </div>
+    </div>
+
+    <div class="chips-row">
+      <div style="width:100%">
+        <div class="chip-label">Стихия</div>
+        <div class="chips-row" id="elementChips" aria-label="Стихия"></div>
+      </div>
+    </div>
+    <div class="chips-row"><button class="toggle-pill" id="multiToggle">Мультистихийность</button><span class="meta">Нажимай на значки, чтобы фильтровать карты.</span></div>
+  </section>
+
+  <main class="wrap layout">
+    <section class="main-panel" id="cards">
+      <div class="panel-top"><div><h2>База карт</h2><div class="meta" id="cardsMeta">Загрузка карт...</div></div><div class="meta">Клик по карте добавляет её в колоду</div></div>
+      <div class="cards-grid" id="cardsGrid"></div>
+      <div class="pager"><button class="btn ghost" id="prevPage">← Назад</button><span class="page-indicator" id="pageInfo">1 / 1</span><button class="btn ghost" id="nextPage">Вперёд →</button></div>
+    </section>
+
+    <aside class="deck-panel" id="deck">
+      <div class="deck-head">
+        <div>
+          <h2>Создать колоду</h2>
+          <div class="deck-count"><span id="deckCount">0</span>/<span id="maxDeckText">60</span> карт · минимум 40 + 1 герой</div>
+        </div>
+        <button class="btn red" id="clearDeck">Очистить</button>
+      </div>
+      <button class="btn gold" id="createDeck" style="width:100%;margin:0 0 14px">Создать</button>
+      <div class="progress"><span id="progressBar"></span></div>
+      <div class="deck-list" id="deckList"></div>
+    </aside>
+  </main>
+
+
+  <div class="create-deck-modal" id="createDeckModal" aria-hidden="true">
+    <div class="create-deck-box">
+      <button class="card-modal-close" id="closeCreateDeckModal" title="Закрыть">×</button>
+      <span class="eyebrow">✦ Создание колоды</span>
+      <h2>Назови свою колоду</h2>
+      <p>Название обязательно. Описание можно добавить по желанию — оно будет видно во вкладке «Колоды».</p>
+
+      <label>
+        <span class="filter-label">Название колоды</span>
+        <input class="field" id="createdDeckTitle" type="text" placeholder="Например: Тёмный контроль">
+      </label>
+
+      <label>
+        <span class="filter-label">Описание</span>
+        <textarea class="textarea" id="createdDeckDescription" placeholder="Кратко опиши стратегию колоды"></textarea>
+      </label>
+
+      <div class="create-deck-actions">
+        <button class="btn gold" id="confirmCreateDeck">Создать колоду</button>
+        <button class="btn ghost" id="cancelCreateDeck">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="custom-alert" id="customAlert" aria-hidden="true">
+    <div class="custom-alert-box">
+      <h3>Готово</h3>
+      <p id="customAlertText">Ваша колода добавлена в ваш сборник колод во вкладке «Колоды».</p>
+      <button class="btn gold" id="customAlertOk">OK</button>
+    </div>
+  </div>
+
+
+  <div class="custom-confirm" id="customConfirm" aria-hidden="true">
+    <div class="confirm-box">
+      <h3>Подтвердите действие</h3>
+      <p id="confirmText">Очистить всю колоду?</p>
+      <div class="confirm-actions">
+        <button class="btn gold" id="confirmYes">OK</button>
+        <button class="btn ghost" id="confirmNo">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  
+<div id="authRequiredModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.72);
+backdrop-filter:blur(10px);
+z-index:99999;
+justify-content:center;
+align-items:center;
+padding:24px;
+">
+  <div style="
+  width:min(460px,100%);
+  background:#0b1019;
+  border:1px solid rgba(232,194,112,.22);
+  border-radius:30px;
+  padding:34px;
+  text-align:center;
+  box-shadow:0 30px 90px rgba(0,0,0,.55);
+  ">
+    <h2 style="
+    margin:0 0 12px;
+    color:#f0d28b;
+    font-size:30px;
+    letter-spacing:-.04em;
+    ">Нужно войти</h2>
+
+    <p id="authRequiredText" style="
+    margin:0 0 28px;
+    color:#cfc7ba;
+    line-height:1.6;
+    ">Чтобы создать колоду, войдите в аккаунт.</p>
+
+    <div style="
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+    ">
+      <button onclick="goToAuth()" style="
+      padding:14px 24px;
+      border:none;
+      border-radius:999px;
+      background:linear-gradient(135deg,#d6a84f,#f0d28b);
+      color:#16110a;
+      font-weight:900;
+      cursor:pointer;
+      ">Войти</button>
+
+      <button onclick="closeAuthRequiredModal()" style="
+      padding:14px 24px;
+      border-radius:999px;
+      border:1px solid #d6a84f;
+      background:transparent;
+      color:#d6a84f;
+      font-weight:900;
+      cursor:pointer;
+      ">Отмена</button>
+    </div>
+  </div>
+</div>
+
+
+  <div class="toast" id="toast">Карта добавлена</div>
+
+  <script>
+    const MIN_DECK = 40;
+    const MAX_DECK = 60;
+    const DEFAULT_MAX_COPIES = 3;
+    const HORDE_MAX_COPIES = 5;
+    const PAGE_SIZE = 60;
+    const ELEMENTS = [
+      {id:'neutral', name:'Нейтральная', icon:'🔴'},
+      {id:'mountains', name:'Горы', icon:'❄️'},
+      {id:'forest', name:'Лес', icon:'🌳'},
+      {id:'dark', name:'Тьма', icon:'☠️'},
+      {id:'steppes', name:'Степи', icon:'☀️'},
+      {id:'swamp', name:'Болото', icon:'🦠'},
+    ];
+    const RARITIES = [
+      {id:'common', name:'Обычная', className:'common'},
+      {id:'uncommon', name:'Необычная', className:'uncommon'},
+      {id:'rare', name:'Редкая', className:'rare'},
+      {id:'ultra', name:'Ультраредкая', className:'ultra'}
+    ];
+    const CARD_TYPES = [
+      {id:'spell', name:'Заклинание', icon:'⭐', aliases:['заклинание','spell','магия']},
+      {id:'hero', name:'Герой', icon:'👑', aliases:['герой','hero']},
+      {id:'event', name:'Событие', icon:'🔔', aliases:['событие','event']},
+      {id:'creature', name:'Существо', icon:'🪖', aliases:['существо','creature','юнит']},
+      {id:'amulet', name:'Амулет', icon:'📿', aliases:['амулет','amulet']},
+      {id:'armor', name:'Броня', icon:'🛡️', aliases:['броня','armor']},
+      {id:'weapon', name:'Оружие', icon:'⚔️', aliases:['оружие','weapon']},
+      {id:'place', name:'Местность', icon:'⛱️', aliases:['местность','place','локация','location']}
+    ];
+    const ELEMENT_ALIASES = {
+      'вода':'water','water':'water',
+      'земля':'earth','earth':'earth','лес':'forest','forest':'forest','природа':'forest',
+      'тьма':'dark','dark':'dark','хаос':'dark','некро':'dark','горы':'mountains','mountains':'mountains','степи':'steppes','steppes':'steppes','болото':'swamp','swamp':'swamp',
+      'свет':'light','light':'light',
+      'жизнь':'life','life':'life',
+      'нейтральная':'neutral','нейтрал':'neutral','neutral':'neutral'
+    };
+
+    let cards = [];
+    let filteredCards = [];
+    let currentPage = 1;
+    let selectedElements = new Set();
+    let selectedRarities = new Set();
+    let selectedTypes = new Set();
+    let selectedCosts = new Set();
+    let multiOnly = false;
+    let deck = JSON.parse(localStorage.getItem('bho_deck_builder_deck') || '[]');
+    const $ = (id) => document.getElementById(id);
+
+
+    function isLoggedIn(){
+      return !!localStorage.getItem("token");
+    }
+
+    function showAuthRequiredModal(text){
+      const modal = document.getElementById("authRequiredModal");
+      const message = document.getElementById("authRequiredText");
+      if(message) message.textContent = text || "Чтобы выполнить это действие, войдите в аккаунт.";
+      if(modal) modal.style.display = "flex";
+    }
+
+    function closeAuthRequiredModal(){
+      const modal = document.getElementById("authRequiredModal");
+      if(modal) modal.style.display = "none";
+    }
+
+    function goToAuth(){
+      window.location.href = "auth.html";
+    }
+
+
+    function isHeroCard(card){
+      return String(card?.type || '').toLowerCase().includes('герой');
+    }
+
+    function isHordeCard(card){
+      return String(card?.text || '').toLowerCase().includes('орда');
+    }
+
+    function deckCardCount(){
+      return deck.filter(card => !isHeroCard(card)).length;
+    }
+
+    function maxCopiesForCard(card){
+      if(isHeroCard(card)) return 1;
+      if(isHordeCard(card)) return HORDE_MAX_COPIES;
+      return DEFAULT_MAX_COPIES;
+    }
+
+    function getSelectedHero(){
+      return deck.find(isHeroCard) || null;
+    }
+
+    function normalizeRuleArray(value){
+      return toArray(value).map(v => String(v).trim()).filter(Boolean);
+    }
+
+    function getDefaultAllowedElements(hero){
+      return [...new Set([...(hero?.elements || []), 'neutral'])];
+    }
+
+    function canCardBeUsedWithHero(card, hero){
+      if(!card) return false;
+      if(!hero) return true;
+
+      // Когда герой уже выбран, в базе оставляем только его самого из героев.
+      if(isHeroCard(card)) return String(card.id) === String(hero.id);
+
+      const rules = hero.deckRules || { mode: 'elements' };
+
+      if(rules.mode === 'all') return true;
+
+      const allowedCards = normalizeRuleArray(rules.allowedCards);
+      const bannedCards = normalizeRuleArray(rules.bannedCards);
+
+      if(bannedCards.includes(String(card.id))) return false;
+      if(allowedCards.includes(String(card.id))) return true;
+
+      const allowedElements =
+        rules.mode === 'custom' && rules.allowedElements
+          ? normalizeRuleArray(rules.allowedElements).map(normalizeElement)
+          : getDefaultAllowedElements(hero);
+
+      if(allowedElements.length){
+        const okElement = (card.elements || []).some(e => allowedElements.includes(e));
+        if(!okElement) return false;
+      }
+
+      const allowedTypes = normalizeRuleArray(rules.allowedTypes);
+      if(allowedTypes.length && !allowedTypes.includes(card.typeId)) return false;
+
+      const forbiddenTypes = normalizeRuleArray(rules.forbiddenTypes);
+      if(forbiddenTypes.length && forbiddenTypes.includes(card.typeId)) return false;
+
+      if(typeof rules.maxCost === 'number' && !isHeroCard(card) && Number(card.cost) > rules.maxCost) return false;
+      if(typeof rules.minCost === 'number' && !isHeroCard(card) && Number(card.cost) < rules.minCost) return false;
+
+      const textIncludes = normalizeRuleArray(rules.textIncludes);
+      if(textIncludes.length){
+        const text = String(card.text || '').toLowerCase();
+        const okText = textIncludes.some(word => text.includes(String(word).toLowerCase()));
+        if(!okText) return false;
+      }
+
+      return true;
+    }
+
+    function invalidCardsForHero(hero){
+      if(!hero) return [];
+      return deck.filter(card => !isHeroCard(card) && !canCardBeUsedWithHero(card, hero));
+    }
+
+    function getDeckMainElement(){
+      for(const card of deck){
+        if(isHeroCard(card)) continue;
+        const element = (card.elements || []).find(e => e !== 'neutral');
+        if(element) return element;
+      }
+      return null;
+    }
+
+    function canCardBeUsedBeforeHero(card){
+      if(!card) return false;
+
+      // Если герой ещё не выбран, но в колоде уже есть карты одной стихии,
+      // показываем только тех героев, которые смогут играть с уже выбранными картами.
+      // Например: взяли карту Гор -> герои Тьмы/Леса скрываются, герой Гор остаётся.
+      if(isHeroCard(card)){
+        return invalidCardsForHero(card).length === 0;
+      }
+
+      const mainElement = getDeckMainElement();
+      if(!mainElement) return true;
+
+      return (card.elements || []).some(e => e === mainElement || e === 'neutral');
+    }
+
+    function canCardBeUsedByCurrentDeck(card){
+      const hero = getSelectedHero();
+      return hero ? canCardBeUsedWithHero(card, hero) : canCardBeUsedBeforeHero(card);
+    }
+
+    function validateDeckForCreate(){
+      const cardsOnlyCount = deckCardCount();
+      const heroes = deck.filter(isHeroCard);
+
+      if(heroes.length === 0) return 'В колоде должен быть один герой.';
+      if(heroes.length > 1) return 'В колоде может быть только один герой.';
+      if(cardsOnlyCount < MIN_DECK) return 'Не хватает карт. Нужно минимум 40 карт + 1 герой.';
+      if(cardsOnlyCount > MAX_DECK) return 'Карт слишком много. Максимум 60 карт + 1 герой.';
+
+      const hero = heroes[0];
+      const invalidCards = invalidCardsForHero(hero);
+      if(invalidCards.length){
+        return 'В колоде есть карты, которые не подходят к выбранному герою: ' + invalidCards.slice(0,3).map(c => c.name).join(', ') + (invalidCards.length > 3 ? '...' : '');
+      }
+
+      const counts = {};
+      for(const card of deck){
+        counts[card.id] = (counts[card.id] || 0) + 1;
+        const limit = maxCopiesForCard(card);
+        if(counts[card.id] > limit){
+          if(isHeroCard(card)) return 'Герой может быть только в одной копии.';
+          if(isHordeCard(card)) return 'Карт с текстом «Орда» может быть не больше 5 копий.';
+          return 'Одинаковых карт может быть не больше 3 копий.';
+        }
+      }
+      return '';
+    }
+
+    function openCreateDeckModal(){
+      if(!isLoggedIn()){
+        showAuthRequiredModal("Чтобы создать колоду, войдите в аккаунт.");
+        return;
+      }
+
+      const error = validateDeckForCreate();
+      if(error){ showCustomAlert(error); return; }
+      $('createdDeckTitle').value='';
+      $('createdDeckDescription').value='';
+      $('createDeckModal').classList.add('show');
+      $('createDeckModal').setAttribute('aria-hidden','false');
+      setTimeout(()=>$('createdDeckTitle').focus(),50);
+    }
+
+    function closeCreateDeckModal(){
+      $('createDeckModal').classList.remove('show');
+      $('createDeckModal').setAttribute('aria-hidden','true');
+    }
+
+    function createDeck(){
+      const title = $('createdDeckTitle').value.trim();
+      const description = $('createdDeckDescription').value.trim();
+
+      if(!title){
+        showCustomAlert('Введите название колоды.');
+        $('createdDeckTitle').focus();
+        return;
+      }
+
+      const error = validateDeckForCreate();
+      if(error){ showCustomAlert(error); return; }
+
+      const playerDecks = JSON.parse(localStorage.getItem('bhoPlayerDecksV1') || '[]');
+      const newDeck = {
+        id: 'player_' + Date.now(),
+        title: title,
+        description: description,
+        createdAt: new Date().toISOString(),
+        cards: deck.map(card => card.id)
+      };
+
+      playerDecks.unshift(newDeck);
+      localStorage.setItem('bhoPlayerDecksV1', JSON.stringify(playerDecks));
+      saveDeck();
+
+      closeCreateDeckModal();
+      showToast('Колода создана: ' + title);
+      showCustomAlert('Ваша колода добавлена в ваш сборник колод во вкладке «Колоды».');
+    }
+
+    function showCustomAlert(text){
+      $('customAlertText').textContent = text;
+      $('customAlert').classList.add('show');
+      $('customAlert').setAttribute('aria-hidden','false');
+    }
+
+    function closeCustomAlert(){
+      $('customAlert').classList.remove('show');
+      $('customAlert').setAttribute('aria-hidden','true');
+    }
+
+    function showConfirm(text, onYes){
+      const modal = $('customConfirm');
+      const txt = $('confirmText');
+      const yes = $('confirmYes');
+      const no = $('confirmNo');
+
+      txt.textContent = text;
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden','false');
+
+      const close = () => {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden','true');
+        yes.onclick = null;
+        no.onclick = null;
+      };
+
+      yes.onclick = () => {
+        if(typeof onYes === 'function') onYes();
+        close();
+      };
+
+      no.onclick = close;
+    }
+
+
+    function showToast(message){const toast=$('toast');toast.textContent=message;toast.classList.add('show');clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>toast.classList.remove('show'),1600)}
+    function escapeHtml(str){return String(str ?? '').replace(/[&<>'"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[s]))}
+    function formatCardText(str){return escapeHtml(str || 'Описание карты пока не добавлено.').replace(/\n/g,'<br>')}
+    function toArray(value){if(Array.isArray(value)) return value.filter(Boolean); if(value===undefined||value===null||value==='') return []; return String(value).split(/[,;\/|]+/).map(s=>s.trim()).filter(Boolean)}
+    function normalizeElement(value){const key=String(value).trim().toLowerCase();return ELEMENT_ALIASES[key] || key}
+    function normalizeRarity(value){
+      const key=String(value||'').trim().toLowerCase();
+      if(['обычная','обычный','common','black'].includes(key)) return 'common';
+      if(['необычная','необычный','uncommon','bronze'].includes(key)) return 'uncommon';
+      if(['редкая','редкий','rare','silver'].includes(key)) return 'rare';
+      if(['ультраредкая','ультраредкий','ultra','ultrarare','ultra rare','gold','желтая','жёлтая'].includes(key)) return 'ultra';
+      return key;
+    }
+    function normalizeTypeId(value){
+      const key=String(value||'').trim().toLowerCase();
+      const item=CARD_TYPES.find(t=>t.aliases.includes(key));
+      return item?item.id:key;
+    }
+    function getCardType(card){return card.type || card.class || card.classes || card.category || 'Не указан'}
+    function getCardSet(card){const sets=toArray(card.sets ?? card.set ?? card.pack ?? card.edition);return sets[0] || 'Без сета'}
+    function getNum(card, keys, fallback=0){for(const k of keys){if(card[k]!==undefined && card[k]!==null && card[k]!==''){const n=Number(card[k]);return Number.isFinite(n)?n:fallback}}return fallback}
+    function normalizeCard(card,index){const id=card.id ?? index+1;const rawElements=toArray(card.elements ?? card.element ?? card['стихия']);return {id,name:card.name||card.title||('Карта '+id),type:String(getCardType(card)),typeId:normalizeTypeId(getCardType(card)),rarity:normalizeRarity(card.rarity||card['редкость']||card.rare||''),cost:getNum(card,['cost','price','mana','energy'],0),attack:getNum(card,['attack','atk','power'],0),health:getNum(card,['health','hp','life'],0),elements:rawElements.map(normalizeElement),set:getCardSet(card),text:card.text||card.description||card.ability||'',image:card.image||('Images/'+id+'.png'),deckRules:card.deckRules||null}}
+
+    function createFallbackCards(count=300){const types=['Герой','Существо','Магия','Артефакт','Событие'];const sets=['Основной сет','Промо','Турнирный','Тьма'];return Array.from({length:count},(_,i)=>{const id=i+1;const el=ELEMENTS[i%ELEMENTS.length].id;const second=(i%7===0)?ELEMENTS[(i+3)%ELEMENTS.length].id:null;return {id,name:'Карта '+id,type:types[i%types.length],cost:(i%9)+1,attack:i%8,health:(i%10)+1,elements:second?[el,second]:[el],set:sets[i%sets.length],text:'Тестовый текст карты '+id+'. Можно заменить данными из cards.json.',rarity:RARITIES[i%RARITIES.length].id,image:'images/'+id+'.png'}})}
+
+    function useCardsData(data, source='cards.json') { const list = Array.isArray(data) ? data : [data]; cards = list.map(normalizeCard); setupFilters(); renderRarityChips(); renderTypeChips(); renderElementChips(); applyFilters(); renderDeck(); updateStats(); showToast(source + ' загружен: ' + cards.length + ' карт'); }
+    async function loadCards(){
+  try {
+    const files = [
+      'cards/cards-dark.json',
+      'cards/cards-forest.json',
+      'cards/cards-mountains.json',
+      'cards/cards-steppes.json',
+      'cards/cards-swamp.json',
+      'cards/cards-neutral.json'
+    ];
+
+    const responses = await Promise.all(
+      files.map(file => fetch(file, { cache:'no-store' }))
+    );
+
+    responses.forEach((res, i) => {
+      if(!res.ok) throw new Error(files[i] + ' не найден');
+    });
+
+    const dataArray = await Promise.all(
+      responses.map(res => res.json())
+    );
+
+    const allCards = dataArray.flat();
+
+    useCardsData(allCards, 'Все файлы карт');
+
+  } catch(error) {
+    console.error(error);
+
+    cards = createFallbackCards(300);
+    setupFilters();
+    renderRarityChips();
+    renderTypeChips();
+    renderElementChips();
+    applyFilters();
+    renderDeck();
+    updateStats();
+
+    showToast('Ошибка загрузки файлов карт. Проверь папку cards и названия JSON.');
+  }
+}
+
+    function setupFilters(){const setSelect=$('setFilter');const sets=[...new Set(cards.map(c=>c.set).filter(Boolean))].sort();setSelect.innerHTML='<option value="all">Все сеты</option>'+sets.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('')}
+    function renderElementChips(){const box=$('elementChips');box.innerHTML=ELEMENTS.map(e=>`<button class="element-chip" data-element="${e.id}" title="${escapeHtml(e.name)}">${e.icon}</button>`).join('');box.querySelectorAll('.element-chip').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.element;if(selectedElements.has(id))selectedElements.delete(id);else selectedElements.add(id);btn.classList.toggle('active');applyFilters()}))}
+    function renderRarityChips(){const box=$('rarityChips');box.innerHTML=RARITIES.map(r=>`<button class="rarity-chip ${r.className}" data-rarity="${r.id}" title="${escapeHtml(r.name)}"></button>`).join('');box.querySelectorAll('.rarity-chip').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.rarity;if(selectedRarities.has(id))selectedRarities.delete(id);else selectedRarities.add(id);btn.classList.toggle('active');applyFilters()}))}
+    function renderTypeChips(){const box=$('typeChips');box.innerHTML=CARD_TYPES.map(t=>`<button class="type-chip" data-type="${t.id}" title="${escapeHtml(t.name)}">${t.icon}</button>`).join('');box.querySelectorAll('.type-chip').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.type;if(selectedTypes.has(id))selectedTypes.delete(id);else selectedTypes.add(id);btn.classList.toggle('active');applyFilters()}))}
+    function matchesTextPattern(text, query){query=query.trim().toLowerCase();if(!query)return true;text=String(text||'').toLowerCase();if(query.includes('%')){const re=new RegExp(query.split('%').map(part=>part.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('.*'),'i');return re.test(text)}return text.includes(query)}
+    function inRange(value,minId,maxId){const min=$(minId).value;const max=$(maxId).value;const n=Number(value)||0;if(min!==''&&n<Number(min))return false;if(max!==''&&n>Number(max))return false;return true}
+    function matchesCostChips(value, card){
+      if(selectedCosts.size===0) return true;
+      if(isHeroCard(card)) return false;
+      const n = Number(value) || 0;
+      if(selectedCosts.has('7+') && n >= 7) return true;
+      return selectedCosts.has(String(n));
+    }
+    function applyFilters(){const name=$('nameFilter').value;const text=$('textFilter').value;const set=$('setFilter').value;filteredCards=cards.filter(card=>{const matchesName=matchesTextPattern(card.name,name);const matchesText=matchesTextPattern(card.text,text);const matchesSet=set==='all'||card.set===set;const matchesCost=matchesCostChips(card.cost, card);const matchesAttack=inRange(card.attack,'attackMin','attackMax');const matchesHealth=inRange(card.health,'healthMin','healthMax');const matchesElements=selectedElements.size===0||card.elements.some(e=>selectedElements.has(e));const matchesRarity=selectedRarities.size===0||selectedRarities.has(card.rarity);const matchesCardType=selectedTypes.size===0||selectedTypes.has(card.typeId);const matchesMulti=!multiOnly||card.elements.length>1;const matchesDeckRules=canCardBeUsedByCurrentDeck(card);return matchesName&&matchesText&&matchesSet&&matchesCost&&matchesAttack&&matchesHealth&&matchesElements&&matchesRarity&&matchesCardType&&matchesMulti&&matchesDeckRules});currentPage=1;renderCards();updateStats()}
+
+    function elementIcons(card){return (card.elements||[]).map(id=>ELEMENTS.find(e=>e.id===id)?.icon || '✦').join(' ')}
+    function mainElement(card){return (card.elements && card.elements[0]) ? card.elements[0] : 'neutral'}
+    function elementClass(card){return 'element-' + mainElement(card)}
+    function isCreatureCard(card){return String(card?.type || '').toLowerCase().includes('существо')}
+    function creatureStatsHtml(card){
+      if(isHeroCard(card)){
+        return `<div class="creature-stats">
+          <span class="stat-sword stat-disabled">⚔ —</span>
+          <span class="stat-heart stat-disabled">❤ —</span>
+        </div>`;
+      }
+      if(isCreatureCard(card)){
+        return `<div class="creature-stats">
+          <span class="stat-sword">⚔ ${card.attack}</span>
+          <span class="stat-heart">❤ ${card.health}</span>
+        </div>`;
+      }
+      return '';
+    }
+    function renderCards(){
+      const grid=$('cardsGrid');
+      const totalPages=Math.max(1,Math.ceil(filteredCards.length/PAGE_SIZE));
+      currentPage=Math.min(currentPage,totalPages);
+      const start=(currentPage-1)*PAGE_SIZE;
+      const pageCards=filteredCards.slice(start,start+PAGE_SIZE);
+
+      grid.innerHTML=pageCards.map(card=>{
+        const copies=deck.filter(d=>d.id===card.id).length;
+        return `<article class="card" onclick="addCard(${card.id})" oncontextmenu="event.preventDefault(); openCardModal(${card.id}); return false;" title="ЛКМ — добавить, ПКМ — посмотреть">
+          ${copies?`<div class="copy-badge">x${copies}</div>`:''}
+          ${isHeroCard(card) ? `<div class="card-cost-badge stat-disabled">💰 —</div>` : `<div class="card-cost-badge">💰 ${card.cost}</div>`}
+          <img src="${escapeHtml(card.image)}" alt="${escapeHtml(card.name)}" onerror="this.style.objectFit='contain';this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 420%22%3E%3Crect width=%22300%22 height=%22420%22 rx=%2230%22 fill=%22%23111622%22/%3E%3Ctext x=%22150%22 y=%22190%22 text-anchor=%22middle%22 font-size=%2258%22%3E%F0%9F%83%8F%3C/text%3E%3Ctext x=%22150%22 y=%22248%22 text-anchor=%22middle%22 font-size=%2220%22 fill=%22%23f0d28b%22%3EBGO CARD%3C/text%3E%3C/svg%3E'">
+          <div class="card-body">
+            <h3 class="card-title ${elementClass(card)}">${escapeHtml(card.name)}</h3>
+            <div class="card-info"><span>${escapeHtml(card.type)}</span><span>${elementIcons(card)}</span></div>
+            ${creatureStatsHtml(card)}
+          </div>
+        </article>`;
+      }).join('');
+
+      $('pageInfo').textContent=`${currentPage} / ${totalPages}`;
+      $('prevPage').disabled=currentPage<=1;
+      $('nextPage').disabled=currentPage>=totalPages;
+      $('cardsMeta').textContent=`Показано ${pageCards.length} из ${filteredCards.length} найденных карт`;
+    }
+    function addCard(id){
+      const card=cards.find(c=>String(c.id)===String(id));
+      if(!card)return;
+
+      const hero=getSelectedHero();
+
+      if(isHeroCard(card) && deck.some(isHeroCard)){showToast('В колоде может быть только один герой');return}
+
+      if(isHeroCard(card)){
+        const invalidCards = invalidCardsForHero(card);
+        if(invalidCards.length){
+          showToast('Сначала уберите карты, которые не подходят этому герою');
+          return;
+        }
+      }
+
+      if(hero && !canCardBeUsedWithHero(card, hero)){
+        showToast('Эта карта не подходит к выбранному герою');
+        return;
+      }
+
+      if(!hero && !canCardBeUsedBeforeHero(card)){
+        const mainElement = getDeckMainElement();
+        const mainElementName = ELEMENTS.find(e => e.id === mainElement)?.name || mainElement;
+        showToast('До выбора героя можно брать только ' + mainElementName + ' + нейтральные карты');
+        return;
+      }
+
+      if(!isHeroCard(card) && deckCardCount()>=MAX_DECK){showToast('Карт слишком много. Максимум — '+MAX_DECK+' карт + 1 герой');return}
+
+      const copies=deck.filter(c=>String(c.id)===String(id)).length;
+      const limit=maxCopiesForCard(card);
+      if(copies>=limit){
+        if(isHeroCard(card)) showToast('Герой может быть только в одной копии');
+        else if(isHordeCard(card)) showToast('Лимит копий для карт с текстом «Орда»: '+HORDE_MAX_COPIES);
+        else showToast('Лимит копий: '+DEFAULT_MAX_COPIES);
+        return;
+      }
+      deck.push(card);saveDeck();renderDeck();applyFilters();updateStats();showToast('Добавлено: '+card.name)
+    }
+    function removeCard(index){deck.splice(index,1);saveDeck();renderDeck();applyFilters();updateStats();showToast('Карта удалена')}
+    function removeCardById(id){
+      const index=deck.findIndex(card=>String(card.id)===String(id));
+      if(index===-1)return;
+      removeCard(index);
+    }
+    function saveDeck(){localStorage.setItem('bho_deck_builder_deck',JSON.stringify(deck))}
+    function renderDeck(){
+      const list=$('deckList');
+      const cardsOnlyCount = deckCardCount();
+      $('deckCount').textContent=cardsOnlyCount;
+      $('maxDeckText').textContent=MAX_DECK;
+      $('progressBar').style.width=Math.min(100,Math.round(cardsOnlyCount/MAX_DECK*100))+'%';
+      if(deck.length===0){
+        list.innerHTML='<div class="empty">Пока пусто. Нажмите на карту слева, чтобы добавить её в колоду.</div>';
+        return;
+      }
+
+      const grouped=[];
+      deck.forEach(card=>{
+        const group=grouped.find(item=>String(item.card.id)===String(card.id));
+        if(group) group.count++;
+        else grouped.push({card,count:1});
+      });
+
+      list.innerHTML=grouped.map(({card,count})=>`<div class="deck-item">
+  <img src="${escapeHtml(card.image)}" alt="${escapeHtml(card.name)}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 90 120%22%3E%3Crect width=%2290%22 height=%22120%22 rx=%2214%22 fill=%22%23111622%22/%3E%3Ctext x=%2245%22 y=%2270%22 text-anchor=%22middle%22 font-size=%2230%22%3E%F0%9F%83%8F%3C/text%3E%3C/svg%3E'">
+  <div>
+    <h3>${escapeHtml(card.name)}</h3>
+    <p>${escapeHtml(card.type)} · ${elementIcons(card)}${isHeroCard(card) ? '' : ` · 💰${card.cost}`}${isCreatureCard(card) ? ` ⚔${card.attack} ❤${card.health}` : ''}</p>
+  </div>
+
+  
+<div class="deck-controls">
+  <button class="count-btn" onclick="addCard('${escapeHtml(card.id)}')" title="Добавить одну копию">+</button>
+  <span class="count-number">${count}x</span>
+  <button class="remove" onclick="removeCardById('${escapeHtml(card.id)}')" title="Удалить одну копию">×</button>
+</div>
+
+</div>`).join('')
+    }
+    function updateStats(){$('totalCards').textContent=cards.length;$('shownCards').textContent=filteredCards.length}
+
+    ['nameFilter','textFilter','attackMin','attackMax','healthMin','healthMax','setFilter'].forEach(id=>$(id).addEventListener(id==='setFilter'?'change':'input',applyFilters));
+    document.querySelectorAll('.cost-chip').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const cost=btn.dataset.cost;
+        if(selectedCosts.has(cost)) selectedCosts.delete(cost);
+        else selectedCosts.add(cost);
+        btn.classList.toggle('active');
+        applyFilters();
+      });
+    });
+    $('multiToggle').addEventListener('click',()=>{multiOnly=!multiOnly;$('multiToggle').classList.toggle('active',multiOnly);applyFilters()});
+    $('resetFilters').addEventListener('click',()=>{['nameFilter','textFilter','attackMin','attackMax','healthMin','healthMax'].forEach(id=>$(id).value='');$('setFilter').value='all';selectedElements.clear();selectedRarities.clear();selectedTypes.clear();selectedCosts.clear();selectedCosts.clear();document.querySelectorAll('.element-chip,.rarity-chip,.type-chip,.cost-chip,.cost-chip').forEach(b=>b.classList.remove('active'));multiOnly=false;$('multiToggle').classList.remove('active');applyFilters()});
+    $('prevPage').addEventListener('click',()=>{if(currentPage>1){currentPage--;renderCards();window.scrollTo({top:0,behavior:'smooth'})}});
+    $('nextPage').addEventListener('click',()=>{const totalPages=Math.ceil(filteredCards.length/PAGE_SIZE);if(currentPage<totalPages){currentPage++;renderCards();window.scrollTo({top:0,behavior:'smooth'})}});
+    $('clearDeck').addEventListener('click',()=>{showConfirm('Очистить всю колоду?',()=>{deck=[];saveDeck();renderDeck();applyFilters();updateStats();showToast('Колода очищена')})});
+    $('createDeck').addEventListener('click',openCreateDeckModal);
+    $('confirmCreateDeck').addEventListener('click',createDeck);
+    $('cancelCreateDeck').addEventListener('click',closeCreateDeckModal);
+    $('closeCreateDeckModal').addEventListener('click',closeCreateDeckModal);
+    $('createDeckModal').addEventListener('click',e=>{if(e.target===$('createDeckModal'))closeCreateDeckModal()});
+    $('customAlertOk').addEventListener('click',closeCustomAlert);
+    $('customAlert').addEventListener('click',e=>{if(e.target===$('customAlert'))closeCustomAlert()});
+    $('customConfirm').addEventListener('click',e=>{if(e.target===$('customConfirm')){$('customConfirm').classList.remove('show');$('customConfirm').setAttribute('aria-hidden','true')}});
+
+    function openCardModal(id){
+      const card=cards.find(c=>c.id===id);
+      if(!card)return;
+      const modal=document.createElement('div');
+      modal.className='card-modal';
+      modal.innerHTML=`<div class="card-modal-box">
+        <button class="card-modal-close" onclick="this.closest('.card-modal').remove()" title="Закрыть">×</button>
+        <div class="card-modal-image-wrap"><img src="${escapeHtml(card.image)}" alt="${escapeHtml(card.name)}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 420%22%3E%3Crect width=%22300%22 height=%22420%22 rx=%2230%22 fill=%22%23111622%22/%3E%3Ctext x=%22150%22 y=%22190%22 text-anchor=%22middle%22 font-size=%2258%22%3E%F0%9F%83%8F%3C/text%3E%3Ctext x=%22150%22 y=%22248%22 text-anchor=%22middle%22 font-size=%2220%22 fill=%22%23f0d28b%22%3EBGO CARD%3C/text%3E%3C/svg%3E'"></div>
+        <div class="card-modal-info">
+          <div class="kicker-modal">${escapeHtml(card.type)} · ${elementIcons(card)} · ${escapeHtml(card.set)}</div>
+          <h2 class="modal-title ${elementClass(card)}">${escapeHtml(card.name)}</h2>
+          <div class="modal-badges"></div>
+          <p>${formatCardText(card.text)}</p>
+          <button class="btn gold" onclick="addCard(${card.id}); this.closest('.card-modal').remove();">Добавить в колоду</button>
+        </div>
+      </div>`;
+      modal.addEventListener('click',e=>{if(e.target===modal)modal.remove()});
+      document.body.appendChild(modal);
+    }
+
+    loadCards();
+  </script>
+<script>
+history.scrollRestoration = "manual";
+
+window.addEventListener("load", function() {
+  const hash = window.location.hash;
+
+  if (hash) {
+    setTimeout(function() {
+      const target = document.querySelector(hash);
+      if (target) {
+        target.scrollIntoView({ behavior: "auto", block: "start" });
+      }
+    }, 100);
+  } else {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  }
+});
+</script><audio id="bgMusic" loop>
+  <source src="BGO.mp3" type="audio/mpeg">
+</audio>
+
+<button id="musicToggle" style="
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:9999;
+  padding:12px 18px;
+  border-radius:999px;
+  border:1px solid rgba(232,194,112,.2);
+  background:rgba(7,9,15,.8);
+  color:#f0d28b;
+  font-weight:900;
+  cursor:pointer;
+">
+  🔇 Звук: ВЫКЛ
+</button>
+
+<script>
+const music = document.getElementById("bgMusic");
+const btn = document.getElementById("musicToggle");
+
+let savedTime = localStorage.getItem("musicTime");
+
+// громкость
+music.volume = 1;
+
+// музыка изначально выключена
+music.muted = true;
+btn.textContent = "🔇 Звук: ВЫКЛ";
+
+// если есть время — продолжаем с него
+if (savedTime) {
+  music.currentTime = savedTime;
+}
+
+// кнопка включает / выключает музыку
+btn.addEventListener("click", () => {
+  if (music.paused) {
+    music.play();
+    music.muted = false;
+    btn.textContent = "🔊 Звук: ВКЛ";
+  } else {
+    music.muted = !music.muted;
+    btn.textContent = music.muted
+      ? "🔇 Звук: ВЫКЛ"
+      : "🔊 Звук: ВКЛ";
+  }
+});
+
+// сохраняем время каждую секунду
+setInterval(() => {
+  localStorage.setItem("musicTime", music.currentTime);
+}, 1000);
+</script>
+
+
+<footer class="footer" style="
+margin-top:18px;
+padding:18px 0 24px;
+border-top:1px solid rgba(232,194,112,.10);
+background:transparent;
+">
+  <div class="wrap">
+    <div style="
+      color:#bfb5a7;
+      font-size:15px;
+      line-height:1.7;
+      opacity:.9;
+    ">
+      Данный сайт является неофициальным фанатским проектом и не имеет никакого отношения к правообладателю игры Берсерк Герои Онлайн, ее лицензиатам или официальным партнерам.
+Все права на игру Берсерк Герои Онлайн, включая название, торговые марки, графические элементы и другие объекты интеллектуальной собственности, принадлежат их законным правообладателям
+    </div>
+  </div>
+</footer>
+
+
+
+
+
+
+<div id="logoutModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.72);
+backdrop-filter:blur(10px);
+z-index:99999;
+justify-content:center;
+align-items:center;
+padding:24px;
+">
+  <div style="
+  width:min(420px,100%);
+  background:#0b1019;
+  border:1px solid rgba(232,194,112,.18);
+  border-radius:30px;
+  padding:34px;
+  text-align:center;
+  box-shadow:0 30px 90px rgba(0,0,0,.55);
+  ">
+    <h2 style="
+    margin:0 0 12px;
+    color:#f0d28b;
+    font-size:30px;
+    ">
+      Выйти из аккаунта?
+    </h2>
+
+    <p style="
+    margin:0 0 28px;
+    color:#cfc7ba;
+    line-height:1.6;
+    ">
+      Вы действительно хотите выйти?
+    </p>
+
+    <div style="
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+    ">
+      <button onclick="confirmLogout()" style="
+      padding:14px 24px;
+      border:none;
+      border-radius:999px;
+      background:linear-gradient(135deg,#d6a84f,#f0d28b);
+      color:#16110a;
+      font-weight:900;
+      cursor:pointer;
+      ">
+        Выйти
+      </button>
+
+      <button onclick="closeLogoutModal()" style="
+      padding:14px 24px;
+      border-radius:999px;
+      border:1px solid #d6a84f;
+      background:transparent;
+      color:#d6a84f;
+      font-weight:900;
+      cursor:pointer;
+      ">
+        Отмена
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const currentUser = JSON.parse(localStorage.getItem("user"));
+function getUserRole(){
+  const user = JSON.parse(localStorage.getItem("user"));
+  return user?.role || "user";
+}
+
+function isOwnerAdmin(){
+  const user = JSON.parse(localStorage.getItem("user"));
+  return user?.username === "Eighth#2020";
+}
+
+function canModerateContent(){
+  return ["admin", "developer", "moderator"].includes(getUserRole());
+}
+
+function canCreateContent(){
+  return ["admin", "developer", "moderator", "creator"].includes(getUserRole());
+}
+if (currentUser?.role === "banned") {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  alert("Ваш аккаунт заблокирован");
+
+  window.location.href = "auth.html";
+}
+const adminLink = document.getElementById("adminPanelLink");
+
+if (
+  currentUser &&
+  currentUser.role === "admin" &&
+  adminLink
+) {
+  adminLink.style.display = "inline-flex";
+}
+
+const roleColors = {
+  user: "#ffffff",
+  admin: "#6f3cff",
+  developer: "#0f7b43",
+  moderator: "#57d46a",
+  vip: "#59c8ff",
+  creator: "#ff9d42",
+  banned: "#ff4d4d"
+};
+function userStarHtml(user){
+  if(!user) return "";
+
+  if(user.username === "Eighth#2020"){
+    return '<span style="color:#6f3cff;filter:drop-shadow(0 0 8px #6f3cff)">⭐</span> ';
+  }
+
+  if(user.is_partner){
+    return '<span style="color:#f0d28b;filter:drop-shadow(0 0 8px #f0d28b)">⭐</span> ';
+  }
+
+  return "";
+}
+function findAuthButton(){
+  const buttons = document.querySelectorAll("a.btn");
+
+  for (const btn of buttons) {
+    const text = btn.textContent.trim();
+    const href = btn.getAttribute("href");
+
+    if (
+      href === "auth.html" ||
+      text === "Войти" ||
+      (currentUser && text === currentUser.username)
+    ) {
+      return btn;
+    }
+  }
+
+  return null;
+}
+
+const authBtn = findAuthButton();
+
+if(currentUser && authBtn){
+
+  authBtn.innerHTML = userStarHtml(currentUser) + currentUser.username;
+
+  authBtn.classList.remove("gold");
+  authBtn.classList.add("ghost");
+
+  authBtn.style.background = "rgba(255,255,255,.06)";
+  authBtn.style.border = "1px solid rgba(232,194,112,.35)";
+  authBtn.style.boxShadow = "none";
+  authBtn.style.color = roleColors[currentUser.role] || "#ffffff";
+
+  authBtn.href = "#";
+
+  authBtn.onclick = function(e){
+    e.preventDefault();
+    document.getElementById("logoutModal").style.display = "flex";
+  };
+}
+
+function confirmLogout(){
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  location.reload();
+}
+
+function closeLogoutModal(){
+  document.getElementById("logoutModal").style.display = "none";
+}
+</script>
+
+</body>
+</html>

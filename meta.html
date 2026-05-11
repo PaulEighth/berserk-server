@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="ru">
+<head> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>Berserk Heroes Online Мета</title> <meta name="theme-color" content="#07090f"> <style> :root{--bg:#07090f;--panel:#111622;--panel2:#151b2a;--text:#f4efe6;--muted:#b8ae9f;--gold:#d6a84f;--gold2:#f0d28b;--red:#ff6b6b;--green:#7bd88f;--line:rgba(232,194,112,.18);--r:24px;--shadow:0 30px 90px rgba(0,0,0,.42)} *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at 80% 8%,rgba(124,108,255,.18),transparent 32%),radial-gradient(circle at 15% 18%,rgba(224,120,48,.16),transparent 30%),linear-gradient(180deg,#05060a,#0a0d15 45%,#07090f);min-height:100vh} .grain{position:fixed;inset:0;background-image:radial-gradient(rgba(255,255,255,.13) 1px,transparent 1px);background-size:22px 22px;opacity:.12;pointer-events:none} .wrap{width:min(1440px,calc(100% - 36px));margin:auto;position:relative;z-index:1} .nav{position:sticky;top:14px;z-index:50;margin:14px auto 0;width:min(1440px,calc(100% - 28px));display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 13px 11px 16px;background:rgba(9,12,19,.78);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:999px;box-shadow:0 16px 45px rgba(0,0,0,.34)} .brand{display:flex;gap:11px;align-items:center;color:var(--text);text-decoration:none;font-weight:950;white-space:nowrap;letter-spacing:-.03em} .brand-mark{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#23190d,#d6a84f);color:#07090f} .nav-links{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center} .nav a{color:var(--text);text-decoration:none;font-size:14px;font-weight:750} .nav-links a{opacity:.74}.nav-links a:hover,.nav-links a.active{opacity:1;color:var(--gold2)} .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 18px;border-radius:999px;border:1px solid transparent;text-decoration:none;font-weight:900;transition:.25s;cursor:pointer;white-space:nowrap;font-size:14px} .btn.gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#171008;box-shadow:0 16px 42px rgba(214,168,79,.22)} .btn.ghost{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.13);color:var(--text)} .btn.red{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.28);color:#ffd7d7} .btn:hover{transform:translateY(-2px)} .hero{padding:70px 0 28px;position:relative} .eyebrow{display:inline-flex;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(214,168,79,.08);font-size:13px;font-weight:900;color:var(--gold2)} h1{font-size:clamp(46px,6.5vw,92px);line-height:.9;margin:22px 0 16px;letter-spacing:-.08em;background:linear-gradient(135deg,#fff 15%,#f0d28b 58%,#b16b2c);-webkit-background-clip:text;background-clip:text;color:transparent;max-width:1060px} .lead{font-size:clamp(17px,2vw,22px);line-height:1.55;color:#d7cec0;max-width:940px} .small{font-size:13px;color:var(--muted);line-height:1.45} .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px auto 22px} .stats-card,.panel,.deck-card,.modal-box{background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.045));border:1px solid rgba(232,194,112,.15);border-radius:var(--r);box-shadow:0 22px 60px rgba(0,0,0,.22);backdrop-filter:blur(10px)} .stats-card{padding:16px}.stats-card b{display:block;font-size:25px;color:var(--gold2);line-height:1.12;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stats-card span{font-size:13px;color:var(--muted)} .panel{padding:18px;margin-bottom:18px} .section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px} .section-title h2{margin:0;font-size:28px;letter-spacing:-.05em}.section-title h2:before{content:'✦ ';color:var(--gold2)} .meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px} .deck-card{padding:18px;position:relative;overflow:hidden;cursor:pointer} .deck-card:before{content:"";position:absolute;right:-55px;top:-55px;width:145px;height:145px;border-radius:50%;background:rgba(214,168,79,.12)} .deck-card>*{position:relative}.deck-card h3{font-size:23px;margin:0 0 8px;letter-spacing:-.04em} .meta{color:var(--muted);font-size:14px;line-height:1.45} .deck-preview{display:grid;grid-template-columns:92px repeat(3,54px);gap:8px;align-items:end;margin:14px 0;min-height:124px;overflow:hidden} .deck-preview img{object-fit:cover;background:#111;border:1px solid rgba(232,194,112,.18);box-shadow:0 12px 28px rgba(0,0,0,.28)} .deck-preview .hero-img{width:92px;height:124px;border-radius:14px}.deck-preview .small-img{width:54px;height:72px;border-radius:10px} .winrate{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px} .win-percent{font-size:30px;font-weight:950;letter-spacing:-.04em} .wr-bordo{color:#7b1f35}.wr-red{color:#ff4b4b}.wr-white{color:#fff}.wr-yellow{color:#f0d28b}.wr-green{color:#55d66b}.wr-lime{color:#b8ff5a} .votes{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px} .vote{height:38px;border-radius:999px;border:1px solid rgba(232,194,112,.18);background:rgba(255,255,255,.06);color:var(--text);font-weight:900;padding:0 13px;cursor:pointer} .vote.win{border-color:rgba(123,216,143,.32)}.vote.loss{border-color:rgba(255,107,107,.32)} .score{height:38px;display:inline-flex;align-items:center;padding:0 13px;border-radius:999px;background:rgba(214,168,79,.13);border:1px solid rgba(214,168,79,.22);color:var(--gold2);font-weight:950} .empty{padding:24px;border-radius:18px;border:1px dashed rgba(232,194,112,.22);color:var(--muted);text-align:center} .modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.82);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;padding:22px}.modal.show{display:flex} .modal-box{width:min(1320px,100%);max-height:92vh;overflow:auto;padding:24px;position:relative} .modal-close{position:absolute;right:18px;top:18px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(232,194,112,.24);background:rgba(255,255,255,.07);color:#fff;font-size:28px;cursor:pointer} .modal-head{margin-bottom:18px}.modal-head h2{font-size:clamp(32px,4vw,52px);line-height:.95;margin:12px 0 10px;letter-spacing:-.06em;background:linear-gradient(135deg,#fff 15%,#f0d28b 58%,#b16b2c);-webkit-background-clip:text;background-clip:text;color:transparent} .modal-layout{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start} .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:12px;margin-top:18px} .card-tile{background:rgba(255,255,255,.045);border:1px solid rgba(232,194,112,.15);border-radius:16px;padding:8px;text-align:center;position:relative}.card-tile img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#111}.copy-badge{position:absolute;right:7px;top:7px;background:rgba(7,9,15,.86);border:1px solid rgba(240,210,139,.28);border-radius:999px;padding:4px 8px;font-size:12px;font-weight:950;color:#f0d28b} .side-panel{padding:18px;border-radius:24px;background:rgba(255,255,255,.045);border:1px solid rgba(232,194,112,.15)} .player-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);color:#d7cec0} .player-row b{color:#fff}.player-row span{color:var(--gold2);font-weight:900} .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);z-index:10000;background:rgba(7,9,15,.94);border:1px solid rgba(232,194,112,.22);box-shadow:0 20px 70px rgba(0,0,0,.42);padding:14px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)} .footer{border-top:1px solid rgba(232,194,112,.14);padding:26px 0;color:var(--muted);font-size:14px;margin-top:32px}.footer a{color:var(--gold2);text-decoration:none} @media(max-width:1120px){.nav-links{display:none}.stats{grid-template-columns:repeat(2,1fr)}.meta-grid{grid-template-columns:repeat(2,1fr)}.modal-layout{grid-template-columns:1fr}} @media(max-width:680px){.wrap{width:min(100% - 24px,1440px)}.nav{border-radius:24px}.stats,.meta-grid{grid-template-columns:1fr}.btn{width:100%}.deck-preview{grid-template-columns:80px repeat(3,44px)}.deck-preview .hero-img{width:80px;height:108px}.deck-preview .small-img{width:44px;height:58px}} .side-panel{position:sticky;top:18px}
+.player-list{margin-top:10px;border-radius:18px;overflow:hidden;border:1px solid rgba(232,194,112,.14);background:rgba(255,255,255,.025)}
+.player-line{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:13px 14px;border-bottom:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.018))}
+.player-line:last-child{border-bottom:none}
+.player-line b{color:#fff;font-size:15px}
+.player-line .result{display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:var(--muted);font-weight:900}
+.player-line .result strong{font-size:18px}
+.element-badge{display:inline-flex;align-items:center;gap:8px;margin-top:8px;padding:8px 12px;border-radius:999px;border:1px solid rgba(232,194,112,.18);background:rgba(214,168,79,.08);color:var(--gold2);font-weight:950} .players-notebook-wrap{margin-top:22px;padding:18px;border-radius:24px;background:rgba(255,255,255,.035);border:1px solid rgba(232,194,112,.15)}
+.players-notebook-wrap h3{margin:0 0 6px;font-size:24px;letter-spacing:-.04em}
+.notebook-table{margin-top:14px;border:1px solid rgba(232,194,112,.20);border-radius:18px;overflow:hidden;background:rgba(255,255,255,.025)}
+.notebook-row{display:grid;grid-template-columns:54px 1fr 170px 170px 110px;align-items:center;min-height:46px;border-bottom:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.030),rgba(255,255,255,.014))}
+.notebook-row:last-child{border-bottom:none}
+.notebook-row.head{background:rgba(214,168,79,.10);color:var(--gold2);font-weight:950;text-transform:uppercase;font-size:12px;letter-spacing:.10em}
+.notebook-cell{padding:10px 12px;border-right:1px solid rgba(255,255,255,.11)}
+.notebook-cell:last-child{border-right:none}
+.notebook-rank{color:var(--gold2);font-weight:950;text-align:center}
+.notebook-nick{font-weight:950;color:#fff}
+.notebook-number{font-weight:900;color:#d7cec0}
+.notebook-percent{font-size:20px;font-weight:950}
+@media(max-width:900px){ .notebook-row{grid-template-columns:42px 1fr 92px 92px 82px;font-size:12px} .notebook-cell{padding:8px 7px} .notebook-percent{font-size:16px}
+} .search-panel{ display:grid; grid-template-columns:repeat(2, minmax(220px, 1fr)); gap:12px; margin:12px 0 18px;
+}
+.search-field{ width:100%; padding:14px 16px; border-radius:999px; border:1px solid rgba(232,194,112,.20); background:rgba(255,255,255,.055); color:var(--text); outline:none; font-size:15px;
+}
+.search-field::placeholder{color:#8f8678}
+@media(max-width:680px){.search-panel{grid-template-columns:1fr}} 
+/* FINAL meta preview: герой + 4 разные карты с x2/x3/x4/x5 */
+.deck-preview{
+  grid-template-columns:92px repeat(3,54px) !important;
+}
+.deck-preview-card{
+  position:relative;
+  display:inline-block;
+  width:fit-content;
+}
+.deck-preview-card img{
+  display:block;
+}
+.deck-preview-count{
+  position:absolute;
+  right:-6px;
+  top:-8px;
+  z-index:5;
+  min-width:28px;
+  height:24px;
+  padding:0 7px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(7,9,15,.9);
+  border:1px solid rgba(240,210,139,.35);
+  color:var(--gold2);
+  font-size:12px;
+  font-weight:950;
+  box-shadow:0 10px 22px rgba(0,0,0,.34);
+}
+@media(max-width:680px){
+  .deck-preview{
+    grid-template-columns:80px repeat(3,44px) !important;
+  }
+}
+
+</style>
+</head>
+<body> <div class="grain"></div> <nav class="nav"> <a class="brand" href="BerserHeroesOnline.html"> <span class="brand-mark"><img src="Logo.png" alt="BHO" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></span> <span>Berserk Heroes Online</span> </a> <div class="nav-links"> <a href="BerserHeroesOnline.html">О сайте</a> <a href="deck-builder_checked.html">База карт</a> <a href="decks_select_publish.html#deck">Колоды</a> <a class="active" href="meta.html">(Мета тех.работа)</a> <a href="tournaments.html">Турниры</a> <a href="news.html">Новости</a>
+  <a id="adminPanelLink" href="admin.html" style="display:none">Админ</a> <a href="BerserHeroesOnline.html#contacts">Контакты</a> </div> <div style="display:flex; gap:14px; align-items:center;">
+
+  <a class="btn ghost"
+     href="https://t.me/Paul_Eighth"
+     target="_blank"
+     style="
+       border:1px solid #d6a84f;
+       color:#d6a84f;
+       background:transparent;
+     ">
+    @Paul_Eighth
+  </a>
+
+  <a class="btn gold" href="auth.html">
+  Войти
+</a>
+
+</div></nav> <header class="hero wrap"> <span class="eyebrow">✦ Мета колод БГО</span> <h1>Рейтинг побед и поражений</h1> <p class="lead">Здесь отображаются все опубликованные колоды из вкладки «Колоды». Игроки могут отмечать победы и поражения, а сайт автоматически считает процент побед</p> <p class="small">Пока всё хранится в этом браузере через localStorage. После подключения сервера статистика станет общей для всех игроков.</p> </header> <section class="wrap stats"> <div class="stats-card"><b id="totalDecks">0</b><span>опубликованных колод</span></div> <div class="stats-card"><b id="bestWinrate"></b><span>лучший процент побед</span></div> <div class="stats-card"><b id="totalGames">0</b><span>сыграно матчей</span></div> <div class="stats-card"><b id="currentNick"></b><span>твой ник</span></div> </section> <main class="wrap"> <section class="panel"> <div class="section-title"><h2>Все опубликованные колоды</h2><span class="small">сортировка по проценту побед</span></div> <div class="search-panel"> <input class="search-field" id="searchDeck" type="search" placeholder="Поиск по названию колоды..."> <input class="search-field" id="searchPlayer" type="search" placeholder="Поиск по нику игрока..."> </div> <div class="meta-grid" id="metaDecks"></div> </section> </main> <div class="modal" id="deckModal" aria-hidden="true"> <div class="modal-box"> <button class="modal-close" onclick="closeDeckModal()">×</button> <div class="modal-head"> <span class="eyebrow">✦ Состав и статистика</span> <h2 id="modalTitle">Колода</h2> <p id="modalMeta" class="meta"></p> </div> <div class="modal-layout"> <div> <div id="modalCards" class="card-grid"></div> <div class="players-notebook-wrap"> <h3>Игроки на этой колоде</h3> <p class="small">Список идёт по проценту побед. Справа видно, сколько раз игрок нажал победу и поражение.</p> <div id="playersNotebook"></div> </div> </div> <aside class="side-panel"> <h3 style="margin-top:0">Статистика колоды</h3> <div id="modalWinrate" class="winrate"></div> <div class="votes"> <button class="btn gold" id="modalWinBtn">Победа</button> <button class="btn red" id="modalLossBtn">Поражение</button> </div> </aside> </div> </div></div></main><footer class="footer"><div class="wrap"><div>Данный сайт является неофициальным фанатским проектом и не имеет никакого отношения к правообладателю игры Берсерк Герои Онлайн, ее лицензиатам или официальным партнерам.
+Все права на игру Берсерк Герои Онлайн, включая название, торговые марки, графические элементы и другие объекты интеллектуальной собственности, принадлежат их законным правообладателям</div></div></footer> <div class="toast" id="toast">Готово</div> <script> const STORAGE_PUBLISHED='bhoPublishedDecksV1'; const META_STATS_KEY='bhoDeckMetaStatsV1'; const USER_NICK_KEY='bhoUserNick'; let cards=[]; let publishedDecks=JSON.parse(localStorage.getItem(STORAGE_PUBLISHED)||'[]'); let metaStats=JSON.parse(localStorage.getItem(META_STATS_KEY)||'{}'); let openedDeckId=null; const $=id=>document.getElementById(id); function showToast(message){const toast=$('toast');toast.textContent=message;toast.classList.add('show');clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>toast.classList.remove('show'),1600)} function escapeHtml(str){return String(str??'').replace(/[&<>'"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[s]))} function toArray(value){if(Array.isArray(value))return value.filter(Boolean);if(value===undefined||value===null||value==='')return[];return String(value).split(/[,;\/|]+/).map(s=>s.trim()).filter(Boolean)} function getNum(card,keys,fallback=0){for(const k of keys){if(card[k]!==undefined&&card[k]!==null&&card[k]!==''){const n=Number(card[k]);return Number.isFinite(n)?n:fallback}}return fallback} function getCardType(card){return card.type||card.class||card.classes||card.category||'Не указан'} function getCardElement(card){ const value=card.element||card.elements||card['стихия']||card.elementName||card.faction||card.school||''; if(Array.isArray(value))return value.filter(Boolean).join(', '); return String(value||'').trim(); } function normalizeCard(card,index){const id=card.id??index+1;return{id,name:card.name||card.title||('Карта '+id),type:String(getCardType(card)),element:getCardElement(card),cost:getNum(card,['cost','price','mana','energy'],0),attack:getNum(card,['attack','atk','power'],0),health:getNum(card,['health','hp','life'],0),text:card.text||card.description||card.ability||'',image:card.image||('Images/'+id+'.png')}} function cardById(id){return cards.find(c=>String(c.id)===String(id))} function normalizeDeckCard(item){if(typeof item==='number'||typeof item==='string')return cardById(item)||{id:item,name:'Карта '+item,type:'Не указано',element:'',cost:0,image:''};if(item&&item.id)return cardById(item.id)||normalizeCard(item,0);return null} function deckCardsFromIds(deck){return (deck.cards||[]).map(normalizeDeckCard).filter(Boolean)} function isHero(card){return String(card?.type||'').toLowerCase().includes('герой')} function getHero(deckCards){return deckCards.find(isHero)||deckCards[0]||null} function groupPreviewCards(deckCards,hero){
+  const grouped=[];
+  deckCards.forEach(card=>{
+    if(!card)return;
+    if(hero&&String(card.id)===String(hero.id))return;
+    const existing=grouped.find(item=>String(item.card.id)===String(card.id));
+    if(existing)existing.count++;
+    else grouped.push({card,count:1});
+  });
+  grouped.sort((a,b)=>(Number(a.card.cost)||0)-(Number(b.card.cost)||0)||String(a.card.name||'').localeCompare(String(b.card.name||''),'ru'));
+  return grouped;
+} function getPreviewGroups(deckCards,hero,deck=null){
+  const grouped=groupPreviewCards(deckCards,hero);
+  const previewIds=(deck&&Array.isArray(deck.previewIds)&&deck.previewIds.length)?deck.previewIds:(deck&&Array.isArray(deck.featuredCards)&&deck.featuredCards.length)?deck.featuredCards:[];
+  const result=[];
+  previewIds.forEach(id=>{
+    const item=grouped.find(g=>String(g.card.id)===String(id));
+    if(item&&!result.some(r=>String(r.card.id)===String(item.card.id)))result.push(item);
+  });
+  grouped.forEach(item=>{
+    if(result.length<4&&!result.some(r=>String(r.card.id)===String(item.card.id)))result.push(item);
+  });
+  return result.slice(0,3);
+} function imgTag(card,cls='small-img',count=1){const src=card?.image||'';const name=card?.name||'Карта';return `<div class="deck-preview-card"><img class="${cls}" src="${escapeHtml(src)}" alt="${escapeHtml(name)}" title="${escapeHtml(name)}" onerror="this.style.visibility='hidden'">${count>1?`<span class="deck-preview-count">${count}x</span>`:''}</div>`} function deckPreviewHtml(deckCards,deck=null){const hero=getHero(deckCards);const first=getPreviewGroups(deckCards,hero,deck);return `<div class="deck-preview">${hero?imgTag(hero,'hero-img',1):''}${first.map(item=>imgTag(item.card,'small-img',item.count)).join('')}</div>`} function groupDeckCards(deckCards){const hero=deckCards.find(isHero);const grouped=[];deckCards.forEach(card=>{if(hero&&String(card.id)===String(hero.id))return;const existing=grouped.find(item=>String(item.card.id)===String(card.id));if(existing)existing.count++;else grouped.push({card,count:1})});grouped.sort((a,b)=>(Number(a.card.cost)||0)-(Number(b.card.cost)||0)||String(a.card.name||'').localeCompare(String(b.card.name||''),'ru'));return hero?[{card:hero,count:1},...grouped]:grouped} function getCurrentUserNick(){let nick=localStorage.getItem(USER_NICK_KEY);if(!nick){nick='Player#'+Math.floor(1000+Math.random()*9000);localStorage.setItem(USER_NICK_KEY,nick)}return nick} function saveStats(){localStorage.setItem(META_STATS_KEY,JSON.stringify(metaStats))} function getDeckStats(deckId){if(!metaStats[deckId])metaStats[deckId]={players:{}};if(!metaStats[deckId].players)metaStats[deckId].players={};return metaStats[deckId]} function deckTotals(deckId){const stats=getDeckStats(deckId);let wins=0,losses=0;Object.values(stats.players).forEach(p=>{wins+=Number(p.wins)||0;losses+=Number(p.losses)||0});return{wins,losses,total:wins+losses,percent:(wins+losses)?Math.round(wins/(wins+losses)*100):0}} function percentClass(percent){if(percent<30)return'wr-bordo';if(percent<45)return'wr-red';if(percent===50)return'wr-white';if(percent<60)return'wr-yellow';if(percent<80)return'wr-lime';return'wr-green'} function sortedDecks(){return [...publishedDecks].sort((a,b)=>deckTotals(b.id).percent-deckTotals(a.id).percent||deckTotals(b.id).total-deckTotals(a.id).total)} async function loadCards(){
+  try{
+    const files=[
+      'cards/cards-dark.json',
+      'cards/cards-forest.json',
+      'cards/cards-mountains.json',
+      'cards/cards-steppes.json',
+      'cards/cards-swamp.json',
+      'cards/cards-neutral.json'
+    ];
+
+    const responses=await Promise.all(
+      files.map(file=>fetch(file,{cache:'no-store'}))
+    );
+
+    responses.forEach((res,i)=>{
+      if(!res.ok) throw new Error(files[i]+' не найден');
+    });
+
+    const dataArray=await Promise.all(
+      responses.map(res=>res.json())
+    );
+
+    cards=dataArray.flat().map(normalizeCard);
+
+  }catch(e){
+    console.error(e);
+    cards=[];
+    showToast('Ошибка загрузки карт');
+  }
+
+  renderAll();
+} 
+function getDeckAuthorColor(deck){
+  return roleColors[deck.author_role || "user"] || "#ffffff";
+}
+
+function deckAuthorStarHtml(deck){
+  const author = String(deck.author || "").trim().toLowerCase();
+
+  if(author === "eighth#2020"){
+    return '<span style="color:#6f3cff;filter:drop-shadow(0 0 8px #6f3cff)">⭐</span> ';
+  }
+
+  if(deck.author_is_partner){
+    return '<span style="color:#f0d28b;filter:drop-shadow(0 0 8px #f0d28b)">⭐</span> ';
+  }
+
+  return "";
+}
+
+function deckAuthorHtml(deck){
+  return `<b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorStarHtml(deck)}${escapeHtml(deck.author || "Не указан")}</b>`;
+}
+function renderDeckCard(deck){const deckCards=deckCardsFromIds(deck);const totals=deckTotals(deck.id);return `<article class="deck-card" onclick="openDeckModal('${deck.id}')"><h3>${escapeHtml(deck.title)}</h3><div class="meta">Автор: ${deckAuthorHtml(deck)} карт: ${deck.cards.length}</div><p class="meta">${escapeHtml(deck.description||'Описание не добавлено.')}</p>${deckPreviewHtml(deckCards,deck)}<div class="winrate"><span class="win-percent ${percentClass(totals.percent)}">${totals.percent}%</span><span class="meta">побед ${totals.wins}W / ${totals.losses}L</span></div><div class="votes"><button class="vote win" onclick="event.stopPropagation(); addResult('${deck.id}','win')">Победа</button><button class="vote loss" onclick="event.stopPropagation(); addResult('${deck.id}','loss')">Поражение</button></div></article>`} function renderAll(){ let decks=sortedDecks(); const searchDeck=($('searchDeck')?.value||'').trim().toLowerCase(); const searchPlayer=($('searchPlayer')?.value||'').trim().toLowerCase(); decks=decks.filter(deck=>{ const title=String(deck.title||'').toLowerCase(); const author=String(deck.author||'').toLowerCase(); return title.includes(searchDeck) && author.includes(searchPlayer); }); $('metaDecks').innerHTML=decks.length ? decks.map(renderDeckCard).join('') : '<div class="empty">Ничего не найдено.</div>'; updateStats(); if(openedDeckId)renderModalContent(openedDeckId); } function updateStats(){const decks=sortedDecks();const best=decks[0];const allTotals=publishedDecks.map(d=>deckTotals(d.id));const totalGames=allTotals.reduce((s,t)=>s+t.total,0);$('totalDecks').textContent=publishedDecks.length;$('totalGames').textContent=totalGames;$('currentNick').textContent=getCurrentUserNick();$('bestWinrate').textContent=best?`${best.title} ${deckTotals(best.id).percent}%`:''} function addResult(deckId,type){const nick=getCurrentUserNick();const stats=getDeckStats(deckId);if(!stats.players[nick])stats.players[nick]={wins:0,losses:0};if(type==='win')stats.players[nick].wins++;else stats.players[nick].losses++;saveStats();renderAll();showToast(type==='win'?'Победа засчитана':'Поражение засчитано')} function openDeckModal(deckId){openedDeckId=deckId;renderModalContent(deckId);$('deckModal').classList.add('show');$('deckModal').setAttribute('aria-hidden','false')} function closeDeckModal(){openedDeckId=null;$('deckModal').classList.remove('show');$('deckModal').setAttribute('aria-hidden','true')} function renderModalContent(deckId){const deck=publishedDecks.find(d=>String(d.id)===String(deckId));if(!deck)return;const deckCards=deckCardsFromIds(deck);const totals=deckTotals(deck.id);$('modalTitle').textContent=deck.title;const hero=getHero(deckCards); const heroElement=hero?.element||'Не указана'; $('modalMeta').innerHTML=`Опубликованная колода Автор: ${deckAuthorHtml(deck)} карт: ${deck.cards.length}<br><span class="element-badge">Стихия героя: ${escapeHtml(heroElement)}</span>`;$('modalCards').innerHTML=deckCards.length?groupDeckCards(deckCards).map(({card,count})=>`<article class="card-tile"><div class="copy-badge">${count}x</div><img src="${escapeHtml(card.image||'')}" alt="${escapeHtml(card.name)}" title="${escapeHtml(card.name)}" onerror="this.style.visibility='hidden'"><div style="font-size:12px;font-weight:900;line-height:1.25;margin-top:7px;color:#f4efe6">${escapeHtml(card.name)}</div></article>`).join(''):'<div class="empty">Карты не найдены. Проверь cards.json и id карт.</div>';$('modalWinrate').innerHTML=`<span class="win-percent ${percentClass(totals.percent)}">${totals.percent}%</span><span class="meta">побед ${totals.wins} побед / ${totals.losses} поражений</span>`;$('modalWinBtn').onclick=()=>addResult(deck.id,'win');$('modalLossBtn').onclick=()=>addResult(deck.id,'loss');renderPlayerStats(deck.id)} function renderPlayerStats(deckId){ const stats=getDeckStats(deckId); const rows=Object.entries(stats.players||{}).map(([nick,p])=>{ const wins=Number(p.wins)||0; const losses=Number(p.losses)||0; const total=wins+losses; const percent=total?Math.round(wins/total*100):0; return{nick,wins,losses,total,percent}; }).sort((a,b)=>b.percent-a.percent||b.wins-a.wins||b.total-a.total); if(!rows.length){ $('playersNotebook').innerHTML='<div class="empty">Пока никто не отметил победу или поражение.</div>'; return; } $('playersNotebook').innerHTML=`<div class="notebook-table"> <div class="notebook-row head"> <div class="notebook-cell">№</div> <div class="notebook-cell">Ник игрока</div> <div class="notebook-cell">Победы</div> <div class="notebook-cell">Поражения</div> <div class="notebook-cell">%</div> </div> ${rows.map((r,i)=>` <div class="notebook-row"> <div class="notebook-cell notebook-rank">${i+1}</div> <div class="notebook-cell notebook-nick">${escapeHtml(r.nick)}</div> <div class="notebook-cell notebook-number">${r.wins}</div> <div class="notebook-cell notebook-number">${r.losses}</div> <div class="notebook-cell notebook-percent ${percentClass(r.percent)}">${r.percent}%</div> </div> `).join('')} </div>`; } $('deckModal').addEventListener('click',e=>{if(e.target===$('deckModal'))closeDeckModal()}); document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDeckModal()}); document.addEventListener('input',e=>{ if(e.target.id==='searchDeck'||e.target.id==='searchPlayer'){ renderAll(); } }); loadCards(); </script> <script> history.scrollRestoration="manual"; window.addEventListener("load",function(){document.body.scrollTop=0;document.documentElement.scrollTop=0}); </script>
+<audio id="bgMusic" loop>
+  <source src="BGO.mp3" type="audio/mpeg">
+</audio>
+
+<button id="musicToggle" style="
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:9999;
+  padding:12px 18px;
+  border-radius:999px;
+  border:1px solid rgba(232,194,112,.2);
+  background:rgba(7,9,15,.8);
+  color:#f0d28b;
+  font-weight:900;
+  cursor:pointer;
+">
+  🔇 Звук: ВЫКЛ
+</button>
+
+<script>
+const music = document.getElementById("bgMusic");
+const btn = document.getElementById("musicToggle");
+
+let savedTime = localStorage.getItem("musicTime");
+
+// громкость
+music.volume = 1;
+
+// музыка изначально выключена
+music.muted = true;
+btn.textContent = "🔇 Звук: ВЫКЛ";
+
+// если есть время — продолжаем с него
+if (savedTime) {
+  music.currentTime = savedTime;
+}
+
+// кнопка включает / выключает музыку
+btn.addEventListener("click", () => {
+  if (music.paused) {
+    music.play();
+    music.muted = false;
+    btn.textContent = "🔊 Звук: ВКЛ";
+  } else {
+    music.muted = !music.muted;
+    btn.textContent = music.muted
+      ? "🔇 Звук: ВЫКЛ"
+      : "🔊 Звук: ВКЛ";
+  }
+});
+
+// сохраняем время каждую секунду
+setInterval(() => {
+  localStorage.setItem("musicTime", music.currentTime);
+}, 1000);
+</script><div id="logoutModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.72);
+backdrop-filter:blur(10px);
+z-index:99999;
+justify-content:center;
+align-items:center;
+padding:24px;
+">
+
+  <div style="
+  width:min(420px,100%);
+  background:#0b1019;
+  border:1px solid rgba(232,194,112,.18);
+  border-radius:30px;
+  padding:34px;
+  text-align:center;
+  box-shadow:0 30px 90px rgba(0,0,0,.55);
+  ">
+
+    <h2 style="
+    margin:0 0 12px;
+    color:#f0d28b;
+    font-size:30px;
+    ">
+      Выйти из аккаунта?
+    </h2>
+
+    <p style="
+    margin:0 0 28px;
+    color:#cfc7ba;
+    line-height:1.6;
+    ">
+      Вы действительно хотите выйти?
+    </p>
+
+    <div style="
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+    ">
+
+      <button onclick="confirmLogout()" style="
+      padding:14px 24px;
+      border:none;
+      border-radius:999px;
+      background:linear-gradient(135deg,#d6a84f,#f0d28b);
+      color:#16110a;
+      font-weight:900;
+      cursor:pointer;
+      ">
+        Выйти
+      </button>
+
+      <button onclick="closeLogoutModal()" style="
+      padding:14px 24px;
+      border-radius:999px;
+      border:1px solid #d6a84f;
+      background:transparent;
+      color:#d6a84f;
+      font-weight:900;
+      cursor:pointer;
+      ">
+        Отмена
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+const currentUser = JSON.parse(localStorage.getItem("user"));
+if (currentUser?.role === "banned") {
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  alert("Ваш аккаунт заблокирован");
+
+  window.location.href = "auth.html";
+}
+const adminLink = document.getElementById("adminPanelLink");
+
+if (
+  currentUser &&
+  currentUser.role === "admin" &&
+  adminLink
+) {
+  adminLink.style.display = "inline-flex";
+}
+
+const roleColors = {
+  user: "#ffffff",
+  admin: "#6f3cff",
+  developer: "#0f7b43",
+  moderator: "#57d46a",
+  vip: "#59c8ff",
+  creator: "#ff9d42",
+  banned: "#ff4d4d"
+};
+function userStarHtml(user){
+  if(!user) return "";
+
+  if(user.username === "Eighth#2020"){
+    return '<span style="color:#6f3cff;filter:drop-shadow(0 0 8px #6f3cff)">⭐</span> ';
+  }
+
+  if(user.is_partner){
+    return '<span style="color:#f0d28b;filter:drop-shadow(0 0 8px #f0d28b)">⭐</span> ';
+  }
+
+  return "";
+}
+function findAuthButton(){
+  const buttons = document.querySelectorAll("a.btn");
+
+  for (const btn of buttons) {
+    const text = btn.textContent.trim();
+    const href = btn.getAttribute("href");
+
+    if (
+      href === "auth.html" ||
+      text === "Войти" ||
+      (currentUser && text === currentUser.username)
+    ) {
+      return btn;
+    }
+  }
+
+  return null;
+}
+
+const authBtn = findAuthButton();
+
+if(currentUser && authBtn){
+
+  authBtn.innerHTML = userStarHtml(currentUser) + currentUser.username;
+
+  authBtn.classList.remove("gold");
+  authBtn.classList.add("ghost");
+
+  authBtn.style.background = "rgba(255,255,255,.06)";
+  authBtn.style.border = "1px solid rgba(232,194,112,.35)";
+  authBtn.style.boxShadow = "none";
+  authBtn.style.color = roleColors[currentUser.role] || "#ffffff";
+
+  authBtn.href = "#";
+
+  authBtn.onclick = function(e){
+    e.preventDefault();
+    document.getElementById("logoutModal").style.display = "flex";
+  };
+}
+
+function confirmLogout(){
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  location.reload();
+}
+
+function closeLogoutModal(){
+
+  document.getElementById("logoutModal").style.display = "none";
+
+}
+</script></body>
+</html>
