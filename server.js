@@ -1190,7 +1190,99 @@ JSON.stringify(decks || [])
     });
   }
 });
+// Редактировать турнир
+app.patch("/api/tournaments/:id", verifyToken, async (req, res) => {
+  try {
+    const access = await canManageTournament(req, req.params.id);
 
+    if(!access.ok){
+      return res.status(access.status).json({
+        ok: false,
+        error: access.error
+      });
+    }
+
+    const {
+      title,
+      description,
+      format,
+      max_players,
+      prize_1,
+      prize_2,
+      prize_3,
+      prize_4,
+      start_date,
+      telegram_link,
+      deckMode,
+      matchFormat,
+      finalFormat,
+      decksBeforeFinal,
+      bansBeforeFinal,
+      decksFinal,
+      bansFinal,
+      isPrivate,
+      privatePassword
+    } = req.body;
+
+    const result = await pool.query(`
+      UPDATE tournaments
+      SET
+        title = $1,
+        description = $2,
+        format = $3,
+        max_players = $4,
+        prize_1 = $5,
+        prize_2 = $6,
+        prize_3 = $7,
+        prize_4 = $8,
+        start_date = $9,
+        telegram_link = $10,
+        deckMode = $11,
+        matchFormat = $12,
+        finalFormat = $13,
+        decksBeforeFinal = $14,
+        bansBeforeFinal = $15,
+        decksFinal = $16,
+        bansFinal = $17,
+        is_private = $18,
+        private_password = $19
+      WHERE id = $20
+      RETURNING *
+    `, [
+      title || "",
+      description || "",
+      format || "single",
+      Number(max_players) || 8,
+      prize_1 || "",
+      prize_2 || "",
+      prize_3 || "",
+      prize_4 || "",
+      start_date || null,
+      telegram_link || "",
+      deckMode || "none",
+      matchFormat || "bo1",
+      finalFormat || "bo3",
+      Number(decksBeforeFinal) || 1,
+      Number(bansBeforeFinal) || 0,
+      Number(decksFinal) || 1,
+      Number(bansFinal) || 0,
+      !!isPrivate,
+      isPrivate ? (privatePassword || "") : "",
+      req.params.id
+    ]);
+
+    res.json({
+      ok: true,
+      tournament: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
 // Удалить турнир
 app.delete("/api/tournaments/:id", verifyToken, async (req, res) => {
   try {
