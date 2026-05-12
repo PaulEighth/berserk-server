@@ -1255,8 +1255,11 @@ const item = {
   title,
 
   author,
-  author_role: loggedUser?.role || "user",
-  author_is_partner: !!loggedUser?.is_partner,
+  author_role: getLoggedUser()?.role || "user",
+
+  // только Eighth всегда со звездой
+  author_is_partner:
+    String(getLoggedUser()?.username || "").trim().toLowerCase() === "eighth#2020",
 
   text,
   cover: selectedCover || placeholder(title),
@@ -1273,7 +1276,7 @@ const item = {
       try{
         const response = await fetch(`https://berserk-server.onrender.com/api/news/${oldItem.id}`, {
           method: "PATCH",
-          headers: {
+          headers: authHeaders(),
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
