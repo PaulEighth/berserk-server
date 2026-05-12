@@ -1249,17 +1249,24 @@ loadNewsComments();
 
       const loggedUser = getLoggedUser();
 
+const oldNewsForEdit =
+  formMode === "edit" && editingNewsIndex !== null
+    ? NEWS[editingNewsIndex]
+    : null;
+
 const item = {
   id: Date.now(),
   date: today(),
   title,
 
   author,
-  author_role: getLoggedUser()?.role || "user",
 
-  // только Eighth всегда со звездой
+  author_role: oldNewsForEdit?.author_role || loggedUser?.role || "user",
+
   author_is_partner:
-    String(getLoggedUser()?.username || "").trim().toLowerCase() === "eighth#2020",
+    String(author || "").trim().toLowerCase() === "eighth#2020"
+      ? true
+      : false,
 
   text,
   cover: selectedCover || placeholder(title),
