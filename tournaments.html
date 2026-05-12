@@ -6189,7 +6189,19 @@ const players = getPlayers(id);
       }
     }
 
+function openEditTournament(id){
+  const t = tournaments.find(item => String(item.id) === String(id));
 
+  if(!t){
+    showAlert("Турнир не найден");
+    return;
+  }
+
+  showAlert(
+    "Кнопка работает. Сейчас следующим шагом подключим заполнение формы редактирования.",
+    "Редактирование турнира"
+  );
+}
     function openDeleteTournamentModal(id){
       const t=tournaments.find(item=>String(item.id)===String(id));
       if(!t) return;
