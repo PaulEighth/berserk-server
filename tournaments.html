@@ -4540,8 +4540,12 @@ function injectSwordsEverywhere(){
       };
 
       try{
-  const response = await fetch("https://berserk-server.onrender.com/api/tournaments", {
-    method: "POST",
+  const response = await fetch(
+  window.editingTournamentId
+    ? `https://berserk-server.com/api/tournaments/${window.editingTournamentId}`
+    : "https://berserk-server.com/api/tournaments",
+  {
+    method: window.editingTournamentId ? "PATCH" : "POST",
     headers: authHeaders(),
     body: JSON.stringify({
       title: request.title,
@@ -4593,10 +4597,18 @@ if(typeof updateStats === "function"){
   showAlert(error.message || "Ошибка создания турнира");
   return;
 }
-      closeOrganizeModal();
+            closeOrganizeModal();
       clearTournamentRequestForm();
-      showAlert('Заявка отправлена на проверку. Турнир появится только после одобрения.');
-      renderPendingRequests();
+
+      if(window.editingTournamentId){
+        window.editingTournamentId = null;
+        showAlert("Турнир обновлён.");
+        await loadTournamentsFromServer();
+        applyFilters();
+      }else{
+        showAlert('Заявка отправлена на проверку. Турнир появится только после одобрения.');
+        renderPendingRequests();
+      }
     }
 
     function clearTournamentRequestForm(){
@@ -6197,10 +6209,50 @@ function openEditTournament(id){
     return;
   }
 
-  showAlert(
-    "Кнопка работает. Сейчас следующим шагом подключим заполнение формы редактирования.",
-    "Редактирование турнира"
-  );
+  window.editingTournamentId = id;
+
+  if($("requestTitle")) $("requestTitle").value = t.title || "";
+  if($("requestOrganizer")) $("requestOrganizer").value = t.organizer || "";
+  if($("requestStartDate")) $("requestStartDate").value = String(t.date || "").replace(" ", "T");
+  if($("requestEndDate")) $("requestEndDate").value = String(t.endDate || "").replace(" ", "T");
+  if($("requestFormat")) $("requestFormat").value = t.format || "bo1";
+  if($("requestDeckMode")) $("requestDeckMode").value = t.deckMode || "none";
+  if($("requestMatchFormat")) $("requestMatchFormat").value = t.matchFormat || "bo1";
+  if($("requestFinalFormat")) $("requestFinalFormat").value = t.finalFormat || "bo3";
+
+  if($("requestDecksBeforeFinal")) $("requestDecksBeforeFinal").value = t.decksBeforeFinal || 1;
+  if($("requestBansBeforeFinal")) $("requestBansBeforeFinal").value = t.bansBeforeFinal || 0;
+  if($("requestDecksFinal")) $("requestDecksFinal").value = t.decksFinal || 1;
+  if($("requestBansFinal")) $("requestBansFinal").value = t.bansFinal || 0;
+
+  if($("requestPlaces")) $("requestPlaces").value = t.places || t.max_players || 8;
+
+  const prizes = t.prizes || [];
+  if($("requestPrize1")) $("requestPrize1").value = prizes[0] || t.prize_1 || "";
+  if($("requestPrize2")) $("requestPrize2").value = prizes[1] || t.prize_2 || "";
+  if($("requestPrize3")) $("requestPrize3").value = prizes[2] || t.prize_3 || "";
+  if($("requestPrize4")) $("requestPrize4").value = prizes[3] || t.prize_4 || "";
+
+  if($("requestRules")) $("requestRules").value = t.deckRules || "";
+  if($("requestDescription")) $("requestDescription").value = t.description || "";
+
+  if($("requestIsPrivate")) $("requestIsPrivate").value = t.isPrivate ? "1" : "0";
+  if($("requestPassword")) $("requestPassword").value = t.privatePassword || "";
+
+  if($("requestPrivateToggle")){
+    $("requestPrivateToggle").textContent = t.isPrivate ? "Закрытый турнир" : "Открытый турнир";
+    $("requestPrivateToggle").classList.toggle("gold", !!t.isPrivate);
+    $("requestPrivateToggle").classList.toggle("ghost", !t.isPrivate);
+  }
+
+  if($("requestPasswordLabel")){
+    $("requestPasswordLabel").style.display = t.isPrivate ? "" : "none";
+  }
+
+  const title = document.querySelector("#organizeModal h2");
+  if(title) title.textContent = "Редактировать турнир";
+
+  openOrganizeModal();
 }
     function openDeleteTournamentModal(id){
       const t=tournaments.find(item=>String(item.id)===String(id));
@@ -6297,7 +6349,7 @@ function openEditTournament(id){
           + '<div class="card-actions">'
 + '<button class="btn gold" '+(disabled ? 'disabled' : '')+' onclick="openJoinModal('+t.id+')">'+(disabled ? 'Регистрация закрыта' : 'Участвовать')+'</button>'
 + '<button type="button" class="btn ghost track-tournament-btn" data-track-id="'+t.id+'" onclick="openTrackModal('+t.id+')">Отслеживать</button>'
-+ (canManageTournament(t.id) ? '<button type="button" class="btn ghost" onclick="openEditTournament('+t.id+')">✏️ Редактировать</button>' : '')
++ (canManageTournament(t.id) ? '<button type="button" class="btn ghost" onclick="openEditTournament('+t.id+')">Редактировать</button>' : '')
 + '<a class="btn ghost" href="deck-builder_checked.html">Собрать колоду</a>'
 + '</div>'
           + '</article>';
