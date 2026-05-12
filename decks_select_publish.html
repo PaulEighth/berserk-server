@@ -989,7 +989,38 @@ $('viewDeckActions').innerHTML = isLocal
       $('myBestDeck').textContent=myBest ? `${myBest.title} 👍 ${myBest.likes||0}` : '—';
       $('hallOfFameDeck').textContent=best ? `${best.title} 👍 ${best.likes||0}` : '—';
     }
-    function voteDeck(id,type){const deck=publishedDecks.find(d=>d.id===id);if(!deck)return;const old=myVotes[id];if(old===type){showToast('Ты уже поставил эту оценку');return}if(old==='up')deck.likes=Math.max(0,(deck.likes||0)-1);if(old==='down')deck.dislikes=Math.max(0,(deck.dislikes||0)-1);if(type==='up')deck.likes=(deck.likes||0)+1;if(type==='down')deck.dislikes=(deck.dislikes||0)+1;myVotes[id]=type;saveVotes();savePublished();renderAll()}
+    async function voteDeck(id, type){
+  const old = myVotes[id];
+
+  if(old === type){
+    showToast("Ты уже поставил эту оценку");
+    return;
+  }
+
+  try{
+    const response = await fetch(`https://berserk-server.onrender.com/api/decks/${id}/vote`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type })
+    });
+
+    const data = await response.json();
+
+    if(!data.ok){
+      throw new Error(data.error || "Не удалось поставить оценку");
+    }
+
+    myVotes[id] = type;
+    saveVotes();
+
+    await loadPublishedDecksFromServer();
+    renderAll();
+
+  }catch(error){
+    console.error(error);
+    showToast(error.message || "Ошибка оценки");
+  }
+}
     function openModal(){
       if(!isLoggedIn()){
         showAuthRequiredModal("Чтобы публиковать колоды, войдите в аккаунт.");
