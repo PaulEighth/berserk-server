@@ -3813,9 +3813,9 @@ function roleNickHtml(nick){
         const modal = document.querySelector('.join-modal');
         const requiredDeckCount = Number(t.decksBeforeFinal || 1);
         const selectedDeckIds = modal ? getSelectedTournamentDeckIds(modal) : [];
-        const myDecks = await getPlayerDecksForTournament();
+const myDecks = await getPlayerDecksForTournament();
 
-        selectedDecks = selectedDeckIds
+selectedDecks = selectedDeckIds
           .map(deckId => myDecks.find(d => String(d.id) === String(deckId)))
           .filter(Boolean);
 
@@ -3841,7 +3841,7 @@ function roleNickHtml(nick){
       try{
   console.log("SELECTED DECKS", selectedDecks);
 
-  const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${id}/join`, {
+  const response = await fetch(`https://berserk-server.com/api/tournaments/${id}/join`, {
   method: "POST",
   headers: {
     ...authHeaders(),
@@ -3881,7 +3881,7 @@ document.getElementById("forceJoinCancel").onclick = () => {
 };
 
 document.getElementById("forceJoinOk").onclick = async () => {
-      const secondResponse = await fetch(`https://berserk-server.onrender.com/api/tournaments/${id}/join`, {
+      const secondResponse = await fetch(`https://berserk-server.com/api/tournaments/${id}/join`, {
         method: "POST",
         headers: {
           ...authHeaders(),
