@@ -3763,7 +3763,7 @@ function roleNickHtml(nick){
         <div class="tournament-deck-select-box">
           <span class="label">Колоды для турнира</span>
           <div class="tournament-deck-count-note">Нужно выбрать колод: ${requiredDeckCount}</div>
-          ${myDecks.length >= requiredDeckCount ? `
+          ${myDecks.length ? `
             <div class="tournament-deck-picker" id="tournamentDeckPicker">
               ${myDecks.map(renderTournamentDeckChoice).join('')}
             </div>
