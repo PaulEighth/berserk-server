@@ -6282,7 +6282,12 @@ const players = getPlayers(id);
           + '</div>'
           + '<div class="places"><div class="places-head"><span>Занято '+busy+'/'+t.places+'</span><span>Свободно: '+free+'</span></div><div class="bar"><i style="width:'+percent+'%"></i></div></div>'
           + renderPlayers(t.id)
-          + '<div class="card-actions"><button class="btn gold" '+(disabled ? 'disabled' : '')+' onclick="openJoinModal('+t.id+')">'+(disabled ? 'Регистрация закрыта' : 'Участвовать')+'</button><button type="button" class="btn ghost track-tournament-btn" data-track-id="'+t.id+'" onclick="openTrackModal('+t.id+')">Отслеживать</button><a class="btn ghost" href="deck-builder_checked.html">Собрать колоду</a></div>'
+          + '<div class="card-actions">'
++ '<button class="btn gold" '+(disabled ? 'disabled' : '')+' onclick="openJoinModal('+t.id+')">'+(disabled ? 'Регистрация закрыта' : 'Участвовать')+'</button>'
++ '<button type="button" class="btn ghost track-tournament-btn" data-track-id="'+t.id+'" onclick="openTrackModal('+t.id+')">Отслеживать</button>'
++ (canManageTournament(t.id) ? '<button type="button" class="btn ghost" onclick="openEditTournament('+t.id+')">✏️ Редактировать</button>' : '')
++ '<a class="btn ghost" href="deck-builder_checked.html">Собрать колоду</a>'
++ '</div>'
           + '</article>';
       }).join('');
     }

@@ -1261,7 +1261,10 @@ const item = {
 
   author,
 
-  author_role: oldNewsForEdit?.author_role || loggedUser?.role || "user",
+  author_role:
+  String(author || "").trim().toLowerCase() === "valdisminski#2583"
+    ? "creator"
+    : (oldNewsForEdit?.author_role || loggedUser?.role || "user"),
 
   author_is_partner:
     String(author || "").trim().toLowerCase() === "eighth#2020"
