@@ -3563,39 +3563,61 @@ function roleNickHtml(nick){
   const nick = getCurrentUserNick();
   const result = [];
 
+  function safeArray(value){
+    if(Array.isArray(value)) return value;
+    if(typeof value === "string"){
+      try{ return JSON.parse(value || "[]"); }catch(e){ return []; }
+    }
+    return [];
+  }
+
+  function addDeck(deck, i, source){
+    if(!deck) return;
+
+    const raw = {
+      ...deck,
+      cards: safeArray(deck.cards || deck.deck),
+      previewIds: safeArray(deck.preview_ids || deck.previewIds)
+    };
+
+    const resolvedCards = resolveDeckCards(raw);
+    if(!resolvedCards.length) return;
+
+    const snapshot = {...raw, cards: resolvedCards};
+
+    result.push({
+      id: source + "_" + (deck.id || i),
+      title: deck.title || deck.name || ("Колода " + (i + 1)),
+      author: deck.author_name || deck.author || nick,
+      source: source === "server" ? "Сервер" : "Моя коллекция",
+      cards: resolvedCards,
+      previewIds: raw.previewIds || [],
+      heroImage: getDeckHeroImage(snapshot),
+      raw,
+      snapshot: JSON.parse(JSON.stringify(snapshot))
+    });
+  }
+
+  try{
+    const player = JSON.parse(localStorage.getItem("bhoPlayerDecksV1") || "[]");
+    if(Array.isArray(player)){
+      player.forEach((deck, i) => addDeck(deck.raw || deck, i, "local"));
+    }
+  }catch(e){}
+
+  try{
+    const published = JSON.parse(localStorage.getItem("bhoPublishedDecksV1") || "[]");
+    if(Array.isArray(published)){
+      published.forEach((deck, i) => addDeck(deck.raw || deck, i, "published"));
+    }
+  }catch(e){}
+
   try{
     const response = await fetch("https://berserk-server.com/api/decks");
     const data = await response.json();
 
     if(data.ok && Array.isArray(data.decks)){
-      data.decks.forEach((deck, i) => {
-        const author = deck.author_name || deck.author || "";
-
-        const raw = {
-          ...deck,
-          cards: Array.isArray(deck.cards)
-            ? deck.cards
-            : JSON.parse(deck.cards || "[]"),
-          previewIds: Array.isArray(deck.preview_ids)
-            ? deck.preview_ids
-            : JSON.parse(deck.preview_ids || "[]")
-        };
-
-        const resolvedCards = resolveDeckCards(raw);
-        const snapshot = {...raw, cards: resolvedCards};
-
-        result.push({
-          id: "server_" + (deck.id || i),
-          title: deck.title || deck.name || ("Колода " + (i + 1)),
-          author,
-          source: "Сервер",
-          cards: resolvedCards,
-          previewIds: raw.previewIds || [],
-          heroImage: getDeckHeroImage(snapshot),
-          raw,
-          snapshot: JSON.parse(JSON.stringify(snapshot))
-        });
-      });
+      data.decks.forEach((deck, i) => addDeck(deck, i, "server"));
     }
   }catch(e){
     console.error("Ошибка загрузки колод с сервера", e);
