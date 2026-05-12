@@ -3559,62 +3559,52 @@ function roleNickHtml(nick){
       return getCardImage(hero);
     }
 
-    function getPlayerDecksForTournament(){
-      const nick = getCurrentUserNick();
-      const result = [];
+    async function getPlayerDecksForTournament(){
+  const nick = getCurrentUserNick();
+  const result = [];
 
-      try{
-        const player = JSON.parse(localStorage.getItem("bhoPlayerDecksV1") || "[]");
-        if(Array.isArray(player)){
-          player.forEach((d,i)=>{
-            if(d){
-              const raw = d.raw || d;
-              const resolvedCards = resolveDeckCards(raw);
-              const snapshot = {...raw, cards: resolvedCards};
+  try{
+    const response = await fetch("https://berserk-server.com/api/decks");
+    const data = await response.json();
 
-              result.push({
-                id: "player_" + (d.id || i),
-                title: d.title || d.name || ("Моя колода " + (i+1)),
-                author: nick,
-                source: "Моя коллекция",
-                cards: resolvedCards,
-                previewIds: d.previewIds || [],
-                heroImage: getDeckHeroImage(snapshot),
-                raw,
-                snapshot: JSON.parse(JSON.stringify(snapshot))
-              });
-            }
-          });
-        }
-      }catch(e){}
+    if(data.ok && Array.isArray(data.decks)){
+      data.decks.forEach((deck, i) => {
+        const author = deck.author_name || deck.author || "";
 
-      try{
-        const published = JSON.parse(localStorage.getItem("bhoPublishedDecksV1") || "[]");
-        if(Array.isArray(published)){
-          published.forEach((d,i)=>{
-            if(d && String(d.author || "").toLowerCase() === String(nick).toLowerCase()){
-              const raw = d.raw || d;
-              const resolvedCards = resolveDeckCards(raw);
-              const snapshot = {...raw, cards: resolvedCards};
+        if(String(author).toLowerCase() !== String(nick).toLowerCase()) return;
 
-              result.push({
-                id: "published_" + (d.id || i),
-                title: d.title || d.name || ("Опубликованная колода " + (i+1)),
-                author: d.author || nick,
-                source: "Опубликована",
-                cards: resolvedCards,
-                previewIds: d.previewIds || [],
-                heroImage: getDeckHeroImage(snapshot),
-                raw,
-                snapshot: JSON.parse(JSON.stringify(snapshot))
-              });
-            }
-          });
-        }
-      }catch(e){}
+        const raw = {
+          ...deck,
+          cards: Array.isArray(deck.cards)
+            ? deck.cards
+            : JSON.parse(deck.cards || "[]"),
+          previewIds: Array.isArray(deck.preview_ids)
+            ? deck.preview_ids
+            : JSON.parse(deck.preview_ids || "[]")
+        };
 
-      return result;
+        const resolvedCards = resolveDeckCards(raw);
+        const snapshot = {...raw, cards: resolvedCards};
+
+        result.push({
+          id: "server_" + (deck.id || i),
+          title: deck.title || deck.name || ("Колода " + (i + 1)),
+          author,
+          source: "Сервер",
+          cards: resolvedCards,
+          previewIds: raw.previewIds || [],
+          heroImage: getDeckHeroImage(snapshot),
+          raw,
+          snapshot: JSON.parse(JSON.stringify(snapshot))
+        });
+      });
     }
+  }catch(e){
+    console.error("Ошибка загрузки колод с сервера", e);
+  }
+
+  return result;
+}
 
 
     function getCardImage(card){
@@ -3741,7 +3731,7 @@ function roleNickHtml(nick){
       const currentUserNick = getCurrentUserNick();
       loadTournamentCardDatabase();
       const needsDeck = String(t.deckMode || '').toLowerCase() === 'required';
-      const myDecks = getPlayerDecksForTournament();
+      const myDecks = await getPlayerDecksForTournament();
       console.log("JOIN DEBUG", {
   deckMode: t.deckMode,
   needsDeck,
@@ -3823,7 +3813,7 @@ function roleNickHtml(nick){
         const modal = document.querySelector('.join-modal');
         const requiredDeckCount = Number(t.decksBeforeFinal || 1);
         const selectedDeckIds = modal ? getSelectedTournamentDeckIds(modal) : [];
-        const myDecks = getPlayerDecksForTournament();
+        const myDecks = await getPlayerDecksForTournament();
 
         selectedDecks = selectedDeckIds
           .map(deckId => myDecks.find(d => String(d.id) === String(deckId)))
