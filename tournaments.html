@@ -3394,17 +3394,22 @@ function authHeaders(){
     }
 
     function getNickRole(nick){
-      const normalized = normalizeNick(String(nick || "")).toLowerCase();
-      if(!normalized) return "user";
+  const normalized = normalizeNick(String(nick || "")).toLowerCase();
+  if(!normalized) return "user";
 
-      const current = getLoggedUser();
-      if(current?.username && normalizeNick(current.username).toLowerCase() === normalized){
-        return current.role || "user";
-      }
+  const current = getLoggedUser();
+  if(current?.username && normalizeNick(current.username).toLowerCase() === normalized){
+    return current.role || "user";
+  }
 
-      const cache = getRoleCache();
-      return cache[normalized] || "user";
-    }
+  const cache = getRoleCache();
+  const item = cache[normalized];
+
+  if(typeof item === "string") return item;
+  if(typeof item === "object" && item?.role) return item.role;
+
+  return "user";
+}
 
     function getNickColor(nick){
       return roleColors[getNickRole(nick)] || "#ffffff";
@@ -6075,7 +6080,9 @@ saveMatchRoomToServer(currentMatchRoomKey);
     }
     function renderSwissStandingsTable(id,players,rounds){
       const rows=sortedSwissTable(players,rounds,id);
-      return `<div class="swiss-table-box"><table class="swiss-table"><thead><tr><th>Место</th><th>Игрок</th><th>Победы</th><th>Ничьи</th><th>Поражения</th><th>Очки</th><th>Разница</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(r.player)}</td><td>${r.wins}</td><td>${r.draws}</td><td>${r.losses}</td><td>${r.points}</td><td>${r.diff>0?'+':''}${r.diff}</td></tr>`).join('')}</tbody></table></div>`;
+      return `<div class="swiss-table-box"><table class="swiss-table"><thead><tr><th>Место</th><th>Игрок</th><th>Победы</th><th>Ничьи</th><th>Поражения</th><th>Очки</th><th>Разница</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td style="color:${roleColors[r.role] || '#ffffff'}">
+  ${escapeHtml(r.player)}
+</td><td>${r.wins}</td><td>${r.draws}</td><td>${r.losses}</td><td>${r.points}</td><td>${r.diff>0?'+':''}${r.diff}</td></tr>`).join('')}</tbody></table></div>`;
     }
     function renderSwissPairings(id,data,roundIndex){
       const round=data.rounds[roundIndex] || {pairings:[]};
