@@ -1720,6 +1720,51 @@ app.delete("/api/decks/:id", verifyToken, async (req, res) => {
     });
   }
 });
+// Лайки / дизлайки колод
+app.patch("/api/decks/:id/vote", async (req, res) => {
+  try {
+
+    const { type } = req.body;
+
+    if (!["up", "down"].includes(type)) {
+      return res.status(400).json({
+        ok: false,
+        error: "Неверный тип голоса"
+      });
+    }
+
+    const column = type === "up"
+      ? "likes"
+      : "dislikes";
+
+    const result = await pool.query(`
+      UPDATE decks
+      SET ${column} = COALESCE(${column}, 0) + 1
+      WHERE id = $1
+      RETURNING *
+    `, [req.params.id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        error: "Колода не найдена"
+      });
+    }
+
+    res.json({
+      ok: true,
+      deck: result.rows[0]
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+
+  }
+});
 app.listen(PORT, () => {
   
   console.log(`Сервер запущен на порту ${PORT}`);
