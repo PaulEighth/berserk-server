@@ -1721,46 +1721,99 @@ app.delete("/api/decks/:id", verifyToken, async (req, res) => {
   }
 });
 // Лайки / дизлайки колод
-app.patch("/api/decks/:id/vote", async (req, res) => {
+app.patch("/api/decks/:id/vote", verifyToken, async (req, res) => {
   try {
 
     const { type } = req.body;
+    const deckId = req.params.id;
+    const userId = req.user.id;
 
     if (!["up", "down"].includes(type)) {
       return res.status(400).json({
-        ok: false,
-        error: "Неверный тип голоса"
+        ok:false,
+        error:"Неверный тип голоса"
       });
     }
 
-    const column = type === "up"
-      ? "likes"
-      : "dislikes";
+    const oldVote = await pool.query(
+      `
+      SELECT *
+      FROM deck_votes
+      WHERE deck_id = $1
+      AND user_id = $2
+      `,
+      [deckId, userId]
+    );
 
-    const result = await pool.query(`
+    if (oldVote.rows.length > 0) {
+
+      const previousType = oldVote.rows[0].vote_type;
+
+      if (previousType === type) {
+        return res.status(400).json({
+          ok:false,
+          error:"Ты уже поставил эту оценку"
+        });
+      }
+
+      await pool.query(
+        `
+        UPDATE deck_votes
+        SET vote_type = $1
+        WHERE deck_id = $2
+        AND user_id = $3
+        `,
+        [type, deckId, userId]
+      );
+
+    } else {
+
+      await pool.query(
+        `
+        INSERT INTO deck_votes
+        (deck_id, user_id, vote_type)
+        VALUES ($1,$2,$3)
+        `,
+        [deckId, userId, type]
+      );
+
+    }
+
+    const counts = await pool.query(
+      `
+      SELECT
+        COUNT(*) FILTER (WHERE vote_type='up') AS likes,
+        COUNT(*) FILTER (WHERE vote_type='down') AS dislikes
+      FROM deck_votes
+      WHERE deck_id = $1
+      `,
+      [deckId]
+    );
+
+    const likes = Number(counts.rows[0].likes || 0);
+    const dislikes = Number(counts.rows[0].dislikes || 0);
+
+    const updated = await pool.query(
+      `
       UPDATE decks
-      SET ${column} = COALESCE(${column}, 0) + 1
-      WHERE id = $1
+      SET likes = $1,
+          dislikes = $2
+      WHERE id = $3
       RETURNING *
-    `, [req.params.id]);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        ok: false,
-        error: "Колода не найдена"
-      });
-    }
+      `,
+      [likes, dislikes, deckId]
+    );
 
     res.json({
-      ok: true,
-      deck: result.rows[0]
+      ok:true,
+      deck: updated.rows[0]
     });
 
-  } catch (error) {
+  } catch(error) {
 
     res.status(500).json({
-      ok: false,
-      error: error.message
+      ok:false,
+      error:error.message
     });
 
   }
