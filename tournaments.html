@@ -6248,9 +6248,30 @@ function openEditTournament(id){
 
   openOrganizeModal();
 }
+function canDeleteTournamentClient(t){
+  const user = getLoggedUser();
+  if(!user) return false;
+
+  if(["admin", "developer", "moderator"].includes(user.role)){
+    return true;
+  }
+
+  if(t.organizerId && user.id && Number(t.organizerId) === Number(user.id)){
+    return true;
+  }
+
+  const nick = user.username || getCurrentUserNick();
+  return !!nick && String(t.organizer || "").toLowerCase() === String(nick).toLowerCase();
+}
     function openDeleteTournamentModal(id){
       const t=tournaments.find(item=>String(item.id)===String(id));
       if(!t) return;
+
+      if(!canDeleteTournamentClient(t)){
+        showAlert("Недостаточно прав");
+        return;
+      }
+
       pendingDeleteTournamentId = id;
       $('deleteTournamentText').textContent = `Удалить турнир "${t.title}"? Это уберёт его из списка и очистит участников, сетку и счёт этого турнира в этом браузере.`;
       $('deleteTournamentModal').classList.add('show');

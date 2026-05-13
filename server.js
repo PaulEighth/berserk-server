@@ -84,7 +84,9 @@ function requireRoles(...roles) {
 function isStaff(user){
   return ["admin", "developer", "moderator", "creator"].includes(user.role);
 }
-
+function isDeleteStaff(user){
+  return ["admin", "developer", "moderator"].includes(user.role);
+}
 async function canManageTournament(req, tournamentId){
   const tournamentResult = await pool.query(
     "SELECT * FROM tournaments WHERE id = $1",
