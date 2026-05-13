@@ -3607,24 +3607,6 @@ function roleNickHtml(nick){
     }
   }catch(e){}
 
-  try{
-    const published = JSON.parse(localStorage.getItem("bhoPublishedDecksV1") || "[]");
-    if(Array.isArray(published)){
-      published.forEach((deck, i) => addDeck(deck.raw || deck, i, "published"));
-    }
-  }catch(e){}
-
-  try{
-    const response = await fetch("https://berserk-server.com/api/decks");
-    const data = await response.json();
-
-    if(data.ok && Array.isArray(data.decks)){
-      data.decks.forEach((deck, i) => addDeck(deck, i, "server"));
-    }
-  }catch(e){
-    console.error("Ошибка загрузки колод с сервера", e);
-  }
-
   return result;
 }
 
