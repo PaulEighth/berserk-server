@@ -488,7 +488,30 @@ app.patch("/admin/users/:id/role", requireAdmin, async (req, res) => {
       "UPDATE users SET role = $1 WHERE id = $2 RETURNING id, username, email, role",
       [role, id]
     );
+await pool.query(
+  "UPDATE news SET author_role = $1 WHERE author_id = $2",
+  [role, id]
+);
 
+await pool.query(
+  "UPDATE news_comments SET author_role = $1 WHERE user_id = $2",
+  [role, id]
+);
+
+await pool.query(
+  "UPDATE tournaments SET organizer_role = $1 WHERE organizer_id = $2",
+  [role, id]
+);
+
+await pool.query(
+  "UPDATE tournament_participants SET role = $1 WHERE user_id = $2",
+  [role, id]
+);
+
+await pool.query(
+  "UPDATE decks SET author_role = $1 WHERE author_id = $2",
+  [role, id]
+);
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Пользователь не найден" });
     }
