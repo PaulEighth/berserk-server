@@ -3259,10 +3259,12 @@ bracketData: Array.isArray(t.bracket)
     tournamentDeckSubmits = {};
 
     data.participants.forEach(p => {
-      const tournamentId = String(p.tournament_id);
-      if(!registrations[tournamentId]){
-        registrations[tournamentId] = [];
-      }
+  rememberUserRole(p.username, p.role || "user", !!p.is_partner);
+
+  const tournamentId = String(p.tournament_id);
+  if(!registrations[tournamentId]){
+    registrations[tournamentId] = [];
+  }
 
       const playerDecks = Array.isArray(p.decks)
   ? p.decks
