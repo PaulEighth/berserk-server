@@ -635,7 +635,6 @@ function authHeaders(){
       const result=[];
       const player=JSON.parse(localStorage.getItem(PLAYER_DECKS_KEY)||'[]');
       if(Array.isArray(player)){player.forEach((d,i)=>{if(d&&Array.isArray(d.cards)&&d.cards.length)result.push({id:d.id||('player_'+i),source:'Мои сохранённые колоды',title:d.title||('Моя колода '+(i+1)),cards:d.cards,raw:d})})}
-      publishedDecks.forEach((d,i)=>{if(d&&Array.isArray(d.cards)&&d.cards.length)result.push({id:'published_'+d.id,source:'Уже опубликована',title:d.title||('Опубликованная колода '+(i+1)),cards:d.cards,raw:d,republish:true})})
       return result;
     }
     function imgTag(card,cls='small-img',count=1){
