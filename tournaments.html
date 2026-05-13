@@ -6328,7 +6328,7 @@ function openEditTournament(id){
         return (!q || text.includes(q)) && (status === 'all' || t.status === status) && (format === 'all' || t.format === format);
       });
       list.sort((a,b) => {
-        const freeA = a.free - getExtraTaken(a.id), freeB = b.free - getExtraTaken(b.id);
+        const freeA = a.free, freeB = b.free;
         return sort === 'places' ? freeB-freeA : sort === 'prize' ? b.prizeValue-a.prizeValue : new Date(a.date.replace(' ','T'))-new Date(b.date.replace(' ','T'));
       });
       render(list); updateStats();
@@ -6337,7 +6337,7 @@ function openEditTournament(id){
     function render(list){
       $('emptyState').style.display = list.length ? 'none' : 'block';
       $('tournamentGrid').innerHTML = list.map(t => {
-        const free = Math.max(0, t.free - getExtraTaken(t.id));
+        const free = Math.max(0, t.free);
         const busy = t.places - free;
         const percent = Math.max(0, Math.min(100, Math.round(busy / t.places * 100)));
         const disabled = t.status === 'closed' || t.status === 'finished' || free <= 0;
