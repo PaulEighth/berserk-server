@@ -3186,6 +3186,14 @@ let approvedTournaments = [];
     console.error("SAVE MATCH ROOM ERROR:", error);
   }
 }
+function getMoneyPrizeValue(text){
+  const value = String(text || "");
+
+  const rubMatch = value.match(/(\d[\d\s]*)\s*(р|руб|₽)/i);
+  if(!rubMatch) return 0;
+
+  return Number(rubMatch[1].replace(/\s/g, "")) || 0;
+}
     async function loadTournamentsFromServer(){
   try{
     const response = await fetch("https://berserk-server.onrender.com/api/tournaments");
@@ -3216,8 +3224,8 @@ privatePassword: t.private_password || "",
     organizer_role: t.organizer_role || "user",
     organizer_is_partner: !!t.organizer_is_partner,
 
-    prize: t.prize_1 || "Без приза",
-    prizeValue: Number(String(t.prize_1 || "").replace(/[^0-9]/g, "")) || 0,
+        prize: t.prize_1 || "Без приза",
+    prizeValue: getMoneyPrizeValue(t.prize_1 || ""),
     prizes: [
       t.prize_1 || "-",
       t.prize_2 || "-",
@@ -6410,8 +6418,8 @@ function canDeleteTournamentClient(t){
 
     function updateStats(){
       $('totalTournaments').textContent = tournaments.length;
-      $('openTournaments').textContent = tournaments.filter(t => t.status === 'open' && (t.free - getExtraTaken(t.id)) > 0).length;
-      $('freePlaces').textContent = tournaments.filter(t => t.status === 'open' || t.status === 'soon').reduce((s,t) => s + Math.max(0, t.free - getExtraTaken(t.id)), 0);
+      $('openTournaments').textContent = tournaments.filter(t => t.status === 'open' && t.free > 0).length;
+      $('freePlaces').textContent = tournaments.filter(t => t.status === 'open' || t.status === 'soon').reduce((s,t) => s + Math.max(0, t.free), 0);
       $('totalPrize').textContent = tournaments.reduce((s,t) => s + t.prizeValue, 0).toLocaleString('ru-RU') + ' ₽';
       updateCountdown();
       if(countdownTimer) clearInterval(countdownTimer);
