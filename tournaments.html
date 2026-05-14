@@ -6382,7 +6382,7 @@ function canDeleteTournamentClient(t){
 
     function getNextTournament(){
       return tournaments
-        .filter(t => (t.status === 'open' || t.status === 'soon') && (t.free - getExtraTaken(t.id)) > 0 && new Date(t.date.replace(' ','T')).getTime() > Date.now())
+        .filter(t => (t.status === 'open' || t.status === 'soon') && t.free > 0 && new Date(t.date.replace(' ','T')).getTime() > Date.now())
         .sort((a,b) => new Date(a.date.replace(' ','T')) - new Date(b.date.replace(' ','T')))[0];
     }
 
@@ -6412,7 +6412,7 @@ function canDeleteTournamentClient(t){
       }
       const start = new Date(next.date.replace(' ','T')).getTime();
       $('nextEvent').textContent = formatDate(next.date);
-      $('nextEventText').innerHTML = `${escapeHtml(next.title)} · свободно мест: ${Math.max(0, next.free - getExtraTaken(next.id))}` + renderCountdown(start - Date.now());
+      $('nextEventText').innerHTML = `${escapeHtml(next.title)} · свободно мест: ${Math.max(0, next.free)}` + renderCountdown(start - Date.now());
     }
 
 
