@@ -5277,8 +5277,11 @@ async function randomizeTournamentStartOrder(id){
     return;
   }
 
-  const ok = confirm("Перемешать стартовые ячейки? Будут изменены только ячейки первого раунда.");
-  if(!ok) return;
+  const ok = await showConfirm(
+  "Перемешать стартовые ячейки? Будут изменены только ячейки первого раунда.",
+  "Рандом сетки"
+);
+if(!ok) return;
 
   const key = String(id);
   const bracketSize = getTournamentBracketSize(t);
@@ -7074,6 +7077,28 @@ function showAlert(text, title='Информация'){
 function closeAlert(){
   document.getElementById('customAlert').classList.remove('show');
 }
+function showConfirm(text, title='Подтвердите действие'){
+  return new Promise(resolve => {
+    const modal = document.getElementById('customConfirm');
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmText').textContent = text;
+
+    modal.classList.add('show');
+
+    const yes = document.getElementById('confirmYes');
+    const no = document.getElementById('confirmNo');
+
+    function cleanup(result){
+      modal.classList.remove('show');
+      yes.onclick = null;
+      no.onclick = null;
+      resolve(result);
+    }
+
+    yes.onclick = () => cleanup(true);
+    no.onclick = () => cleanup(false);
+  });
+}
 </script><script>
 history.scrollRestoration = "manual";
 
@@ -7107,10 +7132,19 @@ function closeAlert(){
   <div class="custom-alert-box">
     <h3 id="alertTitle">Информация</h3>
     <p id="alertText">Текст</p>
-    <button class="btn gold" onclick="closeAlert()">ОК</button>
+    <button class="btn gold" onclick="closeAlert()">Да</button>
   </div>
 </div>
-
+<div class="custom-alert" id="customConfirm">
+  <div class="custom-alert-box">
+    <h3 id="confirmTitle">Подтвердите действие</h3>
+    <p id="confirmText">Текст</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn gold" id="confirmYes">Да</button>
+      <button class="btn ghost" id="confirmNo">Нет</button>
+    </div>
+  </div>
+</div>
 <audio id="bgMusic" loop>
   <source src="BGO.mp3" type="audio/mpeg">
 </audio>
