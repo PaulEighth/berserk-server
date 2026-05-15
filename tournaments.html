@@ -5306,6 +5306,15 @@ async function randomizeTournamentStartOrder(id){
   showAlert("Стартовые пары перемешаны.");
 }
 window.randomizeTournamentStartOrder = randomizeTournamentStartOrder;
+document.addEventListener("click", function(event){
+  const btn = event.target.closest("[data-random-tournament]");
+  if(!btn) return;
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  randomizeTournamentStartOrder(btn.dataset.randomTournament);
+});
     function splitPlayersForBracket(players,bracketSize){
       const size=Number(bracketSize)||16;
       const half=size/2;
@@ -6362,7 +6371,7 @@ const players = getPlayers(id);
       if(t.format === 'swiss'){
   $('fullBracket').innerHTML = `
     <div style="display:flex;justify-content:flex-start;margin:0 0 14px">
-      <button type="button" class="btn gold" onclick="event.preventDefault(); event.stopPropagation(); window.randomizeTournamentStartOrder(${jsArg(id)})">🎲 Рандом</button>
+      <button type="button" class="btn gold" data-random-tournament="${escapeHtml(String(id))}">🎲 Рандом</button>
     </div>
     ${renderSwissMode(t,id,swissPlayersForTournament(t,id))}
   `;
