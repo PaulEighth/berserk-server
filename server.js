@@ -1641,7 +1641,208 @@ app.delete("/api/tournaments/:id", verifyToken, async (req, res) => {
       error: error.message
     });
   }
-});// Сохранить сетку / счёт турнира
+});
+// Сохранить стартовый рандом сетки — только организатор, админ, разработчик, модератор
+app.patch("/api/tournaments/:id/random-play", verifyToken, async (req, res) => {
+  try {
+    const access = await canDeleteTournament(req, req.params.id);
+
+    if(!access.ok){
+      return res.status(access.status).json({
+        ok: false,
+        error: access.error
+      });
+    }
+
+    const { bracket, swiss_data } = req.body;
+
+    const result = await pool.query(`
+      UPDATE tournaments
+      SET
+        bracket = $1,
+        swiss_data = $2
+      WHERE id = $3
+      RETURNING *
+    `, [
+      JSON.stringify(bracket || []),
+      JSON.stringify(swiss_data || {}),
+      req.params.id
+    ]);
+
+    res.json({
+      ok: true,
+      tournament: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+
+// Сохранить стартовый рандом сетки
+app.patch("/api/tournaments/:id/random-play", verifyToken, async (req, res) => {
+  try {
+    const access = await canDeleteTournament(req, req.params.id);
+
+    if(!access.ok){
+      return res.status(access.status).json({
+        ok: false,
+        error: access.error
+      });
+    }
+
+    const { bracket, swiss_data } = req.body;
+
+    const result = await pool.query(`
+      UPDATE tournaments
+      SET
+        bracket = $1,
+        swiss_data = $2
+      WHERE id = $3
+      RETURNING *
+    `, [
+      JSON.stringify(bracket || []),
+      JSON.stringify(swiss_data || {}),
+      req.params.id
+    ]);
+
+    res.json({
+      ok: true,
+      tournament: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+
+// Сохранить стартовый рандом сетки
+app.patch("/api/tournaments/:id/random-play", verifyToken, async (req, res) => {
+  try {
+    const access = await canDeleteTournament(req, req.params.id);
+
+    if(!access.ok){
+      return res.status(access.status).json({
+        ok: false,
+        error: access.error
+      });
+    }
+
+    const { bracket, swiss_data } = req.body;
+
+    const result = await pool.query(`
+      UPDATE tournaments
+      SET
+        bracket = $1,
+        swiss_data = $2
+      WHERE id = $3
+      RETURNING *
+    `, [
+      JSON.stringify(bracket || []),
+      JSON.stringify(swiss_data || {}),
+      req.params.id
+    ]);
+
+    res.json({
+      ok: true,
+      tournament: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+
+// Сохранить стартовый рандом сетки
+app.patch("/api/tournaments/:id/random-play", verifyToken, async (req, res) => {
+  try {
+    const access = await canDeleteTournament(req, req.params.id);
+
+    if(!access.ok){
+      return res.status(access.status).json({
+        ok: false,
+        error: access.error
+      });
+    }
+
+    const { bracket, swiss_data } = req.body;
+
+    const result = await pool.query(`
+      UPDATE tournaments
+      SET
+        bracket = $1,
+        swiss_data = $2
+      WHERE id = $3
+      RETURNING *
+    `, [
+      JSON.stringify(bracket || []),
+      JSON.stringify(swiss_data || {}),
+      req.params.id
+    ]);
+
+    res.json({
+      ok: true,
+      tournament: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+
+// Сохранить стартовый рандом сетки
+app.patch("/api/tournaments/:id/random-play", verifyToken, async (req, res) => {
+  try {
+    const access = await canDeleteTournament(req, req.params.id);
+
+    if(!access.ok){
+      return res.status(access.status).json({
+        ok: false,
+        error: access.error
+      });
+    }
+
+    const { bracket, swiss_data } = req.body;
+
+    const result = await pool.query(`
+      UPDATE tournaments
+      SET
+        bracket = $1,
+        swiss_data = $2
+      WHERE id = $3
+      RETURNING *
+    `, [
+      JSON.stringify(bracket || []),
+      JSON.stringify(swiss_data || {}),
+      req.params.id
+    ]);
+
+    res.json({
+      ok: true,
+      tournament: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+
+// Сохранить сетку / счёт турнира
 app.patch("/api/tournaments/:id/play", verifyToken, async (req, res) => {
   try {
     const access = await canEditTournamentPlay(req, req.params.id);
