@@ -861,7 +861,12 @@ padding:24px;
       }
       return '';
     }
-
+function authHeaders(){
+  return {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${localStorage.getItem("token")}`
+  };
+}
     function openCreateDeckModal(){
       if(!isLoggedIn()){
         showAuthRequiredModal("Чтобы создать колоду, войдите в аккаунт.");
@@ -882,7 +887,7 @@ padding:24px;
       $('createDeckModal').setAttribute('aria-hidden','true');
     }
 
-    function createDeck(){
+    async function createDeck(){
       const title = $('createdDeckTitle').value.trim();
       const description = $('createdDeckDescription').value.trim();
 
@@ -892,10 +897,16 @@ padding:24px;
         return;
       }
 
+      if(!isLoggedIn()){
+        showAuthRequiredModal("Чтобы создать колоду, войдите в аккаунт.");
+        return;
+      }
+
       const error = validateDeckForCreate();
       if(error){ showCustomAlert(error); return; }
 
       const playerDecks = JSON.parse(localStorage.getItem('bhoPlayerDecksV1') || '[]');
+
       const newDeck = {
         id: 'player_' + Date.now(),
         title: title,
@@ -904,13 +915,48 @@ padding:24px;
         cards: deck.map(card => card.id)
       };
 
+      let savedOnServer = false;
+
+      try{
+        const response = await fetch("https://berserk-server.com/api/player-decks", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({
+            title: title,
+            description: description,
+            cards: newDeck.cards,
+            preview_ids: []
+          })
+        });
+
+        const data = await response.json();
+
+        if(!data.ok){
+          throw new Error(data.error || "Не удалось сохранить колоду на сервер");
+        }
+
+        if(data.deck && data.deck.id){
+          newDeck.serverId = data.deck.id;
+        }
+
+        savedOnServer = true;
+
+      }catch(error){
+        console.error(error);
+      }
+
       playerDecks.unshift(newDeck);
       localStorage.setItem('bhoPlayerDecksV1', JSON.stringify(playerDecks));
       saveDeck();
 
       closeCreateDeckModal();
       showToast('Колода создана: ' + title);
-      showCustomAlert('Ваша колода добавлена в ваш сборник колод во вкладке «Колоды».');
+
+      if(savedOnServer){
+        showCustomAlert('Колода сохранена в аккаунте. Теперь она будет доступна с телефона и ПК.');
+      }else{
+        showCustomAlert('Колода создана локально, но не сохранилась на сервер. Проверь интернет или вход в аккаунт.');
+      }
     }
 
     function showCustomAlert(text){

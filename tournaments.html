@@ -3572,6 +3572,7 @@ function roleNickHtml(nick){
     async function getPlayerDecksForTournament(){
   const nick = getCurrentUserNick();
   const result = [];
+  const usedKeys = new Set();
 
   function safeArray(value){
     if(Array.isArray(value)) return value;
@@ -3593,19 +3594,42 @@ function roleNickHtml(nick){
     const resolvedCards = resolveDeckCards(raw);
     if(!resolvedCards.length) return;
 
+    const key = String(deck.serverId || deck.id || deck.title || i);
+    if(usedKeys.has(key)) return;
+    usedKeys.add(key);
+
     const snapshot = {...raw, cards: resolvedCards};
 
     result.push({
       id: source + "_" + (deck.id || i),
       title: deck.title || deck.name || ("Колода " + (i + 1)),
       author: deck.author_name || deck.author || nick,
-      source: source === "server" ? "Сервер" : "Моя коллекция",
+      source: source === "server_player" ? "Мои колоды из аккаунта" : "Моя коллекция",
       cards: resolvedCards,
       previewIds: raw.previewIds || [],
       heroImage: getDeckHeroImage(snapshot),
       raw,
       snapshot: JSON.parse(JSON.stringify(snapshot))
     });
+  }
+
+  if(localStorage.getItem("token")){
+    try{
+      const response = await fetch("https://berserk-server.com/api/player-decks", {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+
+      const data = await response.json();
+
+      if(data.ok && Array.isArray(data.decks)){
+        data.decks.forEach((deck, i) => addDeck(deck, i, "server_player"));
+      }
+    }catch(e){
+      console.error("Ошибка загрузки личных колод с сервера", e);
+    }
   }
 
   try{

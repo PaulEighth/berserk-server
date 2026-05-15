@@ -84,9 +84,11 @@ function requireRoles(...roles) {
 function isStaff(user){
   return ["admin", "developer", "moderator", "creator"].includes(user.role);
 }
+
 function isDeleteStaff(user){
   return ["admin", "developer", "moderator"].includes(user.role);
 }
+
 async function canManageTournament(req, tournamentId){
   const tournamentResult = await pool.query(
     "SELECT * FROM tournaments WHERE id = $1",
@@ -100,6 +102,25 @@ async function canManageTournament(req, tournamentId){
   const tournament = tournamentResult.rows[0];
 
   if(isStaff(req.user) || Number(tournament.organizer_id) === Number(req.user.id)){
+    return { ok: true, tournament };
+  }
+
+    return { ok: false, status: 403, error: "Недостаточно прав" };
+}
+
+async function canDeleteTournament(req, tournamentId){
+  const tournamentResult = await pool.query(
+    "SELECT * FROM tournaments WHERE id = $1",
+    [tournamentId]
+  );
+
+  if(tournamentResult.rows.length === 0){
+    return { ok: false, status: 404, error: "Турнир не найден" };
+  }
+
+  const tournament = tournamentResult.rows[0];
+
+  if(isDeleteStaff(req.user) || Number(tournament.organizer_id) === Number(req.user.id)){
     return { ok: true, tournament };
   }
 
@@ -157,6 +178,17 @@ async function ensurePartnerColumn() {
   try {
     await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_partner BOOLEAN DEFAULT FALSE");
 await pool.query("ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS players_can_edit BOOLEAN DEFAULT FALSE");
+await pool.query(`
+  CREATE TABLE IF NOT EXISTS player_decks (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    cards JSONB NOT NULL DEFAULT '[]',
+    preview_ids JSONB NOT NULL DEFAULT '[]',
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  )
+`);
     await pool.query(
       "UPDATE users SET role = 'admin' WHERE username = $1",
       [ADMIN_USERNAME]
@@ -1311,7 +1343,7 @@ app.patch("/api/tournaments/:id", verifyToken, async (req, res) => {
 // Удалить турнир
 app.delete("/api/tournaments/:id", verifyToken, async (req, res) => {
   try {
-    const access = await canManageTournament(req, req.params.id);
+    const access = await canDeleteTournament(req, req.params.id);
 
 if(!access.ok){
   return res.status(access.status).json({
@@ -1581,7 +1613,7 @@ JSON.stringify(decks || [])
 // Удалить турнир
 app.delete("/api/tournaments/:id", verifyToken, async (req, res) => {
   try {
-    const access = await canManageTournament(req, req.params.id);
+    const access = await canDeleteTournament(req, req.params.id);
 
     if(!access.ok){
       return res.status(access.status).json({
@@ -1719,7 +1751,146 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
 // =========================
 // КОЛОДЫ
 // =========================
+// Получить личные колоды пользователя
+app.get("/api/player-decks", verifyToken, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT *
+      FROM player_decks
+      WHERE user_id = $1
+      ORDER BY updated_at DESC, id DESC
+    `, [req.user.id]);
 
+    res.json({
+      ok: true,
+      decks: result.rows
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+
+// Сохранить личную колоду пользователя
+app.post("/api/player-decks", verifyToken, async (req, res) => {
+  try {
+    const { title, cards, preview_ids } = req.body;
+
+    if (!title || !Array.isArray(cards) || !cards.length) {
+      return res.status(400).json({
+        ok: false,
+        error: "Название и карты обязательны"
+      });
+    }
+
+    const result = await pool.query(`
+      INSERT INTO player_decks (
+        user_id,
+        title,
+        cards,
+        preview_ids
+      )
+      VALUES ($1,$2,$3,$4)
+      RETURNING *
+    `, [
+      req.user.id,
+      title,
+      JSON.stringify(cards || []),
+      JSON.stringify(preview_ids || [])
+    ]);
+
+    res.json({
+      ok: true,
+      deck: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+
+// Обновить личную колоду пользователя
+app.patch("/api/player-decks/:id", verifyToken, async (req, res) => {
+  try {
+    const { title, cards, preview_ids } = req.body;
+
+    if (!title || !Array.isArray(cards) || !cards.length) {
+      return res.status(400).json({
+        ok: false,
+        error: "Название и карты обязательны"
+      });
+    }
+
+    const result = await pool.query(`
+      UPDATE player_decks
+      SET title = $1,
+          cards = $2,
+          preview_ids = $3,
+          updated_at = NOW()
+      WHERE id = $4 AND user_id = $5
+      RETURNING *
+    `, [
+      title,
+      JSON.stringify(cards || []),
+      JSON.stringify(preview_ids || []),
+      req.params.id,
+      req.user.id
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        error: "Колода не найдена"
+      });
+    }
+
+    res.json({
+      ok: true,
+      deck: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+
+// Удалить личную колоду пользователя
+app.delete("/api/player-decks/:id", verifyToken, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      DELETE FROM player_decks
+      WHERE id = $1 AND user_id = $2
+      RETURNING *
+    `, [
+      req.params.id,
+      req.user.id
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        error: "Колода не найдена"
+      });
+    }
+
+    res.json({ ok: true });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
 // Получить опубликованные колоды
 app.get("/api/decks", async (req, res) => {
   try {
