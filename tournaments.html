@@ -6389,7 +6389,7 @@ const players = getPlayers(id);
 
       $('fullBracket').innerHTML = `
   <div style="display:flex;justify-content:flex-start;margin:0 0 14px">
-    <button class="btn gold" onclick="randomizeTournamentStartOrder(${jsArg(id)})">🎲 Рандом</button>
+    <button type="button" class="btn gold" data-random-tournament="${escapeHtml(String(id))}">🎲 Рандом</button>
   </div>
   ${renderFullBracket(id,players,bracketSize)}
 `;
