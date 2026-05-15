@@ -5152,7 +5152,159 @@ renderTrackModal(id);
     function setBracketViewSize(id,size){
       showAlert('Размер сетки зафиксирован при создании турнира. Изменить его после публикации нельзя.');
     }
+function shuffleArrayCopy(arr){
+  const result = [...arr];
 
+  for(let i = result.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+
+  return result;
+}
+
+function getStartSlotsForBracketSize(bracketSize){
+  const size = Number(bracketSize) || 16;
+  const slots = [];
+
+  function addGroup(group, baseSeed, count){
+    const half = count / 2;
+
+    for(let i = 0; i < half; i++){
+      slots.push({ group, side:"left", round:1, slot:i, seed:baseSeed + i });
+    }
+
+    for(let i = 0; i < half; i++){
+      slots.push({ group, side:"right", round:1, slot:i, seed:baseSeed + half + i });
+    }
+  }
+
+  if(size === 8){
+    addGroup("main", 1, 8);
+    return slots;
+  }
+
+  if(size === 16){
+    addGroup("main", 1, 16);
+    return slots;
+  }
+
+  if(size === 32){
+    addGroup("groupA", 1, 16);
+    addGroup("groupB", 17, 16);
+    return slots;
+  }
+
+  if(size === 64){
+    addGroup("groupA", 1, 16);
+    addGroup("groupB", 17, 16);
+    addGroup("groupC", 33, 16);
+    addGroup("groupD", 49, 16);
+    return slots;
+  }
+
+  if(size === 128){
+    addGroup("groupA", 1, 16);
+    addGroup("groupB", 17, 16);
+    addGroup("groupC", 33, 16);
+    addGroup("groupD", 49, 16);
+    addGroup("groupE", 65, 16);
+    addGroup("groupF", 81, 16);
+    addGroup("groupG", 97, 16);
+    addGroup("groupH", 113, 16);
+    return slots;
+  }
+
+  addGroup("main", 1, 16);
+  return slots;
+}
+
+async function saveTournamentRandomPlayToServer(id){
+  try{
+    const t = tournaments.find(x => String(x.id) === String(id));
+    if(!t) return false;
+
+    const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${id}/random-play`, {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        bracket: t.bracketData || [],
+        swiss_data: {
+          ...(t.swissData || {}),
+          manualCells: tournamentManualCells[String(id)] || {},
+          manualScores: tournamentManualScores[String(id)] || {},
+          winners: tournamentWinners[String(id)] || {},
+          outPlayers: tournamentOutPlayers[String(id)] || {}
+        }
+      })
+    });
+
+    const data = await response.json();
+
+    if(!data.ok){
+      showAlert(data.error || "Недостаточно прав");
+      return false;
+    }
+
+    return true;
+
+  }catch(error){
+    console.error("RANDOM PLAY SAVE ERROR:", error);
+    showAlert("Ошибка сохранения рандома");
+    return false;
+  }
+}
+
+async function randomizeTournamentStartOrder(id){
+  const t = tournaments.find(item => String(item.id) === String(id));
+
+  if(!t){
+    showAlert("Турнир не найден");
+    return;
+  }
+
+  if(!canRandomizeTournamentClient(t)){
+    showAlert("Недостаточно прав");
+    return;
+  }
+
+  const players = getPlayers(id)
+    .map(p => typeof p === "object" ? (p.username || p.name || "") : p)
+    .filter(Boolean);
+
+  if(players.length < 2){
+    showAlert("Для рандома нужно минимум 2 игрока.");
+    return;
+  }
+
+  const ok = confirm("Перемешать стартовые ячейки? Будут изменены только ячейки первого раунда.");
+  if(!ok) return;
+
+  const key = String(id);
+  const bracketSize = getTournamentBracketSize(t);
+  const startSlots = getStartSlotsForBracketSize(bracketSize);
+  const shuffled = shuffleArrayCopy(players).slice(0, startSlots.length);
+
+  if(!tournamentManualCells[key]){
+    tournamentManualCells[key] = {};
+  }
+
+  startSlots.forEach((cell, index) => {
+    const cKey = cellKey(cell.group, cell.side, cell.round, cell.slot);
+    tournamentManualCells[key][cKey] = shuffled[index] || EMPTY_CELL;
+  });
+
+  saveManualCells();
+
+  const saved = await saveTournamentRandomPlayToServer(id);
+  if(!saved) return;
+
+  await loadTournamentsFromServer();
+  renderTrackModal(id);
+  applyFilters();
+
+  showAlert("Стартовые пары перемешаны.");
+}
     function splitPlayersForBracket(players,bracketSize){
       const size=Number(bracketSize)||16;
       const half=size/2;
@@ -6207,7 +6359,12 @@ const players = getPlayers(id);
       if(bracketSizeRow) bracketSizeRow.style.display = 'none';
 
       if(t.format === 'swiss'){
-        $('fullBracket').innerHTML = renderSwissMode(t,id,swissPlayersForTournament(t,id));
+  $('fullBracket').innerHTML = `
+    <div style="display:flex;justify-content:flex-start;margin:0 0 14px">
+      <button class="btn gold" onclick="randomizeTournamentStartOrder(${jsArg(id)})">🎲 Рандом</button>
+    </div>
+    ${renderSwissMode(t,id,swissPlayersForTournament(t,id))}
+  `;
         if($('deleteTournamentBtn')){
           $('deleteTournamentBtn').onclick = () => openDeleteTournamentModal(id);
         }
@@ -6220,7 +6377,12 @@ const players = getPlayers(id);
         btn.title = 'Размер сетки зафиксирован при создании турнира';
       });
 
-      $('fullBracket').innerHTML=renderFullBracket(id,players,bracketSize);
+      $('fullBracket').innerHTML = `
+  <div style="display:flex;justify-content:flex-start;margin:0 0 14px">
+    <button class="btn gold" onclick="randomizeTournamentStartOrder(${jsArg(id)})">🎲 Рандом</button>
+  </div>
+  ${renderFullBracket(id,players,bracketSize)}
+`;
 
       if($('deleteTournamentBtn')){
         $('deleteTournamentBtn').onclick = () => openDeleteTournamentModal(id);
@@ -6279,6 +6441,21 @@ function openEditTournament(id){
   if(title) title.textContent = "Редактировать турнир";
 
   openOrganizeModal();
+}
+function canRandomizeTournamentClient(t){
+  const user = getLoggedUser();
+  if(!user) return false;
+
+  if(["admin", "developer", "moderator"].includes(user.role)){
+    return true;
+  }
+
+  if(t.organizerId && user.id && Number(t.organizerId) === Number(user.id)){
+    return true;
+  }
+
+  const nick = user.username || getCurrentUserNick();
+  return !!nick && String(t.organizer || "").toLowerCase() === String(nick).toLowerCase();
 }
 function canDeleteTournamentClient(t){
   const user = getLoggedUser();
