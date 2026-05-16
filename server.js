@@ -1394,31 +1394,6 @@ app.patch("/api/tournaments/:id", verifyToken, async (req, res) => {
     });
   }
 });
-// Покинуть турнир
-app.delete("/api/tournaments/:id/leave", verifyToken, async (req, res) => {
-  try {
-
-    const tournamentId = req.params.id;
-
-    await pool.query(
-      `DELETE FROM tournament_participants
-       WHERE tournament_id = $1 AND user_id = $2`,
-      [tournamentId, req.user.id]
-    );
-
-    res.json({
-      ok: true
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      ok: false,
-      error: error.message
-    });
-
-  }
-});
 // Удалить турнир
 app.delete("/api/tournaments/:id", verifyToken, async (req, res) => {
   try {
@@ -1688,39 +1663,35 @@ JSON.stringify(decks || [])
     });
   }
 });
-
-// Удалить турнир
-app.delete("/api/tournaments/:id", verifyToken, async (req, res) => {
+// Покинуть турнир
+app.delete("/api/tournaments/:id/leave", verifyToken, async (req, res) => {
   try {
-    const access = await canDeleteTournament(req, req.params.id);
-
-    if(!access.ok){
-      return res.status(access.status).json({
-        ok: false,
-        error: access.error
-      });
-    }
     const result = await pool.query(
-      "DELETE FROM tournaments WHERE id = $1 RETURNING *",
-      [req.params.id]
+      `
+      DELETE FROM tournament_participants
+      WHERE tournament_id = $1 AND user_id = $2
+      RETURNING *
+      `,
+      [req.params.id, req.user.id]
     );
 
-    if (result.rows.length === 0) {
+    if(result.rows.length === 0){
       return res.status(404).json({
         ok: false,
-        error: "Турнир не найден"
+        error: "Ты не зарегистрирован на этот турнир"
       });
     }
 
     res.json({ ok: true });
 
-  } catch (error) {
+  } catch(error) {
     res.status(500).json({
       ok: false,
       error: error.message
     });
   }
 });
+
 // Сохранить стартовый рандом сетки — только организатор, админ, разработчик, модератор
 app.patch("/api/tournaments/:id/random-play", verifyToken, async (req, res) => {
   try {
