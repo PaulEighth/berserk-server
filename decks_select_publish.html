@@ -971,65 +971,61 @@ $('viewDeckActions').innerHTML = isLocal
       window.location.href='deck-builder_checked.html';
     }
 
-    function deleteLocalDeck(id){
-  const deck=localDeckById(id);
+  function deleteLocalDeck(id){
+  const deck = localDeckById(id);
+
   if(!deck){
     showToast('Колода не найдена');
     return;
   }
 
-  if(deck.serverId){
-    showToast('Колоды аккаунта пока нельзя удалить здесь');
-    return;
-  }
+  showConfirm('Удалить эту колоду у себя?', async ()=>{
+    if(deck.serverId){
+      try{
+        const response = await fetch(`https://berserk-server.com/api/player-decks/${deck.serverId}`, {
+          method: "DELETE",
+          headers: authHeaders()
+        });
 
-      showConfirm('Удалить эту колоду только у себя? В общем доступе она останется, если была опубликована.',()=>{
-        if(deck.localType==='builder'){
-          localStorage.removeItem(BUILDER_KEY);
-        } else {
-          const player=JSON.parse(localStorage.getItem(PLAYER_DECKS_KEY)||'[]');
-          if(Array.isArray(player)){
-            player.splice(deck.index,1);
-            localStorage.setItem(PLAYER_DECKS_KEY,JSON.stringify(player));
-          }
+        const data = await response.json();
+
+        if(!data.ok){
+          throw new Error(data.error || "Не удалось удалить колоду");
+        }
+
+        serverPlayerDecks = serverPlayerDecks.filter(d => String(d.serverId) !== String(deck.serverId));
+
+        const player = JSON.parse(localStorage.getItem(PLAYER_DECKS_KEY) || "[]");
+        if(Array.isArray(player)){
+          const filtered = player.filter(d => String(d.serverId) !== String(deck.serverId));
+          localStorage.setItem(PLAYER_DECKS_KEY, JSON.stringify(filtered));
         }
 
         closeDeckView();
         renderAll();
-        showToast('Колода удалена у тебя');
-      });
-    }
+        showToast('Колода удалена из аккаунта');
+        return;
 
-    async function deletePublishedDeck(id){
-  showConfirm('Удалить опубликованную колоду из общего списка?', async ()=>{
-
-    try{
-      const response = await fetch(`https://berserk-server.com/api/decks/${id}`, {
-        method: "DELETE",
-        headers: authHeaders()
-      });
-
-      const data = await response.json();
-
-      if(!data.ok){
-        throw new Error(data.error || "Не удалось удалить колоду");
+      }catch(error){
+        console.error(error);
+        showToast('Ошибка удаления колоды');
+        return;
       }
-
-      delete myVotes[id];
-      saveVotes();
-
-      await loadPublishedDecksFromServer();
-
-      closeDeckView();
-      renderAll();
-
-      showToast('Опубликованная колода удалена');
-
-    }catch(error){
-      console.error(error);
-      showToast(error.message || "Ошибка удаления колоды");
     }
 
+    if(deck.localType === 'builder'){
+      localStorage.removeItem(BUILDER_KEY);
+    } else {
+      const player = JSON.parse(localStorage.getItem(PLAYER_DECKS_KEY) || '[]');
+      if(Array.isArray(player)){
+        player.splice(deck.index, 1);
+        localStorage.setItem(PLAYER_DECKS_KEY, JSON.stringify(player));
+      }
+    }
+
+    closeDeckView();
+    renderAll();
+    showToast('Колода удалена у тебя');
   });
 }
 
