@@ -888,76 +888,64 @@ function authHeaders(){
     }
 
     async function createDeck(){
-      const title = $('createdDeckTitle').value.trim();
-      const description = $('createdDeckDescription').value.trim();
+  const title = $('createdDeckTitle').value.trim();
+  const description = $('createdDeckDescription').value.trim();
 
-      if(!title){
-        showCustomAlert('Введите название колоды.');
-        $('createdDeckTitle').focus();
-        return;
-      }
+  if(!title){
+    showCustomAlert('Введите название колоды.');
+    $('createdDeckTitle').focus();
+    return;
+  }
 
-      if(!isLoggedIn()){
-        showAuthRequiredModal("Чтобы создать колоду, войдите в аккаунт.");
-        return;
-      }
+  if(!isLoggedIn()){
+    showAuthRequiredModal("Чтобы создать колоду, войдите в аккаунт.");
+    return;
+  }
 
-      const error = validateDeckForCreate();
-      if(error){ showCustomAlert(error); return; }
+  const error = validateDeckForCreate();
+  if(error){ showCustomAlert(error); return; }
 
-      const playerDecks = JSON.parse(localStorage.getItem('bhoPlayerDecksV1') || '[]');
+  const playerDecks = JSON.parse(localStorage.getItem('bhoPlayerDecksV1') || '[]');
 
-      const newDeck = {
-        id: 'player_' + Date.now(),
-        title: title,
-        description: description,
-        createdAt: new Date().toISOString(),
-        cards: deck.map(card => card.id)
-      };
+  const newDeck = {
+    id: 'player_' + Date.now(),
+    title,
+    description,
+    createdAt: new Date().toISOString(),
+    cards: deck.map(card => card.id)
+  };
 
-      let savedOnServer = false;
+  try{
+    const response = await fetch("https://berserk-server.com/api/player-decks", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      },
+      body: JSON.stringify({
+        title,
+        cards: newDeck.cards,
+        preview_ids: []
+      })
+    });
 
-      try{
-        const response = await fetch("https://berserk-server.com/api/player-decks", {
-          method: "POST",
-          headers: authHeaders(),
-          body: JSON.stringify({
-            title: title,
-            description: description,
-            cards: newDeck.cards,
-            preview_ids: []
-          })
-        });
+    const data = await response.json();
 
-        const data = await response.json();
-
-        if(!data.ok){
-          throw new Error(data.error || "Не удалось сохранить колоду на сервер");
-        }
-
-        if(data.deck && data.deck.id){
-          newDeck.serverId = data.deck.id;
-        }
-
-        savedOnServer = true;
-
-      }catch(error){
-        console.error(error);
-      }
-
-      playerDecks.unshift(newDeck);
-      localStorage.setItem('bhoPlayerDecksV1', JSON.stringify(playerDecks));
-      saveDeck();
-
-      closeCreateDeckModal();
-      showToast('Колода создана: ' + title);
-
-      if(savedOnServer){
-        showCustomAlert('Колода сохранена в аккаунте. Теперь она будет доступна с телефона и ПК.');
-      }else{
-        showCustomAlert('Колода создана локально, но не сохранилась на сервер. Проверь интернет или вход в аккаунт.');
-      }
+    if(data.ok && data.deck?.id){
+      newDeck.serverId = data.deck.id;
     }
+  }catch(error){
+    console.error(error);
+  }
+
+  playerDecks.unshift(newDeck);
+  localStorage.setItem('bhoPlayerDecksV1', JSON.stringify(playerDecks));
+  saveDeck();
+
+  closeCreateDeckModal();
+  showToast('Колода создана: ' + title);
+  showCustomAlert('Колода сохранена.');
+}
 
     function showCustomAlert(text){
       $('customAlertText').textContent = text;
