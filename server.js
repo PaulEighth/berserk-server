@@ -1394,7 +1394,31 @@ app.patch("/api/tournaments/:id", verifyToken, async (req, res) => {
     });
   }
 });
+// Покинуть турнир
+app.delete("/api/tournaments/:id/leave", verifyToken, async (req, res) => {
+  try {
 
+    const tournamentId = req.params.id;
+
+    await pool.query(
+      `DELETE FROM tournament_participants
+       WHERE tournament_id = $1 AND user_id = $2`,
+      [tournamentId, req.user.id]
+    );
+
+    res.json({
+      ok: true
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+
+  }
+});
 // Удалить турнир
 app.delete("/api/tournaments/:id", verifyToken, async (req, res) => {
   try {
