@@ -1042,7 +1042,8 @@ $('viewDeckActions').innerHTML = isLocal
     }
 
     function renderAll(){renderMyDecks();renderTopDecks();updateStats()}
-    function renderMyDecks(){const list=makeLocalDecks();$('myDecks').innerHTML=list.length?list.map(d=>renderLocalDeckCard(d)).join(''):'<div class="empty">Пока нет созданных колод. Собери колоду во вкладке «База карт» и нажми «Создать», после этого она появится здесь.</div>'}
+    function renderMyDecks(){
+  const list=getAvailableDecks();;$('myDecks').innerHTML=list.length?list.map(d=>renderLocalDeckCard(d)).join(''):'<div class="empty">Пока нет созданных колод. Собери колоду во вкладке «База карт» и нажми «Создать», после этого она появится здесь.</div>'}
     function renderTopDecks(){const top=[...publishedDecks].sort((a,b)=>deckScore(b)-deckScore(a)).slice(0,5);$('topDecks').innerHTML=top.length?top.map((d,i)=>renderDeckCard(d,i+1)).join(''):'<div class="empty">Топ появится после публикации колод.</div>'}
     function updateStats(){
       const local=makeLocalDecks();
