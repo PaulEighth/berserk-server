@@ -671,13 +671,15 @@ function authHeaders(){
       serverPlayerDecks.forEach((d,i)=>{
         if(d && Array.isArray(d.cards) && d.cards.length){
           result.push({
-            id:d.id || ('server_player_'+i),
-            source:d.source || 'Мои колоды из аккаунта',
-            title:d.title || ('Моя колода '+(i+1)),
-            cards:d.cards,
-            previewIds:d.previewIds || [],
-            raw:d.raw || d
-          });
+  id:d.id || ('server_player_'+i),
+  serverId:d.serverId,
+  source:d.source || 'Мои колоды из аккаунта',
+  title:d.title || ('Моя колода '+(i+1)),
+  description:d.raw?.description || d.description || '',
+  cards:d.cards,
+  previewIds:d.previewIds || [],
+  raw:d.raw || d
+});
         }
       });
 
@@ -808,8 +810,14 @@ function authHeaders(){
     }
 
     function localDeckById(id){
-      return makeLocalDecks().find(d=>String(d.id)===String(id));
-    }
+  const wanted = String(id);
+
+  return getAvailableDecks().find(d =>
+    String(d.id) === wanted ||
+    String(d.serverId) === wanted ||
+    String("server_player_" + d.serverId) === wanted
+  );
+}
 
     function deckCardsFromLocal(localDeck){
       return (localDeck.cards||[]).map(normalizeDeckCard).filter(Boolean);
@@ -964,8 +972,16 @@ $('viewDeckActions').innerHTML = isLocal
     }
 
     function deleteLocalDeck(id){
-      const deck=localDeckById(id);
-      if(!deck)return;
+  const deck=localDeckById(id);
+  if(!deck){
+    showToast('Колода не найдена');
+    return;
+  }
+
+  if(deck.serverId){
+    showToast('Колоды аккаунта пока нельзя удалить здесь');
+    return;
+  }
 
       showConfirm('Удалить эту колоду только у себя? В общем доступе она останется, если была опубликована.',()=>{
         if(deck.localType==='builder'){
@@ -1046,7 +1062,7 @@ $('viewDeckActions').innerHTML = isLocal
   const list=getAvailableDecks();;$('myDecks').innerHTML=list.length?list.map(d=>renderLocalDeckCard(d)).join(''):'<div class="empty">Пока нет созданных колод. Собери колоду во вкладке «База карт» и нажми «Создать», после этого она появится здесь.</div>'}
     function renderTopDecks(){const top=[...publishedDecks].sort((a,b)=>deckScore(b)-deckScore(a)).slice(0,5);$('topDecks').innerHTML=top.length?top.map((d,i)=>renderDeckCard(d,i+1)).join(''):'<div class="empty">Топ появится после публикации колод.</div>'}
     function updateStats(){
-      const local=makeLocalDecks();
+      const local=getAvailableDecks();
       const sortedByLikes=[...publishedDecks].sort((a,b)=>(b.likes||0)-(a.likes||0)||deckScore(b)-deckScore(a));
       const best=sortedByLikes[0];
       const myBest=sortedByLikes[0];
