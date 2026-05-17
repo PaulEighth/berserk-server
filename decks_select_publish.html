@@ -368,6 +368,27 @@
       <div id="viewDeckCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:12px;margin-top:18px"></div>
       <div id="viewDeckActions" class="votes" style="margin-top:18px"></div>
     </div>
+    <div class="modal" id="editDeckTextModal" aria-hidden="true">
+  <div class="modal-box" style="width:min(680px,100%)">
+    <button class="modal-close" onclick="closeDeckTextModal()">×</button>
+
+    <div class="modal-head">
+      <span class="eyebrow">✦ Описание колоды</span>
+      <h2>Редактировать текст</h2>
+      <p class="small">Измени описание колоды. Текст сохранится в аккаунте и не пропадёт после обновления страницы.</p>
+    </div>
+
+    <label>
+      <span class="label">Описание</span>
+      <textarea class="textarea" id="editDeckTextInput" placeholder="Напиши описание, стратегию или заметки по колоде"></textarea>
+    </label>
+
+    <div class="votes" style="margin-top:18px">
+      <button class="btn gold" onclick="saveDeckTextModal()">Сохранить</button>
+      <button class="btn ghost" onclick="closeDeckTextModal()">Отмена</button>
+    </div>
+  </div>
+</div>
   </div></main><footer class="footer"><div class="wrap"><div>Данный сайт является неофициальным фанатским проектом и не имеет никакого отношения к правообладателю игры Берсерк Герои Онлайн, ее лицензиатам или официальным партнерам.
 Все права на игру Берсерк Герои Онлайн, включая название, торговые марки, графические элементы и другие объекты интеллектуальной собственности, принадлежат их законным правообладателям</div></div></footer>
 
@@ -590,14 +611,15 @@ function authHeaders(){
     }
 
     serverPlayerDecks = data.decks.map(deck => ({
-      id: "server_player_" + deck.id,
-      serverId: deck.id,
-      source: "Мои колоды из аккаунта",
-      title: deck.title || "Моя колода",
-      cards: Array.isArray(deck.cards) ? deck.cards : JSON.parse(deck.cards || "[]"),
-      previewIds: Array.isArray(deck.preview_ids) ? deck.preview_ids : JSON.parse(deck.preview_ids || "[]"),
-      raw: deck
-    }));
+  id: "server_player_" + deck.id,
+  serverId: deck.id,
+  source: "Мои колоды из аккаунта",
+  title: deck.title || "Моя колода",
+  description: deck.description || "",
+  cards: Array.isArray(deck.cards) ? deck.cards : JSON.parse(deck.cards || "[]"),
+  previewIds: Array.isArray(deck.preview_ids) ? deck.preview_ids : JSON.parse(deck.preview_ids || "[]"),
+  raw: deck
+}));
 
   }catch(error){
     console.error(error);
@@ -702,13 +724,14 @@ function authHeaders(){
           if(usedKeys.has(key)) return;
 
           result.push({
-            id:d.id||('player_'+i),
-            source:'Мои сохранённые колоды',
-            title:d.title||('Моя колода '+(i+1)),
-            cards:d.cards,
-            previewIds:d.previewIds || [],
-            raw:d
-          });
+  id:d.id||('player_'+i),
+  source:'Мои сохранённые колоды',
+  title:d.title||('Моя колода '+(i+1)),
+  description:d.description || '',
+  cards:d.cards,
+  previewIds:d.previewIds || [],
+  raw:d
+});
         });
       }
 
@@ -731,14 +754,7 @@ function authHeaders(){
         if(existing) existing.count++;
         else grouped.push({card,count:1});
       });
-function deckCardCount(deck){
-  const deckCards = deckCardsFromIds(deck);
-  const hero = getHero(deckCards);
 
-  return deckCards.filter(card =>
-    !hero || String(card.id) !== String(hero.id)
-  ).length;
-}
       grouped.sort((a,b)=>{
         const ca=Number(a.card.cost)||0;
         const cb=Number(b.card.cost)||0;
@@ -978,7 +994,9 @@ $('viewDeckActions').innerHTML = isLocal
       $('viewDeckModal').classList.remove('show');
       $('viewDeckModal').setAttribute('aria-hidden','true');
     }
-async function editLocalDeckText(id){
+let editingDeckTextId = null;
+
+function editLocalDeckText(id){
   const deck = localDeckById(id);
 
   if(!deck){
@@ -986,14 +1004,40 @@ async function editLocalDeckText(id){
     return;
   }
 
-  const newText = prompt(
-    'Измени описание колоды:',
-    deck.description || ''
-  );
+  editingDeckTextId = id;
 
-  if(newText === null) return;
+  $('editDeckTextInput').value =
+    deck.description ||
+    deck.raw?.description ||
+    '';
 
-  deck.description = newText.trim();
+  $('editDeckTextModal').classList.add('show');
+  $('editDeckTextModal').setAttribute('aria-hidden','false');
+
+  setTimeout(()=>$('editDeckTextInput').focus(),50);
+}
+
+function closeDeckTextModal(){
+  $('editDeckTextModal').classList.remove('show');
+  $('editDeckTextModal').setAttribute('aria-hidden','true');
+  editingDeckTextId = null;
+}
+
+async function saveDeckTextModal(){
+  const deck = localDeckById(editingDeckTextId);
+
+  if(!deck){
+    showToast('Колода не найдена');
+    return;
+  }
+
+  const description = $('editDeckTextInput').value.trim();
+
+  deck.description = description;
+
+  if(deck.raw){
+    deck.raw.description = description;
+  }
 
   const player = JSON.parse(localStorage.getItem(PLAYER_DECKS_KEY) || '[]');
 
@@ -1004,30 +1048,42 @@ async function editLocalDeckText(id){
     );
 
     if(found){
-      found.description = deck.description;
+      found.description = description;
       localStorage.setItem(PLAYER_DECKS_KEY, JSON.stringify(player));
     }
   }
 
   if(deck.serverId){
     try{
-      await fetch(`https://berserk-server.com/api/player-decks/${deck.serverId}`, {
+      const response = await fetch(`https://berserk-server.com/api/player-decks/${deck.serverId}`, {
         method: "PATCH",
         headers: authHeaders(),
         body: JSON.stringify({
           title: deck.title,
-          description: deck.description,
+          description,
           cards: deck.cards,
           preview_ids: deck.previewIds || deck.raw?.previewIds || []
         })
       });
+
+      const data = await response.json();
+
+      if(!data.ok){
+        throw new Error(data.error || 'Не удалось сохранить описание');
+      }
+
+      await loadPlayerDecksFromServer();
+
     }catch(error){
       console.error(error);
+      showToast(error.message || 'Ошибка сохранения текста');
+      return;
     }
   }
 
+  closeDeckTextModal();
   renderAll();
-  showToast('Текст колоды обновлён');
+  showToast('Текст колоды сохранён');
 }
     function editLocalDeck(id){
       const deck=localDeckById(id);
