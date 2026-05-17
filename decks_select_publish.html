@@ -1189,13 +1189,28 @@ async function saveDeckTextModal(){
   showToast('Текст колоды сохранён');
 }
     function editLocalDeck(id){
-      const deck=localDeckById(id);
-      if(!deck){showToast('Колода не найдена');return}
-      const deckCards=deckCardsFromLocal(deck);
-      localStorage.setItem(BUILDER_KEY,JSON.stringify(deckCards));
-      window.location.href='deck-builder_checked.html';
-    }
+  const deck = localDeckById(id);
 
+  if(!deck){
+    showToast('Колода не найдена');
+    return;
+  }
+
+  const deckCards = deckCardsFromLocal(deck);
+
+  localStorage.setItem(BUILDER_KEY, JSON.stringify(deckCards));
+
+  localStorage.setItem('bhoEditingDeckV1', JSON.stringify({
+    id: deck.id,
+    serverId: deck.serverId || deck.raw?.serverId || null,
+    title: deck.title || '',
+    description: deck.description || deck.raw?.description || '',
+    previewIds: deck.previewIds || deck.raw?.previewIds || [],
+    createdAt: deck.createdAt || deck.raw?.createdAt || new Date().toISOString()
+  }));
+
+  window.location.href = 'deck-builder_checked.html';
+}
   function deleteLocalDeck(id){
   const deck = localDeckById(id);
 
