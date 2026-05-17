@@ -1128,7 +1128,7 @@ private_password
       prize_4 || "",
       start_date || null,
       telegram_link || "",
-      JSON.stringify(bracket || []),
+      Number(bracket) || Number(max_players) || 16,
       JSON.stringify(swiss_data || {}),
 
       deckMode || "none",
@@ -1548,7 +1548,7 @@ private_password
       prize_4 || "",
       start_date || null,
       telegram_link || "",
-      JSON.stringify(bracket || []),
+      Number(bracket) || Number(max_players) || 16,
       JSON.stringify(swiss_data || {}),
       deckMode || "none",
 matchFormat || "bo1",
