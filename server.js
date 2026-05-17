@@ -1057,6 +1057,7 @@ app.post("/api/tournaments", verifyToken, requireRoles("admin", "developer", "mo
   description,
   format,
   max_players,
+  bracket,
   prize_1,
   prize_2,
   prize_3,
@@ -1356,8 +1357,9 @@ app.patch("/api/tournaments/:id", verifyToken, async (req, res) => {
         decksFinal = $16,
         bansFinal = $17,
         is_private = $18,
-        private_password = $19
-      WHERE id = $20
+        private_password = $19,
+bracket = $20
+WHERE id = $21
       RETURNING *
     `, [
       title || "",
@@ -1379,7 +1381,8 @@ app.patch("/api/tournaments/:id", verifyToken, async (req, res) => {
       Number(bansFinal) || 0,
       !!isPrivate,
       isPrivate ? (privatePassword || "") : "",
-      req.params.id
+JSON.stringify(bracket || []),
+req.params.id
     ]);
 
     res.json({
