@@ -3257,12 +3257,10 @@ bansBeforeFinal: Number(t.bansbeforefinal || t.bansBeforeFinal || 0),
 decksFinal: Number(t.decksfinal || t.decksFinal || 1),
 bansFinal: Number(t.bansfinal || t.bansFinal || 0),
 
-    bracketSize: Number(t.bracket_size || t.bracketSize || t.grid || t.max_players) || 8,
-grid: Number(t.bracket_size || t.bracketSize || t.grid || t.max_players) || 8,
-bracket: Number(t.bracket_size || t.bracketSize || t.grid || t.max_players) || 8,
-bracketData: Array.isArray(t.bracket)
-  ? t.bracket
-  : JSON.parse(t.bracket || "[]"),
+    bracketSize: Number(t.bracket_size || t.bracketSize || t.bracket || t.grid || t.max_players) || 8,
+grid: Number(t.bracket_size || t.bracketSize || t.bracket || t.grid || t.max_players) || 8,
+bracket: Number(t.bracket_size || t.bracketSize || t.bracket || t.grid || t.max_players) || 8,
+bracketData: Array.isArray(t.bracket) ? t.bracket : [],
 
     swissData: typeof t.swiss_data === "object"
       ? t.swiss_data
@@ -5300,9 +5298,14 @@ if(!ok) return;
   }
 
   startSlots.forEach((cell, index) => {
-    const cKey = cellKey(cell.group, cell.side, cell.round, cell.slot);
-    tournamentManualCells[key][cKey] = shuffled[index] || EMPTY_CELL;
-  });
+  const cKey = cellKey(cell.group, cell.side, cell.round, cell.slot);
+
+  if(shuffled[index]){
+    tournamentManualCells[key][cKey] = shuffled[index];
+  }else{
+    delete tournamentManualCells[key][cKey];
+  }
+});
 
   saveManualCells();
 
@@ -5340,7 +5343,12 @@ document.addEventListener("click", function(event){
     function slotValue(id,group,side,round,slot,autoEntry=null,fallbackSeed=null){
       const manual=getManualCellRaw(id,group,side,round,slot);
       const seed=entrySeed(autoEntry,fallbackSeed);
-      if(manual === EMPTY_CELL) return makeBracketEntry(null,seed);
+      if(manual === EMPTY_CELL){
+  if(Number(round) === 1 && entryNick(autoEntry)){
+    return autoEntry;
+  }
+  return makeBracketEntry(null,seed);
+}
       if(manual !== undefined) return makeBracketEntry(manual || null,seed);
       return autoEntry || makeBracketEntry(null,seed);
     }
