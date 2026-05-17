@@ -248,7 +248,23 @@
   right:-5px !important;
   top:-7px !important;
 }
+.deck-description-preview{
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  line-height:1.45;
+  max-height:4.35em;
+}
 
+.deck-description-full{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:18px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(232,194,112,.14);
+  white-space:pre-wrap;
+}
 </style>
 </head>
 <body>
@@ -951,10 +967,38 @@ function deckAuthorStarHtml(deck){
 
   return "";
 }
-    function renderDeckCard(deck,rank){
-      const deckCards=deckCardsFromIds(deck);
-      return `<article class="deck-card" onclick="openDeckView('${deck.id}','published')" style="cursor:pointer"><h3>${rank?rank+'. ':''}${escapeHtml(deck.title)}</h3><div class="meta">Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorStarHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b> · карт: ${deckCardCount(deck)}</div><p class="meta">${escapeHtml(deck.description||'Описание не добавлено.')}</p>${deckPreviewHtml(deckCards, deck.previewIds || [])}<div class="votes"><button class="vote ${myVotes[deck.id]==='up'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','up')">👍 ${deck.likes||0}</button><button class="vote ${myVotes[deck.id]==='down'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','down')">👎 ${deck.dislikes||0}</button><span class="score">Рейтинг: ${deckScore(deck)}</span><button class="vote" onclick="event.stopPropagation(); openDeckView('${deck.id}','published')">Состав</button></div></article>`;
-    }
+function canEditPublishedDeck(deck){
+  const user = getLoggedUser();
+  if(!user || !deck) return false;
+
+  const sameId = deck.author_id && Number(deck.author_id) === Number(user.id);
+  const sameName = String(user.username || '').toLowerCase() === String(deck.author || '').toLowerCase();
+  const staff = ['admin','developer','moderator'].includes(user.role);
+
+  return sameId || sameName || staff;
+}
+
+function renderDeckCard(deck,rank){
+  const deckCards = deckCardsFromIds(deck);
+
+  const editBtn = canEditPublishedDeck(deck)
+    ? `<button class="vote" onclick="event.stopPropagation(); editPublishedDeckText('${deck.id}')">Редактировать текст</button>`
+    : '';
+
+  return `<article class="deck-card" onclick="openDeckView('${deck.id}','published')" style="cursor:pointer">
+    <h3>${rank?rank+'. ':''}${escapeHtml(deck.title)}</h3>
+    <div class="meta">Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorStarHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b> · карт: ${deckCardCount(deck)}</div>
+    <p class="meta deck-description-preview">${escapeHtml(deck.description||'Описание не добавлено.')}</p>
+    ${deckPreviewHtml(deckCards, deck.previewIds || [])}
+    <div class="votes">
+      <button class="vote ${myVotes[deck.id]==='up'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','up')">👍 ${deck.likes||0}</button>
+      <button class="vote ${myVotes[deck.id]==='down'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','down')">👎 ${deck.dislikes||0}</button>
+      <span class="score">Рейтинг: ${deckScore(deck)}</span>
+      <button class="vote" onclick="event.stopPropagation(); openDeckView('${deck.id}','published')">Состав</button>
+      ${editBtn}
+    </div>
+  </article>`;
+}
 
     function openDeckView(id,kind='published'){
       let deck, deckCards, isLocal=false;
@@ -969,7 +1013,11 @@ function deckAuthorStarHtml(deck){
         deckCards=deckCardsFromIds(deck);
       }
       $('viewDeckTitle').textContent=deck.title||'Колода';
-      $('viewDeckMeta').innerHTML=(isLocal?'Локальная колода':'Опубликованная колода')+' · Автор: <b>'+escapeHtml(deck.author||'Не указан')+'</b> · карт: '+deckCardCount(deck)+(deck.description?' · '+escapeHtml(deck.description):'');
+      $('viewDeckMeta').innerHTML =
+  (isLocal?'Локальная колода':'Опубликованная колода') +
+  ' · Автор: <b>' + escapeHtml(deck.author||'Не указан') + '</b> · карт: ' +
+  deckCardCount(deck) +
+  (deck.description ? '<div class="deck-description-full">' + escapeHtml(deck.description) + '</div>' : '');
       $('viewDeckCards').innerHTML=deckCards.length?groupDeckCards(deckCards).map(({card,count})=>`<article style="background:rgba(255,255,255,.045);border:1px solid rgba(232,194,112,.15);border-radius:16px;padding:8px;text-align:center;position:relative"><div style="position:absolute;right:7px;top:7px;background:rgba(7,9,15,.86);border:1px solid rgba(240,210,139,.28);border-radius:999px;padding:4px 8px;font-size:12px;font-weight:950;color:#f0d28b">${count}x</div><img src="${escapeHtml(card.image||'')}" alt="${escapeHtml(card.name)}" title="${escapeHtml(card.name)}" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#111" onerror="this.style.visibility='hidden'"><div style="font-size:12px;font-weight:900;line-height:1.25;margin-top:7px;color:#f4efe6">${escapeHtml(card.name)}</div></article>`).join(''):'<div class="empty">Карты не найдены. Проверь cards.json и id карт.</div>';
       const canDeletePublished =
   !isLocal &&
@@ -996,7 +1044,45 @@ $('viewDeckActions').innerHTML = isLocal
       $('viewDeckModal').setAttribute('aria-hidden','true');
     }
 let editingDeckTextId = null;
+async function editPublishedDeckText(deckId){
+  const deck = publishedDecks.find(d => String(d.id) === String(deckId));
+  if(!deck){
+    showToast('Колода не найдена');
+    return;
+  }
 
+  const currentText = deck.description || '';
+  const newText = prompt('Новый текст описания колоды:', currentText);
+
+  if(newText === null) return;
+
+  try{
+    const res = await fetch(`/api/decks/${deckId}`, {
+      method:'PATCH',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer ' + localStorage.getItem('bhoToken')
+      },
+      body:JSON.stringify({
+        description:newText
+      })
+    });
+
+    const data = await res.json();
+
+    if(!data.ok){
+      showToast(data.error || 'Ошибка редактирования');
+      return;
+    }
+
+    deck.description = data.deck.description || newText;
+    render();
+    showToast('Текст колоды обновлён');
+
+  }catch(error){
+    showToast('Ошибка сервера');
+  }
+}
 function editLocalDeckText(id){
   const deck = localDeckById(id);
 

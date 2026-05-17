@@ -2225,7 +2225,55 @@ app.post("/api/decks", verifyToken, async (req, res) => {
     });
   }
 });
+app.patch("/api/decks/:id", verifyToken, async (req, res) => {
+  try {
+    const { description } = req.body;
 
+    const deckResult = await pool.query(
+      "SELECT * FROM decks WHERE id = $1",
+      [req.params.id]
+    );
+
+    if (deckResult.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        error: "Колода не найдена"
+      });
+    }
+
+    const deck = deckResult.rows[0];
+    const isOwner = Number(deck.author_id) === Number(req.user.id);
+    const isAdmin = ["admin", "developer", "moderator"].includes(req.user.role);
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({
+        ok: false,
+        error: "Редактировать описание может только автор колоды"
+      });
+    }
+
+    const result = await pool.query(`
+      UPDATE decks
+      SET description = $1, updated_at = NOW()
+      WHERE id = $2
+      RETURNING *
+    `, [
+      description || "",
+      req.params.id
+    ]);
+
+    res.json({
+      ok: true,
+      deck: result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
 // Удалить опубликованную колоду
 app.delete("/api/decks/:id", verifyToken, async (req, res) => {
   try {
