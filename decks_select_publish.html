@@ -560,6 +560,14 @@ function authHeaders(){
 
       return hero ? [{card:hero,count:1}, ...grouped] : grouped;
     }
+    function deckCardCount(deck){
+  const deckCards = deckCardsFromIds(deck);
+  const hero = getHero(deckCards);
+
+  return deckCards.filter(card =>
+    !hero || String(card.id) !== String(hero.id)
+  ).length;
+}
     function getHero(deckCards){return deckCards.find(c=>String(c.type).toLowerCase().includes('герой'))||deckCards[0]||null}
     function getFirstFour(deckCards,hero){return deckCards.filter(c=>!hero||String(c.id)!==String(hero.id)).slice(0,4)}
     function deckScore(deck){return(deck.likes||0)-(deck.dislikes||0)}
@@ -723,7 +731,14 @@ function authHeaders(){
         if(existing) existing.count++;
         else grouped.push({card,count:1});
       });
+function deckCardCount(deck){
+  const deckCards = deckCardsFromIds(deck);
+  const hero = getHero(deckCards);
 
+  return deckCards.filter(card =>
+    !hero || String(card.id) !== String(hero.id)
+  ).length;
+}
       grouped.sort((a,b)=>{
         const ca=Number(a.card.cost)||0;
         const cb=Number(b.card.cost)||0;
@@ -863,12 +878,13 @@ function authHeaders(){
       const deckCards=deckCardsFromLocal(deck);
       return `<article class="deck-card" onclick="openDeckView('${deck.id}','local')" style="cursor:pointer">
         <h3>${escapeHtml(deck.title)}</h3>
-        <div class="meta">Источник: <b>${escapeHtml(deck.source)}</b> · карт: ${deck.cards.length}</div>
+        <div class="meta">Источник: <b>${escapeHtml(deck.source)}</b> · карт: ${deckCardCount(deck)}</div>
         <p class="meta">${escapeHtml(deck.description||'Локальная колода. Можно открыть состав, отредактировать, удалить только у себя или опубликовать.')}</p>
         ${deckPreviewHtml(deckCards,deck.raw?.previewIds||deck.previewIds||[])}
         <div class="votes">
           <button class="vote" onclick="event.stopPropagation(); openDeckView('${deck.id}','local')">Состав</button>
           <button class="vote" onclick="event.stopPropagation(); editLocalDeck('${deck.id}')">Редактировать</button>
+          <button class="vote" onclick="event.stopPropagation(); editLocalDeckText('${deck.id}')">Редактировать текст</button>
           <button class="vote" onclick="event.stopPropagation(); deleteLocalDeck('${deck.id}')">Удалить у себя</button>
           <button class="vote" onclick="event.stopPropagation(); preparePublishFromLocal('${deck.id}')">Опубликовать</button>
         </div>
@@ -920,7 +936,7 @@ function deckAuthorStarHtml(deck){
 }
     function renderDeckCard(deck,rank){
       const deckCards=deckCardsFromIds(deck);
-      return `<article class="deck-card" onclick="openDeckView('${deck.id}','published')" style="cursor:pointer"><h3>${rank?rank+'. ':''}${escapeHtml(deck.title)}</h3><div class="meta">Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorStarHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b> · карт: ${deck.cards.length}</div><p class="meta">${escapeHtml(deck.description||'Описание не добавлено.')}</p>${deckPreviewHtml(deckCards, deck.previewIds || [])}<div class="votes"><button class="vote ${myVotes[deck.id]==='up'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','up')">👍 ${deck.likes||0}</button><button class="vote ${myVotes[deck.id]==='down'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','down')">👎 ${deck.dislikes||0}</button><span class="score">Рейтинг: ${deckScore(deck)}</span><button class="vote" onclick="event.stopPropagation(); openDeckView('${deck.id}','published')">Состав</button></div></article>`;
+      return `<article class="deck-card" onclick="openDeckView('${deck.id}','published')" style="cursor:pointer"><h3>${rank?rank+'. ':''}${escapeHtml(deck.title)}</h3><div class="meta">Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorStarHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b> · карт: ${deckCardCount(deck)}</div><p class="meta">${escapeHtml(deck.description||'Описание не добавлено.')}</p>${deckPreviewHtml(deckCards, deck.previewIds || [])}<div class="votes"><button class="vote ${myVotes[deck.id]==='up'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','up')">👍 ${deck.likes||0}</button><button class="vote ${myVotes[deck.id]==='down'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','down')">👎 ${deck.dislikes||0}</button><span class="score">Рейтинг: ${deckScore(deck)}</span><button class="vote" onclick="event.stopPropagation(); openDeckView('${deck.id}','published')">Состав</button></div></article>`;
     }
 
     function openDeckView(id,kind='published'){
@@ -936,7 +952,7 @@ function deckAuthorStarHtml(deck){
         deckCards=deckCardsFromIds(deck);
       }
       $('viewDeckTitle').textContent=deck.title||'Колода';
-      $('viewDeckMeta').innerHTML=(isLocal?'Локальная колода':'Опубликованная колода')+' · Автор: <b>'+escapeHtml(deck.author||'Не указан')+'</b> · карт: '+(deck.cards||[]).length+(deck.description?' · '+escapeHtml(deck.description):'');
+      $('viewDeckMeta').innerHTML=(isLocal?'Локальная колода':'Опубликованная колода')+' · Автор: <b>'+escapeHtml(deck.author||'Не указан')+'</b> · карт: '+deckCardCount(deck)+(deck.description?' · '+escapeHtml(deck.description):'');
       $('viewDeckCards').innerHTML=deckCards.length?groupDeckCards(deckCards).map(({card,count})=>`<article style="background:rgba(255,255,255,.045);border:1px solid rgba(232,194,112,.15);border-radius:16px;padding:8px;text-align:center;position:relative"><div style="position:absolute;right:7px;top:7px;background:rgba(7,9,15,.86);border:1px solid rgba(240,210,139,.28);border-radius:999px;padding:4px 8px;font-size:12px;font-weight:950;color:#f0d28b">${count}x</div><img src="${escapeHtml(card.image||'')}" alt="${escapeHtml(card.name)}" title="${escapeHtml(card.name)}" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#111" onerror="this.style.visibility='hidden'"><div style="font-size:12px;font-weight:900;line-height:1.25;margin-top:7px;color:#f4efe6">${escapeHtml(card.name)}</div></article>`).join(''):'<div class="empty">Карты не найдены. Проверь cards.json и id карт.</div>';
       const canDeletePublished =
   !isLocal &&
@@ -962,7 +978,57 @@ $('viewDeckActions').innerHTML = isLocal
       $('viewDeckModal').classList.remove('show');
       $('viewDeckModal').setAttribute('aria-hidden','true');
     }
+async function editLocalDeckText(id){
+  const deck = localDeckById(id);
 
+  if(!deck){
+    showToast('Колода не найдена');
+    return;
+  }
+
+  const newText = prompt(
+    'Измени описание колоды:',
+    deck.description || ''
+  );
+
+  if(newText === null) return;
+
+  deck.description = newText.trim();
+
+  const player = JSON.parse(localStorage.getItem(PLAYER_DECKS_KEY) || '[]');
+
+  if(Array.isArray(player)){
+    const found = player.find(d =>
+      String(d.id) === String(deck.id) ||
+      String(d.serverId) === String(deck.serverId)
+    );
+
+    if(found){
+      found.description = deck.description;
+      localStorage.setItem(PLAYER_DECKS_KEY, JSON.stringify(player));
+    }
+  }
+
+  if(deck.serverId){
+    try{
+      await fetch(`https://berserk-server.com/api/player-decks/${deck.serverId}`, {
+        method: "PATCH",
+        headers: authHeaders(),
+        body: JSON.stringify({
+          title: deck.title,
+          description: deck.description,
+          cards: deck.cards,
+          preview_ids: deck.previewIds || deck.raw?.previewIds || []
+        })
+      });
+    }catch(error){
+      console.error(error);
+    }
+  }
+
+  renderAll();
+  showToast('Текст колоды обновлён');
+}
     function editLocalDeck(id){
       const deck=localDeckById(id);
       if(!deck){showToast('Колода не найдена');return}
@@ -1133,7 +1199,7 @@ const response = await fetch(`https://berserk-server.com/api/decks/${id}/vote`, 
               <div class="choose-mini">${deckPreviewHtml(deckCards, choice.raw?.previewIds || choice.previewIds || [])}</div>
               <div>
                 <b>${escapeHtml(choice.title)}</b>
-                <div class="meta">${escapeHtml(choice.source)} · карт: ${choice.cards.length}${hero?' · герой: '+escapeHtml(hero.name):''}</div>
+                <div class="meta">${escapeHtml(choice.source)} · карт: ${deckCardCount(choice)}${hero?' · герой: '+escapeHtml(hero.name):''}</div>
               </div>
               <span class="score">Выбрать</span>
             </article>`;
@@ -1200,7 +1266,7 @@ const response = await fetch(`https://berserk-server.com/api/decks/${id}/vote`, 
     showToast(error.message || "Ошибка публикации колоды");
   }
 }
-    function showSuccess(deck){const deckCards=deckCardsFromIds(deck);const hero=getHero(deckCards);const first=getPreviewGroups(deckCards,hero,deck.previewIds||[]).map(item=>item.card);$('successTitle').textContent=deck.title;$('successMeta').innerHTML=`Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorStarHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b> · карт: ${deck.cards.length}`;$('successHero').src=hero?.image||'';$('successHero').alt=hero?.name||'Герой колоды';$('successFour').innerHTML=first.map(c=>`<img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.name)}" title="${escapeHtml(c.name)}" onerror="this.style.visibility='hidden'">`).join('');$('successModal').classList.add('show')}
+    function showSuccess(deck){const deckCards=deckCardsFromIds(deck);const hero=getHero(deckCards);const first=getPreviewGroups(deckCards,hero,deck.previewIds||[]).map(item=>item.card);$('successTitle').textContent=deck.title;$('successMeta').innerHTML=`Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorStarHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b> · карт: ${deckCardCount(deck)}`;$('successHero').src=hero?.image||'';$('successHero').alt=hero?.name||'Герой колоды';$('successFour').innerHTML=first.map(c=>`<img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.name)}" title="${escapeHtml(c.name)}" onerror="this.style.visibility='hidden'">`).join('');$('successModal').classList.add('show')}
     function closeSuccess(){$('successModal').classList.remove('show')}
     $('openAddDeck').addEventListener('click',openModal);$('closeDeckModal').addEventListener('click',closeModal);$('deckModal').addEventListener('click',e=>{if(e.target===$('deckModal'))closeModal()});$('confirmPublish').addEventListener('click',publishSelected);$('closeSuccessModal').addEventListener('click',closeSuccess);$('successOk').addEventListener('click',closeSuccess);$('successModal').addEventListener('click',e=>{if(e.target===$('successModal'))closeSuccess()});$('viewDeckModal').addEventListener('click',e=>{if(e.target===$('viewDeckModal'))closeDeckView()});$('customConfirm').addEventListener('click',e=>{if(e.target===$('customConfirm')){$('customConfirm').classList.remove('show');$('customConfirm').setAttribute('aria-hidden','true')}});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDeckView()});
     (async function initDecksPage(){

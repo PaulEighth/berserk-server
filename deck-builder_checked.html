@@ -923,10 +923,11 @@ function authHeaders(){
         "Authorization": `Bearer ${localStorage.getItem("token")}`
       },
       body: JSON.stringify({
-        title,
-        cards: newDeck.cards,
-        preview_ids: []
-      })
+  title,
+  description,
+  cards: newDeck.cards,
+  preview_ids: []
+})
     });
 
     const data = await response.json();
