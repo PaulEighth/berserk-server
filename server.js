@@ -1318,6 +1318,7 @@ app.patch("/api/tournaments/:id", verifyToken, async (req, res) => {
       description,
       format,
       max_players,
+      bracket,
       prize_1,
       prize_2,
       prize_3,
