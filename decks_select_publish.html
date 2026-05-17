@@ -1077,11 +1077,16 @@ $('viewDeckActions').innerHTML = isLocal
   }
 
   try{
-    const response = await fetch(`https://berserk-server.com/api/decks/${id}/vote`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type })
-    });
+    if(!isLoggedIn()){
+  showAuthRequiredModal("Чтобы оценивать колоды, войдите в аккаунт.");
+  return;
+}
+
+const response = await fetch(`https://berserk-server.com/api/decks/${id}/vote`, {
+  method: "PATCH",
+  headers: authHeaders(),
+  body: JSON.stringify({ type })
+});
 
     const data = await response.json();
 
