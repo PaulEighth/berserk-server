@@ -1381,7 +1381,7 @@ WHERE id = $21
       Number(bansFinal) || 0,
       !!isPrivate,
       isPrivate ? (privatePassword || "") : "",
-JSON.stringify(bracket || []),
+Number(bracket) || Number(max_players) || 16,
 req.params.id
     ]);
 

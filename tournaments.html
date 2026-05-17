@@ -6518,6 +6518,9 @@ function openEditTournament(id){
 
   if($("requestPlaces")) $("requestPlaces").value = t.places || t.max_players || 8;
 
+  if($("requestBracketSize")){
+  $("requestBracketSize").value = String(t.bracketSize || t.bracket || t.grid || t.max_players || 16);
+}
   const prizes = t.prizes || [];
   if($("requestPrize1")) $("requestPrize1").value = prizes[0] || t.prize_1 || "";
   if($("requestPrize2")) $("requestPrize2").value = prizes[1] || t.prize_2 || "";
