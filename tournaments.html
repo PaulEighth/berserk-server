@@ -3765,7 +3765,7 @@ function roleNickHtml(nick){
       const t = tournaments.find(item => String(item.id) === String(id));
       if(!t) return;
 
-      const freeNow = t.free - getExtraTaken(id);
+      const freeNow = Number(t.free || 0);
       if(t.status === 'closed' || t.status === 'finished' || freeNow <= 0){
         showAlert('Регистрация закрыта или мест нет');
         return;
@@ -3876,7 +3876,7 @@ selectedDecks = selectedDeckIds
   return;
 }
 
-      if(t.status === 'closed' || t.status === 'finished' || (t.free - getExtraTaken(id)) <= 0){
+      if(t.status === 'closed' || t.status === 'finished' || Number(t.free || 0) <= 0){
         showAlert('Регистрация закрыта или мест нет');
         return;
       }
