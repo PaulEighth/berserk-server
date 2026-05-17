@@ -1043,21 +1043,32 @@ $('viewDeckActions').innerHTML = isLocal
       $('viewDeckModal').classList.remove('show');
       $('viewDeckModal').setAttribute('aria-hidden','true');
     }
-let editingDeckTextId = null;
-async function editPublishedDeckText(deckId){
+let editingPublishedDeckId = null;
+
+function editPublishedDeckText(deckId){
   const deck = publishedDecks.find(d => String(d.id) === String(deckId));
   if(!deck){
     showToast('Колода не найдена');
     return;
   }
 
-  const currentText = deck.description || '';
-  const newText = prompt('Новый текст описания колоды:', currentText);
+  editingPublishedDeckId = deckId;
+  $('editDeckTextInput').value = deck.description || '';
+  $('editDeckTextModal').classList.add('show');
+}
 
-  if(newText === null) return;
+function closeEditDeckTextModal(){
+  editingPublishedDeckId = null;
+  $('editDeckTextModal').classList.remove('show');
+}
+
+async function savePublishedDeckText(){
+  if(!editingPublishedDeckId) return;
+
+  const newText = $('editDeckTextInput').value;
 
   try{
-    const res = await fetch(`/api/decks/${deckId}`, {
+    const res = await fetch(`/api/decks/${editingPublishedDeckId}`, {
       method:'PATCH',
       headers:{
         'Content-Type':'application/json',
@@ -1075,7 +1086,12 @@ async function editPublishedDeckText(deckId){
       return;
     }
 
-    deck.description = data.deck.description || newText;
+    const deck = publishedDecks.find(d => String(d.id) === String(editingPublishedDeckId));
+    if(deck){
+      deck.description = data.deck.description || newText;
+    }
+
+    closeEditDeckTextModal();
     render();
     showToast('Текст колоды обновлён');
 
@@ -1671,6 +1687,25 @@ function closeLogoutModal(){
   document.getElementById("logoutModal").style.display = "none";
 }
 </script>
+<div class="modal" id="editDeckTextModal">
+  <div class="modal-box" style="width:min(620px,100%)">
+    <button class="modal-close" onclick="closeEditDeckTextModal()">×</button>
+    <div class="modal-head">
+      <span class="eyebrow">✦ Редактирование колоды</span>
+      <h2>Текст описания</h2>
+      <p class="meta">Измени описание опубликованной колоды.</p>
+    </div>
 
+    <label>
+      <span class="label">Описание колоды</span>
+      <textarea class="textarea" id="editDeckTextInput" rows="6"></textarea>
+    </label>
+
+    <div class="confirm-actions" style="margin-top:18px">
+      <button class="btn gold" onclick="savePublishedDeckText()">Сохранить</button>
+      <button class="btn ghost" onclick="closeEditDeckTextModal()">Отмена</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
