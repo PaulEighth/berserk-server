@@ -4591,7 +4591,7 @@ function injectSwordsEverywhere(){
       prize_4: request.prizes?.[3] || "",
       start_date: request.date,
       telegram_link: "",
-      bracket: [],
+      bracket: request.bracketSize,
       swiss_data: {
   swissRounds: request.swissRounds || 3,
   rules: request.deckRules || "",
