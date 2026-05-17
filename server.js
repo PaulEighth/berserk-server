@@ -1057,7 +1057,6 @@ app.post("/api/tournaments", verifyToken, requireRoles("admin", "developer", "mo
   description,
   format,
   max_players,
-  bracket,
   prize_1,
   prize_2,
   prize_3,
