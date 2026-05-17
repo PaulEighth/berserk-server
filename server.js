@@ -189,6 +189,7 @@ await pool.query(`
     updated_at TIMESTAMP DEFAULT NOW()
   )
 `);
+await pool.query("ALTER TABLE player_decks ADD COLUMN IF NOT EXISTS description TEXT DEFAULT ''");
     await pool.query(
       "UPDATE users SET role = 'admin' WHERE username = $1",
       [ADMIN_USERNAME]
@@ -2031,7 +2032,7 @@ app.get("/api/player-decks", verifyToken, async (req, res) => {
 // Сохранить личную колоду пользователя
 app.post("/api/player-decks", verifyToken, async (req, res) => {
   try {
-    const { title, cards, preview_ids } = req.body;
+    const { title, description, cards, preview_ids } = req.body;
 
     if (!title || !Array.isArray(cards) || !cards.length) {
       return res.status(400).json({
@@ -2042,18 +2043,20 @@ app.post("/api/player-decks", verifyToken, async (req, res) => {
 
     const result = await pool.query(`
       INSERT INTO player_decks (
-        user_id,
-        title,
-        cards,
-        preview_ids
-      )
-      VALUES ($1,$2,$3,$4)
+  user_id,
+  title,
+  description,
+  cards,
+  preview_ids
+)
+VALUES ($1,$2,$3,$4,$5)
       RETURNING *
     `, [
       req.user.id,
-      title,
-      JSON.stringify(cards || []),
-      JSON.stringify(preview_ids || [])
+title,
+description || "",
+JSON.stringify(cards || []),
+JSON.stringify(preview_ids || [])
     ]);
 
     res.json({
@@ -2072,7 +2075,7 @@ app.post("/api/player-decks", verifyToken, async (req, res) => {
 // Обновить личную колоду пользователя
 app.patch("/api/player-decks/:id", verifyToken, async (req, res) => {
   try {
-    const { title, cards, preview_ids } = req.body;
+    const { title, description, cards, preview_ids } = req.body;
 
     if (!title || !Array.isArray(cards) || !cards.length) {
       return res.status(400).json({
@@ -2083,18 +2086,20 @@ app.patch("/api/player-decks/:id", verifyToken, async (req, res) => {
 
     const result = await pool.query(`
       UPDATE player_decks
-      SET title = $1,
-          cards = $2,
-          preview_ids = $3,
-          updated_at = NOW()
-      WHERE id = $4 AND user_id = $5
+SET title = $1,
+    description = $2,
+    cards = $3,
+    preview_ids = $4,
+    updated_at = NOW()
+WHERE id = $5 AND user_id = $6
       RETURNING *
     `, [
       title,
-      JSON.stringify(cards || []),
-      JSON.stringify(preview_ids || []),
-      req.params.id,
-      req.user.id
+description || "",
+JSON.stringify(cards || []),
+JSON.stringify(preview_ids || []),
+req.params.id,
+req.user.id
     ]);
 
     if (result.rows.length === 0) {
