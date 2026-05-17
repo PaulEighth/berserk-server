@@ -5223,7 +5223,70 @@ function getStartSlotsForBracketSize(bracketSize){
   addGroup("main", 1, 16);
   return slots;
 }
+function compactTournamentManualCells(id){
+  const key = String(id);
+  const t = tournaments.find(item => String(item.id) === key);
 
+  if(!t || !tournamentManualCells[key]){
+    return;
+  }
+
+  const players = getPlayers(id).filter(Boolean);
+  const active = new Set(players.map(p => String(p).trim().toLowerCase()));
+  const used = new Set();
+  const cells = tournamentManualCells[key];
+  const bracketSize = getTournamentBracketSize(t);
+  const startSlots = getStartSlotsForBracketSize(bracketSize);
+
+  const ordered = [];
+
+  startSlots.forEach(cell => {
+    const cKey = cellKey(cell.group, cell.side, cell.round, cell.slot);
+    const nick = cells[cKey];
+
+    if(
+      nick &&
+      nick !== EMPTY_CELL &&
+      active.has(String(nick).trim().toLowerCase()) &&
+      !used.has(String(nick).trim().toLowerCase())
+    ){
+      ordered.push(nick);
+      used.add(String(nick).trim().toLowerCase());
+    }
+  });
+
+  players.forEach(nick => {
+    const n = String(nick).trim().toLowerCase();
+    if(!used.has(n)){
+      ordered.push(nick);
+      used.add(n);
+    }
+  });
+
+  startSlots.forEach((cell, index) => {
+    const cKey = cellKey(cell.group, cell.side, cell.round, cell.slot);
+
+    if(ordered[index]){
+      cells[cKey] = ordered[index];
+    }else{
+      delete cells[cKey];
+    }
+  });
+
+  Object.keys(cells).forEach(cKey => {
+    const nick = cells[cKey];
+
+    if(
+      nick &&
+      nick !== EMPTY_CELL &&
+      !active.has(String(nick).trim().toLowerCase())
+    ){
+      delete cells[cKey];
+    }
+  });
+
+  saveManualCells();
+}
 async function saveTournamentRandomPlayToServer(id){
   try{
     const t = tournaments.find(x => String(x.id) === String(id));
@@ -5233,7 +5296,7 @@ async function saveTournamentRandomPlayToServer(id){
       method: "PATCH",
       headers: authHeaders(),
       body: JSON.stringify({
-        bracket: t.bracketData || [],
+  bracket: getTournamentBracketSize(t),
         swiss_data: {
           ...(t.swissData || {}),
           manualCells: tournamentManualCells[String(id)] || {},
@@ -6491,8 +6554,9 @@ if(!ok){
     }
 
     await loadTournamentsFromServer();
-    renderTrackModal(id);
-    applyFilters();
+compactTournamentManualCells(id);
+renderTrackModal(id);
+applyFilters();
 
     showAlert("Ты покинул турнир.");
 
