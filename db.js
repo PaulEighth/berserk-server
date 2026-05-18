@@ -13,10 +13,10 @@ const pool = new Pool({
   port: parseInt(process.env.DB_PORT || '5432', 10),
 
   ssl: isLocal
-    ? false
-    : {
-        rejectUnauthorized: false
-      },
+  ? false
+  : {
+      rejectUnauthorized: false
+    },
 
   max: 20,
   idleTimeoutMillis: 30000,
