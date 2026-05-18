@@ -175,28 +175,7 @@ async function canEditTournamentPlay(req, tournamentId){
   return { ok: true, tournament };
 }
 async function ensurePartnerColumn() {
-  try {
-    await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_partner BOOLEAN DEFAULT FALSE");
-await pool.query("ALTER TABLE tournaments ADD COLUMN IF NOT EXISTS players_can_edit BOOLEAN DEFAULT FALSE");
-await pool.query(`
-  CREATE TABLE IF NOT EXISTS player_decks (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    cards JSONB NOT NULL DEFAULT '[]',
-    preview_ids JSONB NOT NULL DEFAULT '[]',
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
-  )
-`);
-await pool.query("ALTER TABLE player_decks ADD COLUMN IF NOT EXISTS description TEXT DEFAULT ''");
-    await pool.query(
-      "UPDATE users SET role = 'admin' WHERE username = $1",
-      [ADMIN_USERNAME]
-    );
-  } catch (error) {
-    console.error("Ошибка подготовки поля is_partner:", error.message);
-  }
+  return;
 }
 
 
