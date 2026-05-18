@@ -3230,7 +3230,9 @@ function getMoneyPrizeValue(text){
   tournamentManualCells[tid] = parsedSwissData.manualCells || {};
   tournamentManualScores[tid] = parsedSwissData.manualScores || {};
   tournamentWinners[tid] = parsedSwissData.winners || {};
-  tournamentOutPlayers[tid] = parsedSwissData.outPlayers || {};
+  tournamentOutPlayers[tid] = Array.isArray(parsedSwissData.outPlayers)
+  ? parsedSwissData.outPlayers
+  : [];
 
   if (parsedSwissData.matchRooms) {
     Object.assign(matchRooms, parsedSwissData.matchRooms);
@@ -4762,8 +4764,9 @@ if(typeof updateStats === "function"){
     }
 
     function getOutPlayers(id){
-      return tournamentOutPlayers[String(id)] || [];
-    }
+  const list = tournamentOutPlayers[String(id)];
+  return Array.isArray(list) ? list : [];
+}
 
     function setPlayerOut(id,nick){
       const key=String(id);
@@ -4862,7 +4865,7 @@ async function saveTournamentPlayToServer(id){
           manualCells: tournamentManualCells[String(id)] || {},
           manualScores: tournamentManualScores[String(id)] || {},
           winners: tournamentWinners[String(id)] || {},
-          outPlayers: tournamentOutPlayers[String(id)] || {}
+          outPlayers: getOutPlayers(id)
         }
       })
     });
