@@ -1175,13 +1175,17 @@ const { decks, password } = req.body;
     }
 
     const tournament = tournamentResult.rows[0];
-    const tournamentDate = new Date(tournament.date);
+    const tournamentStartRaw = tournament.start_date || tournament.date;
 
-if(Date.now() >= tournamentDate.getTime()){
-  return res.status(403).json({
-    ok:false,
-    error:"Турнир уже закрыт. Время регистрации окончено."
-  });
+if(tournamentStartRaw){
+  const tournamentDate = new Date(tournamentStartRaw);
+
+  if(!Number.isNaN(tournamentDate.getTime()) && Date.now() >= tournamentDate.getTime()){
+    return res.status(403).json({
+      ok:false,
+      error:"Турнир уже закрыт. Время регистрации окончено."
+    });
+  }
 }
 const isMainAdmin =
   String(req.user.username || "").trim() === "Eighth#2020";
@@ -1602,13 +1606,17 @@ app.post("/api/tournaments/:id/join", verifyToken, async (req, res) => {
     }
 
     const tournament = tournamentResult.rows[0];
-    const tournamentDate = new Date(tournament.date);
+    const tournamentStartRaw = tournament.start_date || tournament.date;
 
-if(Date.now() >= tournamentDate.getTime()){
-  return res.status(403).json({
-    ok:false,
-    error:"Турнир уже закрыт. Время регистрации окончено."
-  });
+if(tournamentStartRaw){
+  const tournamentDate = new Date(tournamentStartRaw);
+
+  if(!Number.isNaN(tournamentDate.getTime()) && Date.now() >= tournamentDate.getTime()){
+    return res.status(403).json({
+      ok:false,
+      error:"Турнир уже закрыт. Время регистрации окончено."
+    });
+  }
 }
 const isMainAdmin =
   String(req.user.username || "").trim() === "Eighth#2020";
