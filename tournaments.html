@@ -3122,6 +3122,7 @@ html body .tournament-playoff .bracket-pair.match-side-third > button.match-swor
     let pendingDeleteTournamentId = null;
     let currentTrackTournamentId = null;
     let countdownTimer = null;
+let tournamentRefreshTimer = null;
     let registrations = {};
 let tournamentRequests = [];
 let approvedTournaments = [];
@@ -3214,6 +3215,27 @@ function getMoneyPrizeValue(text){
   const maxPlayers = Number(t.max_players) || 8;
   const taken = data.participants.filter(p => String(p.tournament_id) === String(t.id)).length;
 
+  let parsedSwissData = {};
+
+  try {
+    parsedSwissData = typeof t.swiss_data === "object"
+      ? (t.swiss_data || {})
+      : JSON.parse(t.swiss_data || "{}");
+  } catch (e) {
+    parsedSwissData = {};
+  }
+
+  const tid = String(t.id);
+
+  tournamentManualCells[tid] = parsedSwissData.manualCells || {};
+  tournamentManualScores[tid] = parsedSwissData.manualScores || {};
+  tournamentWinners[tid] = parsedSwissData.winners || {};
+  tournamentOutPlayers[tid] = parsedSwissData.outPlayers || {};
+
+  if (parsedSwissData.matchRooms) {
+    Object.assign(matchRooms, parsedSwissData.matchRooms);
+  }
+
   return {
     id: String(t.id),
     title: t.title,
@@ -3262,9 +3284,7 @@ grid: Number(t.bracket_size || t.bracketSize || t.bracket || t.grid || t.max_pla
 bracket: Number(t.bracket_size || t.bracketSize || t.bracket || t.grid || t.max_players) || 8,
 bracketData: Array.isArray(t.bracket) ? t.bracket : [],
 
-    swissData: typeof t.swiss_data === "object"
-      ? t.swiss_data
-      : JSON.parse(t.swiss_data || "{}")
+    swissData: parsedSwissData
   };
 });
 
@@ -4760,16 +4780,35 @@ if(typeof updateStats === "function"){
       applyFilters();
     }
 
-    function openTrackModal(id){
-      renderTrackModal(id);
-      $('trackModal').classList.add('show');
-      $('trackModal').setAttribute('aria-hidden','false');
-    }
+    async function openTrackModal(id){
+  await loadTournamentsFromServer();
+  renderTrackModal(id);
 
-    function closeTrackModal(){
-      $('trackModal').classList.remove('show');
-      $('trackModal').setAttribute('aria-hidden','true');
-    }
+  $('trackModal').classList.add('show');
+  $('trackModal').setAttribute('aria-hidden','false');
+
+  if(tournamentRefreshTimer){
+    clearInterval(tournamentRefreshTimer);
+  }
+
+  tournamentRefreshTimer = setInterval(async () => {
+    if(!$('trackModal') || !$('trackModal').classList.contains('show')) return;
+    if(String(currentTrackTournamentId) !== String(id)) return;
+
+    await loadTournamentsFromServer();
+    renderTrackModal(id);
+  }, 5000);
+}
+
+function closeTrackModal(){
+  $('trackModal').classList.remove('show');
+  $('trackModal').setAttribute('aria-hidden','true');
+
+  if(tournamentRefreshTimer){
+    clearInterval(tournamentRefreshTimer);
+    tournamentRefreshTimer = null;
+  }
+}
 
     function getTournamentBracketSize(t){
       const saved = Number(t.bracketSize || t.bracket || t.grid || t.places || 16);
@@ -5995,35 +6034,58 @@ function renderFullBracket(id,players,bracketSize){
     }
 
     function openMatchRoom(id,group,side,round,matchIndex,a,b){
-      const t = tournaments.find(item => String(item.id) === String(id));
-      if(!t) return;
+  const t = tournaments.find(item => String(item.id) === String(id));
+  if(!t) return;
 
-      const key = matchRoomKey(id,group,side,round,matchIndex);
+  const key = matchRoomKey(id,group,side,round,matchIndex);
 
-      if(!matchRooms[key]){
-        matchRooms[key] = {
-          id,
-          group,
-          side,
-          round,
-          matchIndex,
-          playerA:a || "",
-          playerB:b || "",
-          scoreA:"",
-          scoreB:"",
-          bannedA:[],
-          bannedB:[],
-          chat:[]
-        };
-      }
+  if(!matchRooms[key]){
+    matchRooms[key] = {
+      id,
+      group,
+      side,
+      round,
+      matchIndex,
+      playerA: a || "",
+      playerB: b || "",
+      scoreA: "",
+      scoreB: "",
+      bannedA: [],
+      bannedB: [],
+      chat: []
+    };
+  }
 
-      const room = matchRooms[key];
+  const room = matchRooms[key];
 
-      room.playerA = a || room.playerA || "";
-      room.playerB = b || room.playerB || "";
-      room.bannedA = Array.isArray(room.bannedA) ? room.bannedA : [];
-      room.bannedB = Array.isArray(room.bannedB) ? room.bannedB : [];
-      room.chat = Array.isArray(room.chat) ? room.chat : [];
+  const nextA = a || "";
+  const nextB = b || "";
+
+  const playersChanged =
+    String(room.playerA || "") !== String(nextA) ||
+    String(room.playerB || "") !== String(nextB);
+
+  room.id = id;
+  room.group = group;
+  room.side = side;
+  room.round = round;
+  room.matchIndex = matchIndex;
+  room.playerA = nextA;
+  room.playerB = nextB;
+
+  if(playersChanged){
+    room.scoreA = "";
+    room.scoreB = "";
+    room.bannedA = [];
+    room.bannedB = [];
+    room.chat = [];
+    saveMatchRooms();
+    saveMatchRoomToServer(key);
+  }
+
+  room.bannedA = Array.isArray(room.bannedA) ? room.bannedA : [];
+  room.bannedB = Array.isArray(room.bannedB) ? room.bannedB : [];
+  room.chat = Array.isArray(room.chat) ? room.chat : [];
 
       window.currentMatchRoomKey = key;
 
