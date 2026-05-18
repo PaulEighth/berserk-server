@@ -4802,7 +4802,7 @@ async function saveTournamentPlayToServer(id){
       method: "PATCH",
       headers: authHeaders(),
       body: JSON.stringify({
-        bracket: t.bracketData || [],
+        bracket: getTournamentBracketSize(t),
         swiss_data: {
           ...(t.swissData || {}),
           manualCells: tournamentManualCells[String(id)] || {},
@@ -5407,9 +5407,6 @@ document.addEventListener("click", function(event){
       const manual=getManualCellRaw(id,group,side,round,slot);
       const seed=entrySeed(autoEntry,fallbackSeed);
       if(manual === EMPTY_CELL){
-  if(Number(round) === 1 && entryNick(autoEntry)){
-    return autoEntry;
-  }
   return makeBracketEntry(null,seed);
 }
       if(manual !== undefined) return makeBracketEntry(manual || null,seed);
