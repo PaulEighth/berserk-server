@@ -4780,10 +4780,23 @@ if(typeof updateStats === "function"){
       applyFilters();
     }
 
-    async function openTrackModal(id){
-  renderTrackModal(id);
-  $('trackModal').classList.add('show');
-  $('trackModal').setAttribute('aria-hidden','false');
+    function openTrackModal(id){
+  currentTrackTournamentId = id;
+
+  const modal = $('trackModal');
+  if(!modal){
+    console.error("trackModal не найден");
+    return;
+  }
+
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden','false');
+
+  try{
+    renderTrackModal(id);
+  }catch(e){
+    console.error("Ошибка открытия отслеживания:", e);
+  }
 
   if(tournamentRefreshTimer){
     clearInterval(tournamentRefreshTimer);
@@ -6811,7 +6824,7 @@ function canDeleteTournamentClient(t){
           + renderPlayers(t.id)
           + '<div class="card-actions">'
 + '<button class="btn gold" '+(disabled ? 'disabled' : '')+' onclick="openJoinModal('+t.id+')">'+(disabled ? 'Регистрация закрыта' : 'Участвовать')+'</button>'
-+ '<button type="button" class="btn ghost track-tournament-btn" data-track-id="'+t.id+'" onclick="openTrackModal('+t.id+')">Отслеживать</button>'
++ '<button type="button" class="btn ghost track-tournament-btn" data-track-id="'+escapeHtml(String(t.id))+'">Отслеживать</button>'
 + (canManageTournament(t.id) ? '<button type="button" class="btn ghost" onclick="openEditTournament('+t.id+')">Редактировать</button>' : '')
 + '<a class="btn ghost" href="deck-builder_checked.html">Собрать колоду</a>'
 + '</div>'
