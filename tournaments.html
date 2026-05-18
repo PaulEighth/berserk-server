@@ -4781,9 +4781,7 @@ if(typeof updateStats === "function"){
     }
 
     async function openTrackModal(id){
-  await loadTournamentsFromServer();
   renderTrackModal(id);
-
   $('trackModal').classList.add('show');
   $('trackModal').setAttribute('aria-hidden','false');
 
@@ -4792,11 +4790,15 @@ if(typeof updateStats === "function"){
   }
 
   tournamentRefreshTimer = setInterval(async () => {
-    if(!$('trackModal') || !$('trackModal').classList.contains('show')) return;
-    if(String(currentTrackTournamentId) !== String(id)) return;
+    try{
+      if(!$('trackModal') || !$('trackModal').classList.contains('show')) return;
+      if(String(currentTrackTournamentId) !== String(id)) return;
 
-    await loadTournamentsFromServer();
-    renderTrackModal(id);
+      await loadTournamentsFromServer();
+      renderTrackModal(id);
+    }catch(e){
+      console.error("Ошибка автообновления турнира:", e);
+    }
   }, 5000);
 }
 
