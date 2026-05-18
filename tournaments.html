@@ -6824,7 +6824,7 @@ function canDeleteTournamentClient(t){
           + renderPlayers(t.id)
           + '<div class="card-actions">'
 + '<button class="btn gold" '+(disabled ? 'disabled' : '')+' onclick="openJoinModal('+t.id+')">'+(disabled ? 'Регистрация закрыта' : 'Участвовать')+'</button>'
-+ '<button type="button" class="btn ghost track-tournament-btn" data-track-id="'+escapeHtml(String(t.id))+'">Отслеживать</button>'
++ '<button type="button" class="btn ghost track-tournament-btn" data-track-id="'+escapeHtml(String(t.id))+'" onclick="forceOpenTrackModal(\''+escapeHtml(String(t.id))+'\')">Отслеживать</button>'
 + (canManageTournament(t.id) ? '<button type="button" class="btn ghost" onclick="openEditTournament('+t.id+')">Редактировать</button>' : '')
 + '<a class="btn ghost" href="deck-builder_checked.html">Собрать колоду</a>'
 + '</div>'
@@ -7882,6 +7882,45 @@ function toggleDeckBan(){
   console.log("toggleDeckBan временно отключен");
 }
 </script>
+<script>
+function forceOpenTrackModal(id){
+  const modal = document.getElementById('trackModal');
 
+  if(!modal){
+    console.error('trackModal не найден');
+    return false;
+  }
+
+  window.currentTrackTournamentId = id;
+
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden', 'false');
+
+  try{
+    if(typeof window.openTrackModal === 'function'){
+      window.openTrackModal(id);
+      return false;
+    }
+
+    if(typeof renderTrackModal === 'function'){
+      renderTrackModal(id);
+    }
+  }catch(e){
+    console.error('Ошибка forceOpenTrackModal:', e);
+  }
+
+  return false;
+}
+
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.track-tournament-btn, [data-track-id]');
+  if(!btn) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  forceOpenTrackModal(btn.dataset.trackId);
+}, true);
+</script>
 </body>
 </html>
