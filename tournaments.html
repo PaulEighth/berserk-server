@@ -3759,7 +3759,7 @@ return String(img).replace(/\.png$/i, ".webp");
     function getDeckPreviewCards(deck){
       const cards = resolveDeckCards(deck);
       const heroCard = deck.hero || getHeroFromDeckCards(cards);
-      const heroImg = deck.heroImage || getCardImage(heroCard) || getDeckHeroImage(deck);
+      const heroImg = String(deck.heroImage || getCardImage(heroCard) || getDeckHeroImage(deck) || "").replace(/\.png$/i, ".webp");
 
       const otherCards = cards
         .filter(c => String(c?.id || c?.cardId || getCardName(c)) !== String(heroCard?.id || heroCard?.cardId || getCardName(heroCard)))
@@ -3773,7 +3773,7 @@ return String(img).replace(/\.png$/i, ".webp");
       const sourceDeck = deck.snapshot || deck.raw || deck;
       const resolvedCards = resolveDeckCards(sourceDeck);
       const preview = getDeckPreviewCards(sourceDeck);
-      const hero = deck.heroImage || preview.heroImg;
+      const hero = String(deck.heroImage || preview.heroImg || "").replace(/\.png$/i, ".webp");
       const cards = preview.otherCards || [];
 
       let cardsHtml = "";
@@ -5929,8 +5929,9 @@ function renderFullBracket(id,players,bracketSize){
     }
 
     function deckHeroImage(deck){
-      return deck?.heroImage || getDeckHeroImage(deck?.snapshot || deck) || "";
-    }
+  const img = deck?.heroImage || getDeckHeroImage(deck?.snapshot || deck) || "";
+  return String(img).replace(/\.png$/i, ".webp");
+}
 
     function getMatchDeckCount(t, round){
       const isFinal = Number(round) >= 999 || String(round) === "final";
