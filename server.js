@@ -1846,6 +1846,55 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
     });
   }
 });
+// Получить только чат матч-комнаты
+app.get("/api/tournaments/:id/match-room-chat", verifyToken, async (req, res) => {
+  try {
+    const tournamentId = req.params.id;
+    const roomKey = req.query.roomKey;
+
+    if (!roomKey) {
+      return res.status(400).json({
+        ok: false,
+        error: "Не указан roomKey"
+      });
+    }
+
+    const result = await pool.query(
+      "SELECT swiss_data FROM tournaments WHERE id = $1",
+      [tournamentId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        error: "Турнир не найден"
+      });
+    }
+
+    let swissData = {};
+
+    try {
+      swissData = typeof result.rows[0].swiss_data === "string"
+        ? JSON.parse(result.rows[0].swiss_data || "{}")
+        : (result.rows[0].swiss_data || {});
+    } catch (e) {
+      swissData = {};
+    }
+
+    const room = swissData.matchRooms?.[roomKey] || {};
+
+    res.json({
+      ok: true,
+      chat: Array.isArray(room.chat) ? room.chat : []
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
 // =========================
 // КОЛОДЫ
 // =========================
