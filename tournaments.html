@@ -2838,6 +2838,12 @@ html body .tournament-playoff .bracket-pair.match-side-third > button.match-swor
   width:auto !important;
   min-width:190px !important;
 }
+.prize-info-row span:last-child{
+  text-align:left !important;
+  white-space:pre-line;
+  word-break:break-word;
+  line-height:1.4;
+}
 </style>
 </head>
 <body>
@@ -6892,7 +6898,7 @@ function canDeleteTournamentClient(t){
           + '<div class="info-grid">'
           + '<div class="info-row"><span>Дата</span><span>'+formatDate(t.date)+'</span></div>'
           + '<div class="info-row"><span>Организатор</span><span>'+escapeHtml(t.organizer)+'</span></div>'
-          + '<div class="info-row"><span>Призы</span><span>'+escapeHtml(prizeText(t))+'</span></div>'
+          + '<div class="info-row prize-info-row"><span>Призы</span><span>'+escapeHtml(prizeText(t))+'</span></div>'
           + '<div class="info-row"><span>Формат</span><span>'+escapeHtml(t.mode)+'</span></div>'
           + '<div class="info-row"><span>Колоды</span><span>'+escapeHtml(deckModeLabel(t.deckMode))+'</span></div>'
           + '<div class="info-row"><span>До финала</span><span>'+escapeHtml(matchFormatLabel(t.matchFormat))+' · колод: '+escapeHtml(t.decksBeforeFinal || 1)+' · банов: '+escapeHtml(t.bansBeforeFinal || 1)+'</span></div>'
