@@ -1847,7 +1847,7 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
   }
 });
 // Получить только чат матч-комнаты
-app.get("/api/tournaments/:id/match-room-chat", verifyToken, async (req, res) => {
+app.get("/api/tournaments/:id/match-room-chat", async (req, res) => {
   try {
     const tournamentId = req.params.id;
     const roomKey = req.query.roomKey;
@@ -1886,6 +1886,87 @@ app.get("/api/tournaments/:id/match-room-chat", verifyToken, async (req, res) =>
     res.json({
       ok: true,
       chat: Array.isArray(room.chat) ? room.chat : []
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+app.post("/api/tournaments/:id/match-room-chat", async (req, res) => {
+  try {
+    const tournamentId = req.params.id;
+    const { roomKey, author, text } = req.body;
+
+    if (!roomKey || !author || !text) {
+      return res.status(400).json({
+        ok: false,
+        error: "Не хватает данных для сообщения"
+      });
+    }
+
+    const result = await pool.query(
+      "SELECT swiss_data FROM tournaments WHERE id = $1",
+      [tournamentId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        ok: false,
+        error: "Турнир не найден"
+      });
+    }
+
+    let swissData = {};
+
+    try {
+      swissData = typeof result.rows[0].swiss_data === "string"
+        ? JSON.parse(result.rows[0].swiss_data || "{}")
+        : (result.rows[0].swiss_data || {});
+    } catch (e) {
+      swissData = {};
+    }
+
+    swissData.matchRooms = swissData.matchRooms || {};
+    const room = swissData.matchRooms[roomKey];
+
+    if (!room) {
+      return res.status(404).json({
+        ok: false,
+        error: "Комната матча не найдена"
+      });
+    }
+
+    const isMatchPlayer =
+      String(author || "") === String(room.playerA || "") ||
+      String(author || "") === String(room.playerB || "");
+
+    if (!isMatchPlayer) {
+      return res.status(403).json({
+        ok: false,
+        error: "Писать могут только игроки этой пары"
+      });
+    }
+
+    room.chat = Array.isArray(room.chat) ? room.chat : [];
+    room.chat.push({
+      author,
+      text,
+      time: new Date().toISOString()
+    });
+
+    swissData.matchRooms[roomKey] = room;
+
+    await pool.query(
+      "UPDATE tournaments SET swiss_data = $1 WHERE id = $2",
+      [JSON.stringify(swissData), tournamentId]
+    );
+
+    res.json({
+      ok: true,
+      chat: room.chat
     });
 
   } catch (error) {
