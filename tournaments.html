@@ -2809,7 +2809,29 @@ html body .tournament-playoff .bracket-pair.match-side-third > button.match-swor
   font-weight:950;
   text-shadow:0 0 14px currentColor;
 }
+.match-center-panel{
+  width:320px !important;
+  min-width:320px !important;
+  max-width:320px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:18px !important;
+  padding-top:24px !important;
+}
 
+.match-center-panel .match-local-score{
+  width:100% !important;
+  min-width:0 !important;
+  max-width:none !important;
+  padding:0 !important;
+}
+
+.match-chat-refresh-btn{
+  width:auto !important;
+  min-width:190px !important;
+}
 </style>
 </head>
 <body>
@@ -6117,10 +6139,14 @@ function renderFullBracket(id,players,bracketSize){
             ${renderMatchPlayerDecks(t, room, room.playerA, "a")}
           </section>
 
-                              <section class="match-local-score">
-            <input id="matchRoomScoreA" type="number" min="0" step="1" value="${escapeHtml(room.scoreA || '')}" ${canEdit ? "" : "disabled"}>
-            <span>VS</span>
-            <input id="matchRoomScoreB" type="number" min="0" step="1" value="${escapeHtml(room.scoreB || '')}" ${canEdit ? "" : "disabled"}>
+                      <section class="match-center-panel">
+            <div class="match-local-score">
+              <input id="matchRoomScoreA" type="number" min="0" step="1" value="${escapeHtml(room.scoreA || '')}" ${canEdit ? "" : "disabled"}>
+              <span>VS</span>
+              <input id="matchRoomScoreB" type="number" min="0" step="1" value="${escapeHtml(room.scoreB || '')}" ${canEdit ? "" : "disabled"}>
+            </div>
+
+            <button class="btn ghost match-chat-refresh-btn" type="button" onclick="refreshMatchRoomChat()">Обновить чат</button>
           </section>
 
           <div class="match-chat-refresh-row">
