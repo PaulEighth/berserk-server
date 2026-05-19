@@ -6117,12 +6117,15 @@ function renderFullBracket(id,players,bracketSize){
             ${renderMatchPlayerDecks(t, room, room.playerA, "a")}
           </section>
 
-                    <section class="match-local-score">
+                              <section class="match-local-score">
             <input id="matchRoomScoreA" type="number" min="0" step="1" value="${escapeHtml(room.scoreA || '')}" ${canEdit ? "" : "disabled"}>
             <span>VS</span>
             <input id="matchRoomScoreB" type="number" min="0" step="1" value="${escapeHtml(room.scoreB || '')}" ${canEdit ? "" : "disabled"}>
-            <button class="btn ghost" type="button" onclick="refreshMatchRoomChat()">Обновить чат</button>
           </section>
+
+          <div class="match-chat-refresh-row">
+            <button class="btn ghost" type="button" onclick="refreshMatchRoomChat()">Обновить чат</button>
+          </div>
 
           <section class="match-side-panel">
             <h3 class="match-player-name">${room.playerB ? roleNickHtml(room.playerB) : "Игрок 2"}</h3>
