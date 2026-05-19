@@ -3184,37 +3184,37 @@ let approvedTournaments = [];
     function saveTournamentDeckSubmits(){ localStorage.setItem(TOURNAMENT_DECKS_KEY, JSON.stringify(tournamentDeckSubmits)); }
     
     function saveMatchRooms(){ localStorage.setItem(MATCH_ROOMS_KEY, JSON.stringify(matchRooms)); }
-    async function saveMatchRoomToServer(roomKey){
-  try{
-    const room = matchRooms[roomKey];
-    if(!room) return;
+   async function saveMatchRoomToServer(roomKey){
+  const room = matchRooms[roomKey];
+  if(!room) throw new Error("Комната матча не найдена");
 
-    const tournamentId = room.tournamentId || currentTrackTournamentId;
-    if(!tournamentId) return;
+  const tournamentId = room.tournamentId || room.id || currentTrackTournamentId;
+  if(!tournamentId) throw new Error("Турнир не найден");
 
-    const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${tournamentId}/match-room`, {
-      method: "PATCH",
-      headers: authHeaders(),
-      body: JSON.stringify({
-        roomKey,
-        room
-      })
-    });
+  const token = localStorage.getItem("token");
 
-    const data = await response.json();
-
-    if(!data.ok){
-      showAlert(data.error || "Нет прав менять матч");
-      await loadTournamentsFromServer();
-      applyFilters();
-      if(currentTrackTournamentId){
-        renderTrackModal(currentTrackTournamentId);
-      }
-    }
-
-  }catch(error){
-    console.error("SAVE MATCH ROOM ERROR:", error);
+  if(!token || token === "null" || token === "undefined"){
+    showAlert("Нужно выйти из аккаунта и войти заново.");
+    throw new Error("Нет токена");
   }
+
+  const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${tournamentId}/match-room`, {
+    method: "PATCH",
+    headers: authHeaders(),
+    body: JSON.stringify({
+      roomKey,
+      room
+    })
+  });
+
+  const data = await response.json();
+
+  if(!response.ok || !data.ok){
+    showAlert(data.error || "Не удалось сохранить чат");
+    throw new Error(data.error || "Не удалось сохранить чат");
+  }
+
+  return data;
 }
 function getMoneyPrizeValue(text){
   const value = String(text || "");
@@ -6226,7 +6226,7 @@ function renderFullBracket(id,players,bracketSize){
     }
 
     window.refreshMatchRoomChat = refreshMatchRoomChat;
-    function sendMatchRoomChatMessage(){
+    async function sendMatchRoomChatMessage(){
       const room = getCurrentMatchRoom();
       if(!room) return;
 
@@ -6249,9 +6249,10 @@ function renderFullBracket(id,players,bracketSize){
         time: new Date().toISOString()
       });
 
-      saveMatchRooms();
-saveMatchRoomToServer(currentMatchRoomKey);
+            await saveMatchRoomToServer(currentMatchRoomKey);
+
       if(input) input.value = '';
+      saveMatchRooms();
       const log = $("matchRoomChatLog");
       if(log){
         log.innerHTML = renderMatchRoomChat(room);
