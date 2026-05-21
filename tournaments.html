@@ -4901,14 +4901,16 @@ async function saveTournamentPlayToServer(id){
 
     const data = await response.json();
 
-    if(!data.ok){
-      showAlert(data.error || "Нет прав редактировать турнир");
-      await loadTournamentsFromServer();
-      applyFilters();
-      if(currentTrackTournamentId){
-        renderTrackModal(currentTrackTournamentId);
-      }
-    }
+    if(!response.ok || !data.ok){
+  if(response.status === 401 || data.error === "Неверный токен"){
+    localStorage.removeItem("token");
+    showAlert("Сессия устарела. Выйди и войди заново, потом повтори изменение.");
+    return;
+  }
+
+  showAlert(data.error || "Нет прав редактировать турнир");
+  return;
+}
 
   }catch(error){
     console.error("SAVE TOURNAMENT PLAY ERROR:", error);
