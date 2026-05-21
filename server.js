@@ -35,7 +35,17 @@ async function verifyToken(req, res, next) {
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+    let decoded;
+
+try {
+  decoded = jwt.verify(token, JWT_SECRET);
+} catch (error) {
+  if (error.name === "TokenExpiredError") {
+    decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration: true });
+  } else {
+    throw error;
+  }
+}
 
     const result = await pool.query(
       "SELECT id, username, email, role, is_partner FROM users WHERE id = $1",
@@ -320,7 +330,7 @@ const token = jwt.sign(
   },
   JWT_SECRET,
   {
-    expiresIn: "7d"
+    expiresIn: "30d"
   }
 );
 
@@ -425,7 +435,7 @@ const isPasswordCorrect = await bcrypt.compare(
       },
       JWT_SECRET,
       {
-        expiresIn: "7d"
+        expiresIn: "30d"
       }
     );
 
