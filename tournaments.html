@@ -3406,10 +3406,13 @@ if(playerDecks.length){
       try { return JSON.parse(localStorage.getItem("user")); }
       catch(e){ return null; }
     }
-function authHeaders(){
+function authHeaders(extra = {}){
+  const token = localStorage.getItem("token");
+
   return {
     "Content-Type": "application/json",
-    "Authorization": `Bearer ${localStorage.getItem("token")}`
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...extra
   };
 }
     function isLoggedIn(){
@@ -5922,7 +5925,7 @@ function renderFullBracket(id,players,bracketSize){
 
   const userNick = normalizeMatchNick(nick);
 
-  if(role === "admin") return true;
+  if(["admin","developer","moderator","creator"].includes(String(role))) return true;
   if(typeof isAdmin === "function" && isAdmin()) return true;
 
   if(normalizeMatchNick(t?.organizer) === userNick) return true;
@@ -6088,8 +6091,9 @@ function renderFullBracket(id,players,bracketSize){
   if(!t) return;
 
   const key = matchRoomKey(id,group,side,round,matchIndex);
-
+let isNewMatchRoom = false;
   if(!matchRooms[key]){
+    isNewMatchRoom = true;
     matchRooms[key] = {
       id,
       group,
@@ -6123,7 +6127,7 @@ function renderFullBracket(id,players,bracketSize){
   room.playerA = nextA;
   room.playerB = nextB;
 
-  if(playersChanged){
+  if(isNewMatchRoom || playersChanged){
     room.scoreA = "";
     room.scoreB = "";
     room.bannedA = [];
@@ -6265,9 +6269,7 @@ function renderFullBracket(id,players,bracketSize){
   try{
     const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${room.id}/match-room-chat`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: authHeaders(),
       body: JSON.stringify({
         roomKey,
         author: authorNick,
