@@ -1905,7 +1905,7 @@ app.get("/api/tournaments/:id/match-room-chat", async (req, res) => {
     });
   }
 });
-app.post("/api/tournaments/:id/match-room-chat", async (req, res) => {
+app.post("/api/tournaments/:id/match-room-chat", verifyToken, async (req, res) => {
   try {
     const tournamentId = req.params.id;
     const { roomKey, author, text } = req.body;
@@ -1918,7 +1918,7 @@ app.post("/api/tournaments/:id/match-room-chat", async (req, res) => {
     }
 
     const result = await pool.query(
-      "SELECT swiss_data FROM tournaments WHERE id = $1",
+      "SELECT swiss_data, organizer_id FROM tournaments WHERE id = $1",
       [tournamentId]
     );
 
@@ -1949,16 +1949,19 @@ app.post("/api/tournaments/:id/match-room-chat", async (req, res) => {
       });
     }
 
-    const isMatchPlayer =
-      String(author || "") === String(room.playerA || "") ||
-      String(author || "") === String(room.playerB || "");
+    const isStaffUser = isStaff(req.user);
+const isOrganizer = Number(result.rows[0].organizer_id) === Number(req.user.id);
 
-    if (!isMatchPlayer) {
-      return res.status(403).json({
-        ok: false,
-        error: "Писать могут только игроки этой пары"
-      });
-    }
+const isMatchPlayer =
+  String(req.user.username || "") === String(room.playerA || "") ||
+  String(req.user.username || "") === String(room.playerB || "");
+
+if (!isStaffUser && !isOrganizer && !isMatchPlayer) {
+  return res.status(403).json({
+    ok: false,
+    error: "Писать могут только игроки этой пары"
+  });
+}
 
     room.chat = Array.isArray(room.chat) ? room.chat : [];
     room.chat.push({
