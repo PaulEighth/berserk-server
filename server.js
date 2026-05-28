@@ -2162,11 +2162,12 @@ app.get("/api/decks", async (req, res) => {
 app.post("/api/decks", verifyToken, async (req, res) => {
   try {
     const {
-      title,
-      description,
-      cards,
-      preview_ids
-    } = req.body;
+  title,
+  description,
+  cards,
+  preview_ids,
+  deck_code
+} = req.body;
 
     if (!title || !Array.isArray(cards) || !cards.length) {
       return res.status(400).json({
@@ -2184,9 +2185,10 @@ app.post("/api/decks", verifyToken, async (req, res) => {
         author_id,
         author_name,
         author_role,
-        author_is_partner
+        author_is_partner,
+deck_code
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
       RETURNING *
     `, [
       title,
@@ -2196,7 +2198,8 @@ app.post("/api/decks", verifyToken, async (req, res) => {
       req.user.id,
       req.user.username,
       req.user.role || "user",
-      !!req.user.is_partner
+      !!req.user.is_partner,
+deck_code || ""
     ]);
 
     res.json({

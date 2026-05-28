@@ -1000,9 +1000,7 @@ async function copyDeckCode(deckId){
 }
 function renderDeckCard(deck,rank){
   const deckCards = deckCardsFromIds(deck);
-const copyCodeBtn = deck.deckCode
-  ? `<button class="vote" onclick="event.stopPropagation(); copyDeckCode('${deck.id}')">📋 Скопировать код</button>`
-  : '';
+const copyCodeBtn = `<button class="vote" onclick="event.stopPropagation(); copyDeckCode('${deck.id}')">📋 Скопировать код</button>`;
   const editBtn = canEditPublishedDeck(deck)
     ? `<button class="vote" onclick="event.stopPropagation(); editPublishedDeckText('${deck.id}')">Редактировать текст</button>`
     : '';
@@ -1061,7 +1059,32 @@ $('viewDeckActions').innerHTML = isLocal
       $('viewDeckModal').classList.add('show');
       $('viewDeckModal').setAttribute('aria-hidden','false');
     }
+async function deletePublishedDeck(deckId){
+  showConfirm('Удалить опубликованную колоду?', async ()=>{
+    try{
+      const response = await fetch(`https://berserk-server.com/api/decks/${deckId}`, {
+        method: "DELETE",
+        headers: authHeaders()
+      });
 
+      const data = await response.json();
+
+      if(!data.ok){
+        showToast(data.error || "Не удалось удалить колоду");
+        return;
+      }
+
+      publishedDecks = publishedDecks.filter(d => String(d.id) !== String(deckId));
+      closeDeckView();
+      renderAll();
+      showToast("Колода удалена");
+
+    }catch(error){
+      console.error(error);
+      showToast("Ошибка удаления колоды");
+    }
+  });
+}
     function closeDeckView(){
       $('viewDeckModal').classList.remove('show');
       $('viewDeckModal').setAttribute('aria-hidden','true');
