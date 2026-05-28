@@ -348,6 +348,10 @@
           <label><span class="label">Название колоды</span><input class="field" id="publishTitle" placeholder="Например: Тёмный контроль"></label>
           <label><span class="label">Автор / ник</span><input class="field" id="publishAuthor" placeholder="Например: Eighth#2020" readonly title="Ник берётся из профиля игрока"></label>
           <label><span class="label">Описание</span><textarea class="textarea" id="publishDescription" placeholder="Кратко опиши стратегию колоды"></textarea></label>
+          <label>
+  <span class="label">Код колоды / импорт-код</span>
+  <textarea class="textarea" id="publishDeckCode" placeholder="Введите код колоды, необязательно"></textarea>
+</label>
           <div class="selected-preview" id="selectedPreview"></div>
           <button class="btn gold" id="confirmPublish">Опубликовать выбранную колоду</button>
         </aside>
@@ -572,7 +576,7 @@ function authHeaders(){
     function normalizeElement(value){return String(value||'').trim().toLowerCase()}
     function getNum(card,keys,fallback=0){for(const k of keys){if(card[k]!==undefined&&card[k]!==null&&card[k]!==''){const n=Number(card[k]);return Number.isFinite(n)?n:fallback}}return fallback}
     function getCardType(card){return card.type||card.class||card.classes||card.category||'Не указан'}
-    function normalizeCard(card,index){const id=card.id??index+1;const rawElements=toArray(card.elements??card.element??card['стихия']);return{id,name:card.name||card.title||('Карта '+id),type:String(getCardType(card)),cost:getNum(card,['cost','price','mana','energy'],0),attack:getNum(card,['attack','atk','power'],0),health:getNum(card,['health','hp','life'],0),elements:rawElements.map(normalizeElement),text:card.text||card.description||card.ability||'',image:card.image||('Images/'+id+'.png')}}
+    function normalizeCard(card,index){const id=card.id??index+1;const rawElements=toArray(card.elements??card.element??card['стихия']);return{id,name:card.name||card.title||('Карта '+id),type:String(getCardType(card)),cost:getNum(card,['cost','price','mana','energy'],0),attack:getNum(card,['attack','atk','power'],0),health:getNum(card,['health','hp','life'],0),elements:rawElements.map(normalizeElement),text:card.text||card.description||card.ability||'',image: String(card.image || ('Images/'+id+'.webp')).replace(/\.png$/i, ".webp")}}
     function savePublished(){localStorage.setItem(STORAGE_PUBLISHED,JSON.stringify(publishedDecks))}
     function saveVotes(){localStorage.setItem(STORAGE_VOTES,JSON.stringify(myVotes))}
     function cardById(id){return cards.find(c=>String(c.id)===String(id))}
@@ -656,6 +660,7 @@ function authHeaders(){
       id: String(deck.id),
       title: deck.title,
       description: deck.description || "",
+      deckCode: deck.deck_code || "",
 
       cards: Array.isArray(deck.cards)
         ? deck.cards
@@ -725,6 +730,7 @@ function authHeaders(){
   description:d.raw?.description || d.description || '',
   cards:d.cards,
   previewIds:d.previewIds || [],
+  
   raw:d.raw || d
 });
         }
@@ -977,10 +983,26 @@ function canEditPublishedDeck(deck){
 
   return sameId || sameName || staff;
 }
+async function copyDeckCode(deckId){
+  const deck = publishedDecks.find(d => String(d.id) === String(deckId));
 
+  if(!deck || !deck.deckCode){
+    showToast("Код колоды не добавлен");
+    return;
+  }
+
+  try{
+    await navigator.clipboard.writeText(deck.deckCode);
+    showToast("Код колоды скопирован");
+  }catch(e){
+    showToast("Не удалось скопировать код");
+  }
+}
 function renderDeckCard(deck,rank){
   const deckCards = deckCardsFromIds(deck);
-
+const copyCodeBtn = deck.deckCode
+  ? `<button class="vote" onclick="event.stopPropagation(); copyDeckCode('${deck.id}')">📋 Скопировать код</button>`
+  : '';
   const editBtn = canEditPublishedDeck(deck)
     ? `<button class="vote" onclick="event.stopPropagation(); editPublishedDeckText('${deck.id}')">Редактировать текст</button>`
     : '';
@@ -995,7 +1017,8 @@ function renderDeckCard(deck,rank){
       <button class="vote ${myVotes[deck.id]==='down'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','down')">👎 ${deck.dislikes||0}</button>
       <span class="score">Рейтинг: ${deckScore(deck)}</span>
       <button class="vote" onclick="event.stopPropagation(); openDeckView('${deck.id}','published')">Состав</button>
-      ${editBtn}
+${copyCodeBtn}
+${editBtn}
     </div>
   </article>`;
 }
@@ -1282,6 +1305,10 @@ async function saveDeckTextModal(){
       $('publishTitle').value=deck.title==='Текущая колода из конструктора'?'Новая колода':deck.title;
       $('publishAuthor').value=getCurrentUserNick();
       $('publishDescription').value=deck.description||'';
+      if($('publishDeckCode')){
+  $('publishDeckCode').value = deck.deckCode || deck.raw?.deckCode || "";
+}
+      if($('publishDeckCode')) $('publishDeckCode').value = deck.deckCode || deck.raw?.deckCode || "";
       closeDeckView();
       renderChoices();
       $('deckModal').classList.add('show');
@@ -1396,6 +1423,7 @@ const response = await fetch(`https://berserk-server.com/api/decks/${id}/vote`, 
 
   const title = $('publishTitle').value.trim();
   const description = $('publishDescription').value.trim();
+  const deckCode = $('publishDeckCode').value.trim();
 
   if(!title){
     showToast('Напиши название колоды');
@@ -1414,11 +1442,12 @@ const response = await fetch(`https://berserk-server.com/api/decks/${id}/vote`, 
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({
-        title,
-        description,
-        cards: deckCards.map(c => c.id),
-        preview_ids: selectedPreviewIds.slice(0,4)
-      })
+  title,
+  description,
+  deck_code: deckCode,
+  cards: deckCards.map(c => c.id),
+  preview_ids: selectedPreviewIds.slice(0,4)
+})
     });
 
     const data = await response.json();
