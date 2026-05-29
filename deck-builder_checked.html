@@ -1148,12 +1148,37 @@ async function saveEditedDeck(){
       return selectedCosts.has(String(n));
     }
     function applyFilters(){const name=$('nameFilter').value;const text=$('textFilter').value;const set=$('setFilter').value;filteredCards=cards.filter(card=>{const matchesName=matchesTextPattern(card.name,name);const matchesText=matchesTextPattern(card.text,text);const matchesSet=set==='all'||card.set===set;const matchesCost=matchesCostChips(card.cost, card);const matchesAttack=inRange(card.attack,'attackMin','attackMax');const matchesHealth=inRange(card.health,'healthMin','healthMax');const matchesElements=selectedElements.size===0||card.elements.some(e=>selectedElements.has(e));const matchesRarity=selectedRarities.size===0||selectedRarities.has(card.rarity);const matchesCardType=selectedTypes.size===0||selectedTypes.has(card.typeId);const matchesMulti=!multiOnly||card.elements.length>1;const matchesDeckRules=canCardBeUsedByCurrentDeck(card);return matchesName&&matchesText&&matchesSet&&matchesCost&&matchesAttack&&matchesHealth&&matchesElements&&matchesRarity&&matchesCardType&&matchesMulti&&matchesDeckRules});filteredCards.sort((a, b) => {
+
+  const elementOrder = {
+    dark: 1,
+    neutral: 2,
+    swamp: 3,
+    forest: 4,
+    steppes: 5,
+    mountains: 6
+  };
+
+  const elementA = a.elements?.[0] || "";
+  const elementB = b.elements?.[0] || "";
+
+  const orderA = elementOrder[elementA] || 999;
+  const orderB = elementOrder[elementB] || 999;
+
+  if (orderA !== orderB) {
+    return orderA - orderB;
+  }
+
   const costA = Number(a.cost) || 0;
   const costB = Number(b.cost) || 0;
 
-  if (costA !== costB) return costA - costB;
+  if (costA !== costB) {
+    return costA - costB;
+  }
 
-  return String(a.name || "").localeCompare(String(b.name || ""), "ru");
+  return String(a.name || "").localeCompare(
+    String(b.name || ""),
+    "ru"
+  );
 });if(!window.keepCurrentCardPage) currentPage = 1;
 renderCards();
 updateStats();}
