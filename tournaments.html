@@ -648,6 +648,8 @@
   border:1px solid rgba(232,194,112,.22);
   background:rgba(255,255,255,.062);
   box-shadow:0 12px 28px rgba(0,0,0,.20);
+  display:grid;
+  grid-template-rows:1fr 1fr;
 }
 .bracket-pair.clickable{
   cursor:pointer;
@@ -657,7 +659,7 @@
   box-shadow:0 0 24px rgba(214,168,79,.18);
 }
 .bracket-cell{
-  height:var(--slot-h);
+  min-height:var(--slot-h);
   width:100%;
   min-width:0;
   display:grid;
