@@ -395,19 +395,31 @@
 
     <div class="modal-head">
       <span class="eyebrow">✦ Описание колоды</span>
-      <h2>Редактировать текст</h2>
+      <h2>Редактировать</h2>
       <p class="small">Измени описание колоды. Текст сохранится в аккаунте и не пропадёт после обновления страницы.</p>
     </div>
+  <label>
+  <span class="label">Описание</span>
+  <textarea
+    class="textarea"
+    id="editDeckTextInput"
+    placeholder="Напиши описание, стратегию или заметки по колоде"
+  ></textarea>
+</label>
 
-    <label>
-      <span class="label">Описание</span>
-      <textarea class="textarea" id="editDeckTextInput" placeholder="Напиши описание, стратегию или заметки по колоде"></textarea>
-    </label>
+<label>
+  <span class="label">Код колоды</span>
+  <textarea
+    class="textarea"
+    id="editDeckCodeInput"
+    placeholder="Код колоды, необязательно"
+  ></textarea>
+</label>
 
-    <div class="votes" style="margin-top:18px">
-      <button class="btn gold" onclick="saveDeckTextModal()">Сохранить</button>
-      <button class="btn ghost" onclick="closeDeckTextModal()">Отмена</button>
-    </div>
+<div class="votes" style="margin-top:18px">
+  <button class="btn gold" onclick="saveDeckTextModal()">Сохранить</button>
+  <button class="btn ghost" onclick="closeDeckTextModal()">Отмена</button>
+</div>
   </div>
 </div>
   </div></main><footer class="footer"><div class="wrap"><div>Данный сайт является неофициальным фанатским проектом и не имеет никакого отношения к правообладателю игры Берсерк Герои Онлайн, ее лицензиатам или официальным партнерам.
@@ -1002,7 +1014,7 @@ function renderDeckCard(deck,rank){
   const deckCards = deckCardsFromIds(deck);
 const copyCodeBtn = `<button class="vote" onclick="event.stopPropagation(); copyDeckCode('${deck.id}')">📋 Скопировать код</button>`;
   const editBtn = canEditPublishedDeck(deck)
-    ? `<button class="vote" onclick="event.stopPropagation(); editPublishedDeckText('${deck.id}')">Редактировать текст</button>`
+    ? `<button class="vote" onclick="event.stopPropagation(); editPublishedDeckText('${deck.id}')">Редактировать</button>`
     : '';
 
   return `<article class="deck-card" onclick="openDeckView('${deck.id}','published')" style="cursor:pointer">
@@ -1100,6 +1112,7 @@ function editPublishedDeckText(deckId){
 
   editingPublishedDeckId = deckId;
   $('editDeckTextInput').value = deck.description || '';
+  $('editDeckCodeInput').value = deck.deckCode || '';
   $('editDeckTextModal').classList.add('show');
 }
 
@@ -1173,6 +1186,46 @@ function closeDeckTextModal(){
 }
 
 async function saveDeckTextModal(){
+
+  if(editingPublishedDeckId){
+    const description = $('editDeckTextInput').value.trim();
+    const deck_code = $('editDeckCodeInput').value.trim();
+
+    try{
+      const response = await fetch(`https://berserk-server.com/api/decks/${editingPublishedDeckId}`, {
+        method: "PATCH",
+        headers: authHeaders(),
+        body: JSON.stringify({
+          description,
+          deck_code
+        })
+      });
+
+      const data = await response.json();
+
+      if(!data.ok){
+        throw new Error(data.error || 'Не удалось сохранить колоду');
+      }
+
+      const deck = publishedDecks.find(d => String(d.id) === String(editingPublishedDeckId));
+      if(deck){
+        deck.description = description;
+        deck.deckCode = deck_code;
+      }
+
+      editingPublishedDeckId = null;
+      closeDeckTextModal();
+      renderAll();
+      showToast('Колода обновлена');
+      return;
+
+    }catch(error){
+      console.error(error);
+      showToast(error.message || 'Ошибка сохранения колоды');
+      return;
+    }
+  }
+
   const deck = localDeckById(editingDeckTextId);
 
   if(!deck){
