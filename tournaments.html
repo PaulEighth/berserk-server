@@ -678,8 +678,8 @@
   background:rgba(214,168,79,.13);
 }
 .bracket-cell.empty{
-  color:#8f8678;
-  opacity:.88;
+  color:#f4efe6;
+  opacity:1;
 }
 .bracket-cell.out{
   opacity:.32;
@@ -2870,7 +2870,14 @@ html body .clean-bracket .bracket-cell{
 html body .clean-bracket .bracket-cell.empty{
   opacity:1 !important;
   background:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.055)) !important;
-}</style>
+}
+/* FIX: пустые места выглядят как обычные ячейки с игроком */
+html body .clean-bracket .bracket-cell.empty{
+  opacity:1 !important;
+  color:#f4efe6 !important;
+  background:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.055)) !important;
+}
+</style>
 </head>
 <body>
   <div class="grain"></div>
