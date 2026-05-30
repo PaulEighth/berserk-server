@@ -2244,8 +2244,7 @@ app.patch("/api/decks/:id", verifyToken, async (req, res) => {
     const result = await pool.query(`
   UPDATE decks
   SET description = $1,
-      deck_code = $2,
-      updated_at = NOW()
+      deck_code = $2
   WHERE id = $3
   RETURNING *
 `, [
