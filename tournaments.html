@@ -2855,11 +2855,13 @@ html body .tournament-playoff .bracket-pair.match-side-third > button.match-swor
   max-width:420px;
   margin-left:auto;
 }
-/* FINAL FIX: компактные одинаковые пары сетки */
+/* FIX: одинаковый вид пустых и заполненных матчей */
 .clean-bracket .bracket-pair{
-  display:block !important;
-  height:auto !important;
-  min-height:0 !important;
+  display:grid !important;
+  grid-template-rows:36px 36px !important;
+  height:72px !important;
+  min-height:72px !important;
+  max-height:72px !important;
   padding:0 !important;
   overflow:visible !important;
 }
@@ -2868,31 +2870,6 @@ html body .tournament-playoff .bracket-pair.match-side-third > button.match-swor
   height:36px !important;
   min-height:36px !important;
   max-height:36px !important;
-}
-
-.clean-bracket .bracket-cell .seed,
-.clean-bracket .bracket-cell .score{
-  height:36px !important;
-}
-
-.clean-bracket .bracket-col{
-  justify-content:flex-start !important;
-}
-
-.clean-bracket .bracket-col.left-r1,
-.clean-bracket .bracket-col.right-r1{
-  gap:8px !important;
-}
-
-.clean-bracket .bracket-col.left-r2,
-.clean-bracket .bracket-col.right-r2{
-  gap:42px !important;
-}
-
-.clean-bracket .bracket-col.left-r3,
-.clean-bracket .bracket-col.right-r3,
-.clean-bracket .bracket-col.center-final{
-  gap:0 !important;
 }
 </style>
 </head>
