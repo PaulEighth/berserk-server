@@ -605,10 +605,10 @@
   margin:0 0 14px;
 }
 .clean-bracket{
-  --card-w:188px;
+  --card-w:240px;
   --gap:34px;
   --slot-h:36px;
-  min-width:1180px;
+  min-width:1800px;
   display:grid;
   grid-template-columns:var(--card-w) var(--card-w) var(--card-w) 156px var(--card-w) var(--card-w) var(--card-w);
   gap:var(--gap);
@@ -617,7 +617,7 @@
   padding:10px 4px 4px;
 }
 .clean-bracket.bracket-8{
-  min-width:820px;
+  min-width:1250px;
   grid-template-columns:var(--card-w) var(--card-w) 156px var(--card-w) var(--card-w);
 }
 .clean-bracket.bracket-8 .hide-8{display:none}
@@ -3309,7 +3309,7 @@ privatePassword: t.private_password || "",
     prize4: t.prize_4 || "",
 
     date: t.start_date || "",
-endDate: t.end_date || "",
+endDate: t.end_date || parsedSwissData.endDate || "",
 telegram: t.telegram_link || "",
 
     mode: formatMap[t.format] || t.format || "BO1",
