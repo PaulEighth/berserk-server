@@ -2854,19 +2854,6 @@ html body .tournament-playoff .bracket-pair.match-side-third > button.match-swor
   width:100%;
   max-width:420px;
   margin-left:auto;
-}/* FIX: убрать большой зазор внутри матча */
-.bracket-pair{
-  height:auto !important;
-  min-height:0 !important;
-}
-
-.bracket-cell{
-  height:36px !important;
-  min-height:36px !important;
-}
-
-.clean-bracket{
-  --slot-h:36px !important;
 }
 </style>
 </head>
@@ -5613,7 +5600,9 @@ document.addEventListener("click", function(event){
         const b=slots[i*2+1] || makeBracketEntry(null,null);
         pairs.push(renderPair(id,group,side,round,i,a,b,entrySeed(a),entrySeed(b),right?'right-line':'left-line'));
       }
-      return `<div class="bracket-col ${right?'right-side':''} ${finalCol?'center-final':''}">
+      const roundClass = side === 'final' ? 'center-final' : `${side}-r${round}`;
+
+return `<div class="bracket-col ${roundClass} ${right?'right-side':''} ${finalCol?'center-final':''}">
         <div class="round-caption">${label}</div>
         ${pairs.join('')}
       </div>`;
