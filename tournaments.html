@@ -374,7 +374,7 @@
   border-radius:22px;
   background:rgba(255,255,255,.035);
   border:1px solid rgba(232,194,112,.13);
-  overflow:hidden;
+  overflow:visible;
 }
 .bracket-side.off{
   opacity:.55;
@@ -558,7 +558,7 @@
 }
 .bracket-wrap{
   padding:18px;
-  overflow:hidden;
+  overflow:visible;
 }
 .bracket-title{
   align-items:flex-start;
@@ -593,7 +593,7 @@
   border-radius:24px;
   background:radial-gradient(circle at 50% 50%,rgba(214,168,79,.08),transparent 46%),rgba(255,255,255,.025);
   border:1px solid rgba(232,194,112,.13);
-  overflow:auto;
+  overflow:visible;
 }
 .bracket-group-title{
   text-align:center;
@@ -3309,7 +3309,8 @@ privatePassword: t.private_password || "",
     prize4: t.prize_4 || "",
 
     date: t.start_date || "",
-    telegram: t.telegram_link || "",
+endDate: t.end_date || "",
+telegram: t.telegram_link || "",
 
     mode: formatMap[t.format] || t.format || "BO1",
     deckMode: t.deckmode || t.deckMode || "none",
@@ -4655,7 +4656,8 @@ function injectSwordsEverywhere(){
       start_date: request.date,
       telegram_link: "",
       bracket: request.bracketSize,
-      swiss_data: {
+end_date: request.endDate || null,
+swiss_data: {
   swissRounds: request.swissRounds || 3,
   rules: request.deckRules || "",
   endDate: request.endDate || "",
