@@ -626,7 +626,10 @@
   flex-direction:column;
   justify-content:center;
 }
-.bracket-col.left-r1,.bracket-col.right-r1{gap:6px}
+.bracket-col.left-r1,
+.bracket-col.right-r1{
+  gap:0;
+}
 .bracket-col.left-r2,.bracket-col.right-r2{gap:18px}
 .bracket-col.left-r3,.bracket-col.right-r3{gap:0}
 .bracket-col.center-final{gap:0}
@@ -648,6 +651,7 @@
   border:1px solid rgba(232,194,112,.22);
   background:rgba(255,255,255,.062);
   box-shadow:0 12px 28px rgba(0,0,0,.20);
+  padding:0;
 }
 .bracket-pair.clickable{
   cursor:pointer;
@@ -657,7 +661,7 @@
   box-shadow:0 0 24px rgba(214,168,79,.18);
 }
 .bracket-cell{
-  height:var(--slot-h);
+  height:42px;
   width:100%;
   min-width:0;
   display:grid;
