@@ -2918,6 +2918,15 @@ html body .bracket-pair .bracket-cell.empty{
   color:#f4efe6 !important;
   background:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.055)) !important;
 }
+/* ОДИНАКОВЫЙ РАЗМЕР ДЛЯ ПУСТОЙ И ЗАНЯТОЙ ЯЧЕЙКИ */
+html body .bracket-cell.empty,
+html body .bracket-cell.alive{
+  height:42px !important;
+  min-height:42px !important;
+  max-height:42px !important;
+  width:100% !important;
+  box-sizing:border-box !important;
+}
 </style>
 </head>
 <body>
