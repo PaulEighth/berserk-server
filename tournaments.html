@@ -646,12 +646,19 @@
 }
 .bracket-pair{
   position:relative;
-  border-radius:10px;
-  overflow:hidden;
-  border:1px solid rgba(232,194,112,.22);
-  background:rgba(255,255,255,.062);
-  box-shadow:0 12px 28px rgba(0,0,0,.20);
-  padding:0;
+  border:none !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  overflow:visible !important;
+
+  display:flex;
+  flex-direction:column;
+  gap:0;
+}
+.bracket-cell{
+  height:42px !important;
+  min-height:42px !important;
+  max-height:42px !important;
 }
 .bracket-pair.clickable{
   cursor:pointer;
@@ -2888,9 +2895,9 @@ html body .clean-bracket .bracket-pair{
 }
 
 html body .clean-bracket .bracket-cell{
-  height:42px !important;
-  min-height:42px !important;
-  max-height:42px !important;
+  height:32px !important;
+  min-height:32px !important;
+  max-height:32px !important;
   border:1px solid rgba(232,194,112,.22) !important;
   border-radius:10px !important;
   margin:0 !important;
