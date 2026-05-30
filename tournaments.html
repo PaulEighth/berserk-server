@@ -2884,8 +2884,8 @@ html body .clean-bracket .bracket-cell.empty{
   color:#f4efe6 !important;
   background:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.055)) !important;
 }
-/* REAL FIX: убираем большую коробку пары, оставляем только сами ячейки */
-html body .clean-bracket .bracket-pair{
+/* FINAL FIX: пустой слот = слот с игроком */
+html body .bracket-pair{
   background:transparent !important;
   border:none !important;
   box-shadow:none !important;
@@ -2894,17 +2894,29 @@ html body .clean-bracket .bracket-pair{
   overflow:visible !important;
 }
 
-html body .clean-bracket .bracket-cell{
-  height:32px !important;
-  min-height:32px !important;
-  max-height:32px !important;
-  border:1px solid rgba(232,194,112,.22) !important;
-  border-radius:10px !important;
+html body .bracket-pair .bracket-cell{
+  height:42px !important;
+  min-height:42px !important;
+  max-height:42px !important;
+  border:0 !important;
+  border-bottom:1px solid rgba(255,255,255,.08) !important;
+  border-radius:0 !important;
   margin:0 !important;
 }
 
-html body .clean-bracket .bracket-cell + .bracket-cell{
-  margin-top:0 !important;
+html body .bracket-pair .bracket-cell:first-of-type{
+  border-radius:10px 10px 0 0 !important;
+}
+
+html body .bracket-pair .bracket-cell:last-of-type{
+  border-bottom:none !important;
+  border-radius:0 0 10px 10px !important;
+}
+
+html body .bracket-pair .bracket-cell.empty{
+  opacity:1 !important;
+  color:#f4efe6 !important;
+  background:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.055)) !important;
 }
 </style>
 </head>
