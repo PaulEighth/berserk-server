@@ -2856,7 +2856,21 @@ html body .tournament-playoff .bracket-pair.match-side-third > button.match-swor
   margin-left:auto;
 
 }
-</style>
+/* FINAL: пустые и заполненные ячейки выглядят одинаково */
+html body .clean-bracket .bracket-pair{
+  overflow:hidden !important;
+}
+
+html body .clean-bracket .bracket-cell{
+  height:42px !important;
+  min-height:42px !important;
+  max-height:42px !important;
+}
+
+html body .clean-bracket .bracket-cell.empty{
+  opacity:1 !important;
+  background:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.055)) !important;
+}</style>
 </head>
 <body>
   <div class="grain"></div>
