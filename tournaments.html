@@ -5628,13 +5628,13 @@ return `<div class="bracket-col ${roundClass} ${right?'right-side':''} ${finalCo
       return `<div class="bracket-group">
         <h4 class="bracket-group-title">${title}</h4>
         <div class="clean-bracket bracket-16">
-          <div class="bracket-col left-r1">${leftR1}</div>
-          <div class="bracket-col left-r2">${leftR2}</div>
-          <div class="bracket-col left-r3">${leftR3}</div>
+          ${leftR1}
+${leftR2}
+${leftR3}
           <div class="bracket-col center-final"><div class="round-caption">${finalCaption}</div>${finalPair}${thirdPlace}</div>
-          <div class="bracket-col right-r3 right-side">${rightR3}</div>
-          <div class="bracket-col right-r2 right-side">${rightR2}</div>
-          <div class="bracket-col right-r1 right-side">${rightR1}</div>
+          ${rightR3}
+${rightR2}
+${rightR1}
         </div>
       </div>`;
     }
@@ -5657,11 +5657,11 @@ return `<div class="bracket-col ${roundClass} ${right?'right-side':''} ${finalCo
       return `<div class="bracket-group">
         <h4 class="bracket-group-title">${title}</h4>
         <div class="clean-bracket bracket-8">
-          <div class="bracket-col left-r1">${leftR1}</div>
-          <div class="bracket-col left-r2">${leftR2}</div>
+          ${leftR1}
+${leftR2}
           <div class="bracket-col center-final"><div class="round-caption">${finalCaption}</div>${finalPair}${thirdPlace}</div>
-          <div class="bracket-col right-r2 right-side">${rightR2}</div>
-          <div class="bracket-col right-r1 right-side">${rightR1}</div>
+          ${rightR2}
+${rightR1}
         </div>
       </div>`;
     }
