@@ -304,15 +304,8 @@ async function sendMessage(){
   await loadMessages();
 }
 
-async function deleteMessage(id){
+function deleteMessage(id){
   openDeleteMessageModal(id);
-  const res = await fetch(`/api/site-chats/${currentChannel}/messages/${id}`, {
-    method:"DELETE",
-    headers:authHeaders()
-  });
-  const data = await res.json();
-  if(!data.ok){showAlert(data.error || "Ошибка удаления");return;}
-  await loadMessages();
 }
 
 const music = document.getElementById("bgMusic");
@@ -360,10 +353,15 @@ function closeDeleteMessageModal(){
 
 async function confirmDeleteMessage(){
 
-  if(!deleteMessageId) return;
+  const id = deleteMessageId;
+
+  if(!id) return;
+
+  deleteMessageId = null;
+  closeDeleteMessageModal();
 
   const res = await fetch(
-    `/api/site-chats/${currentChannel}/messages/${deleteMessageId}`,
+    `/api/site-chats/${currentChannel}/messages/${id}`,
     {
       method:"DELETE",
       headers:authHeaders()
@@ -377,7 +375,6 @@ async function confirmDeleteMessage(){
     return;
   }
 
-  closeDeleteMessageModal();
   await loadMessages();
 }
 </script>

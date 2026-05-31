@@ -1056,10 +1056,22 @@ app.get("/api/site-chats/:channel/messages", verifyToken, async (req,res)=>{
     }
 
     const result = await pool.query(`
-      SELECT *
-      FROM site_chat_messages
-      WHERE channel = $1
-      ORDER BY created_at ASC
+      SELECT
+        m.id,
+        m.channel,
+        m.user_id,
+        COALESCE(u.username, m.username) AS username,
+        COALESCE(u.role, m.role) AS role,
+        COALESCE(u.is_partner, m.is_partner) AS is_partner,
+        m.text,
+        m.media_type,
+        m.media_name,
+        m.media_data,
+        m.created_at
+      FROM site_chat_messages m
+      LEFT JOIN users u ON u.id = m.user_id
+      WHERE m.channel = $1
+      ORDER BY m.created_at ASC
     `,[channel]);
 
     res.json({
@@ -1074,7 +1086,6 @@ app.get("/api/site-chats/:channel/messages", verifyToken, async (req,res)=>{
     });
   }
 });
-
 app.post("/api/site-chats/:channel/messages", verifyToken, async (req,res)=>{
   try{
     const channel = req.params.channel;
