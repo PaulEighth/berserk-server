@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Berserk Heroes Online — Чаты</title>
+  <meta name="description" content="Чаты Berserk Heroes Online: флудилка и техническая часть сайта.">
+  <meta name="theme-color" content="#07090f">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307090f'/%3E%3Ctext x='50' y='66' text-anchor='middle' font-size='56'%3E%F0%9F%92%AC%3C/text%3E%3C/svg%3E">
+  <style>
+    :root{--bg:#07090f;--bg2:#0b0f18;--panel:#111622;--panel2:#151b2a;--text:#f4efe6;--muted:#b8ae9f;--gold:#d6a84f;--gold2:#f0d28b;--ember:#e07830;--violet:#7c6cff;--red:#ff6b6b;--green:#7bd88f;--line:rgba(232,194,112,.18);--r:28px;--shadow:0 30px 90px rgba(0,0,0,.46)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at 82% 7%,rgba(124,108,255,.18),transparent 32%),radial-gradient(circle at 18% 16%,rgba(224,120,48,.18),transparent 30%),linear-gradient(180deg,#05060a,#0a0d15 45%,#07090f);min-height:100vh;overflow-x:hidden}
+    .grain{position:fixed;inset:0;background-image:radial-gradient(rgba(255,255,255,.13) 1px,transparent 1px);background-size:22px 22px;opacity:.14;pointer-events:none}
+    .wrap{width:min(1440px,calc(100% - 36px));margin:auto;position:relative;z-index:1}
+    .nav{position:sticky;top:14px;z-index:50;margin:14px auto 0;width:min(1440px,calc(100% - 28px));display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 13px 11px 16px;background:rgba(9,12,19,.76);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:999px;box-shadow:0 16px 45px rgba(0,0,0,.34)}
+    .brand{display:flex;gap:11px;align-items:center;color:var(--text);text-decoration:none;font-weight:950;white-space:nowrap;letter-spacing:-.03em}
+    .brand-mark{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#23190d,#d6a84f);color:#07090f;overflow:hidden}
+    .brand-mark img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+    .nav-links{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center}
+    .nav a{color:var(--text);text-decoration:none;font-size:14px;font-weight:750}
+    .nav-links a{opacity:.74}.nav-links a:hover,.nav-links a.active{opacity:1;color:var(--gold2)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 18px;border-radius:999px;border:1px solid transparent;text-decoration:none;font-weight:900;transition:.25s;cursor:pointer;white-space:nowrap;font-size:14px}
+    .btn.gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#171008;box-shadow:0 16px 42px rgba(214,168,79,.22)}
+    .btn.ghost{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.13);color:var(--text)}
+    .btn.red{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.28);color:#ffd7d7}
+    .btn:hover{transform:translateY(-2px)}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+    .hero{padding:64px 0 28px}.eyebrow{display:inline-flex;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(214,168,79,.08);font-size:13px;font-weight:900;color:var(--gold2)}
+    h1{font-size:clamp(46px,7vw,92px);line-height:.92;margin:18px 0 16px;letter-spacing:-.075em;background:linear-gradient(135deg,#fff 15%,#f0d28b 58%,#b16b2c);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .lead{font-size:clamp(17px,2vw,21px);line-height:1.58;color:#d7cec0;max-width:900px}.small{font-size:13px;color:var(--muted);line-height:1.45}
+    .chat-layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px;align-items:start;margin-bottom:42px}.panel,.chat-main,.side-card{background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.045));border:1px solid rgba(232,194,112,.15);border-radius:var(--r);box-shadow:0 22px 60px rgba(0,0,0,.22);backdrop-filter:blur(10px)}
+    .panel{padding:16px;position:sticky;top:92px}.side-card{padding:16px;margin-top:12px}.tabs{display:grid;gap:10px}.tab{width:100%;text-align:left;padding:16px;border-radius:20px;border:1px solid rgba(232,194,112,.14);background:rgba(255,255,255,.045);color:var(--text);cursor:pointer;transition:.2s}.tab:hover{transform:translateY(-2px);border-color:rgba(240,210,139,.42)}.tab.active{background:rgba(214,168,79,.13);border-color:rgba(240,210,139,.55)}.tab b{display:block;font-size:18px;margin-bottom:5px}.tab span{display:block;color:var(--muted);font-size:13px;line-height:1.35}
+    .chat-main{min-height:720px;display:flex;flex-direction:column;overflow:hidden}.chat-head{padding:22px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.chat-title h2{font-size:34px;margin:0 0 6px;letter-spacing:-.05em}.chat-title p{margin:0;color:var(--muted);line-height:1.45}.chat-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.messages{height:560px;overflow:auto;padding:18px;display:grid;gap:12px;align-content:start;background:rgba(0,0,0,.10)}
+    .message{position:relative;padding:14px 52px 14px 14px;border-radius:22px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08)}.message:hover{border-color:rgba(232,194,112,.22)}.message-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:7px}.author{font-weight:950}.role-user{color:#f4efe6}.role-admin{color:#ff6b6b;text-shadow:0 0 16px rgba(255,107,107,.28)}.role-developer{color:#7c6cff;text-shadow:0 0 16px rgba(124,108,255,.30)}.role-moderator{color:#7bd88f;text-shadow:0 0 16px rgba(123,216,143,.24)}.role-creator{color:#f0d28b}.role-vip{color:#e07830}.partner-star{color:#f0d28b;text-shadow:0 0 14px rgba(240,210,139,.42);margin-right:5px}.time{color:var(--muted);font-size:12px;font-weight:800}.message-text{white-space:pre-wrap;overflow-wrap:anywhere;color:#e5dacb;line-height:1.52}.delete-msg{position:absolute;right:12px;top:12px;width:30px;height:30px;border-radius:10px;border:1px solid rgba(255,107,107,.35);background:rgba(255,107,107,.16);color:#ffd3d3;font-weight:950;cursor:pointer}.delete-msg:hover{background:rgba(255,107,107,.25)}
+    .media{margin-top:10px}.media img,.media video{max-width:min(520px,100%);max-height:360px;border-radius:18px;border:1px solid rgba(232,194,112,.18);background:#05060a;display:block}.media-name{font-size:12px;color:var(--muted);margin-top:6px}.composer{padding:16px;border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:1fr auto;gap:12px;background:rgba(255,255,255,.025)}.composer-main{display:grid;gap:10px}.field,.textarea{width:100%;padding:14px 15px;border-radius:16px;border:1px solid rgba(232,194,112,.18);background:rgba(255,255,255,.06);color:var(--text);outline:none;font-size:15px}.textarea{min-height:76px;resize:vertical;line-height:1.5}.field::placeholder,.textarea::placeholder{color:#8f8678}.file-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.file-pill{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;border:1px solid rgba(232,194,112,.18);background:rgba(255,255,255,.055);color:var(--muted);font-weight:850;font-size:13px}.file-pill input{display:none}.file-preview{font-size:13px;color:var(--gold2);font-weight:850}.empty{padding:28px;border-radius:20px;border:1px dashed rgba(232,194,112,.22);color:var(--muted);text-align:center;line-height:1.55}.auth-box{padding:22px;border-radius:24px;background:rgba(255,255,255,.045);border:1px solid rgba(232,194,112,.15);text-align:center;margin:18px}.auth-box p{color:var(--muted);line-height:1.55}.footer{border-top:1px solid rgba(232,194,112,.14);padding:26px 0;color:var(--muted);font-size:14px}.footer a{color:var(--gold2);text-decoration:none}
+    .custom-alert{position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:22px}.custom-alert.show{display:flex}.custom-alert-box{width:min(460px,100%);padding:28px;border-radius:28px;background:linear-gradient(180deg,rgba(17,22,34,.98),rgba(9,12,19,.98));border:1px solid rgba(232,194,112,.24);box-shadow:0 35px 110px rgba(0,0,0,.62);text-align:center}.custom-alert-box h3{margin:0 0 10px;font-size:28px;color:var(--gold2);letter-spacing:-.04em}.custom-alert-box p{margin:0 0 20px;color:var(--muted);line-height:1.55}.music-toggle{position:fixed;bottom:20px;right:20px;z-index:9999;padding:12px 18px;border-radius:999px;border:1px solid rgba(232,194,112,.2);background:rgba(7,9,15,.8);color:#f0d28b;font-weight:900;cursor:pointer}
+    @media(max-width:1060px){.nav-links{display:none}.chat-layout{grid-template-columns:1fr}.panel{position:relative;top:auto}.messages{height:520px}.chat-head{display:grid}.chat-actions{justify-content:flex-start}}
+    @media(max-width:680px){.wrap{width:min(100% - 24px,1440px)}.nav{border-radius:24px;align-items:flex-start}.brand{white-space:normal}.hero{padding-top:42px}.composer{grid-template-columns:1fr}.btn{width:100%}.chat-main{min-height:auto}.messages{height:480px}.music-toggle{left:20px;right:auto}.message{padding-right:46px}}
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+  <nav class="nav">
+    <a class="brand" href="BerserHeroesOnline.html">
+      <span class="brand-mark"><img src="Logo.png" alt="BHO"></span>
+      <span>Berserk Heroes Online</span>
+    </a>
+    <div class="nav-links">
+      <a href="BerserHeroesOnline.html">О сайте</a>
+      <a href="deck-builder_checked.html">База карт</a>
+      <a href="decks_select_publish.html#deck">Колоды</a>
+      <a href="meta.html#meta">(Мета тех.работа)</a>
+      <a href="tournaments.html">Турниры</a>
+      <a href="news.html">Новости</a>
+      <a class="active" href="chats.html">Чаты</a>
+      <a id="adminPanelLink" href="admin.html" style="display:none">Админ</a>
+      <a href="BerserHeroesOnline.html#contacts">Контакты</a>
+    </div>
+    <div style="display:flex;gap:14px;align-items:center">
+      <a class="btn ghost" href="https://t.me/Paul_Eighth" target="_blank" style="border:1px solid #d6a84f;color:#d6a84f;background:transparent">@Paul_Eighth</a>
+      <a class="btn gold" href="auth.html" id="authLink">Войти</a>
+    </div>
+  </nav>
+
+  <header class="hero wrap">
+    <span class="eyebrow">✦ Чаты БГО</span>
+    <h1>Чаты</h1>
+    <p class="lead">Общие комнаты для игроков Berserk Heroes Online. Сейчас доступны флудилка и техническая часть сайта. Писать могут только игроки с аккаунтом.</p>
+  </header>
+
+  <main class="wrap chat-layout">
+    <aside class="panel">
+      <div class="tabs">
+        <button class="tab active" data-channel="flood"><b>💬 Флудилка</b><span>Общение, вопросы, обсуждения и любые разговоры игроков.</span></button>
+        <button class="tab" data-channel="tech"><b>🛠 Техническая часть сайта</b><span>Баги, идеи, предложения и вопросы по работе сайта.</span></button>
+      </div>
+      <div class="side-card">
+        <b style="color:var(--gold2)">Файлы</b>
+        <p class="small">Можно прикреплять только <b>WEBP</b> и <b>WEBM</b>, размером не больше <b>5 МБ</b>.</p>
+      </div>
+      <div class="side-card">
+        <b style="color:var(--gold2)">Удаление</b>
+        <p class="small">Игрок удаляет только свои сообщения. Admin, developer и moderator могут удалять чужие, но сообщения admin удаляет только admin.</p>
+      </div>
+    </aside>
+
+    <section class="chat-main">
+      <div class="chat-head">
+        <div class="chat-title">
+          <h2 id="chatTitle">Флудилка</h2>
+          <p id="chatSubtitle">Общение, вопросы, обсуждения и любые разговоры игроков.</p>
+        </div>
+        <div class="chat-actions">
+          <button class="btn ghost" onclick="loadMessages()">Обновить</button>
+        </div>
+      </div>
+
+      <div id="authBox" class="auth-box" style="display:none">
+        <h3>Нужен аккаунт</h3>
+        <p>Чтобы читать и писать в чатах, войди в аккаунт.</p>
+        <a class="btn gold" href="auth.html">Войти</a>
+      </div>
+
+      <div class="messages" id="messages"></div>
+
+      <div class="composer" id="composer">
+        <div class="composer-main">
+          <textarea class="textarea" id="messageInput" placeholder="Написать сообщение..."></textarea>
+          <div class="file-row">
+            <label class="file-pill">📎 WEBP / WEBM до 5 МБ <input id="mediaInput" type="file" accept="image/webp,video/webm"></label>
+            <span class="file-preview" id="filePreview"></span>
+            <button type="button" class="btn ghost" id="clearFileBtn" style="display:none;width:auto" onclick="clearSelectedFile()">Убрать файл</button>
+          </div>
+        </div>
+        <button class="btn gold" onclick="sendMessage()">Отправить</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="wrap">Данный сайт является неофициальным фанатским проектом Berserk Heroes Online.</div></footer>
+
+  <div class="custom-alert" id="customAlert">
+    <div class="custom-alert-box">
+      <h3 id="customAlertTitle">Информация</h3>
+      <p id="customAlertText"></p>
+      <button class="btn gold" onclick="closeAlert()">OK</button>
+    </div>
+  </div>
+
+  <audio id="bgMusic" loop><source src="BGO.mp3" type="audio/mpeg"></audio>
+  <button id="musicToggle" class="music-toggle">🔇 Звук: ВЫКЛ</button>
+
+<script>
+history.scrollRestoration = "manual";
+
+const CHANNELS = {
+  flood:{ title:"Флудилка", subtitle:"Общение, вопросы, обсуждения и любые разговоры игроков." },
+  tech:{ title:"Техническая часть сайта", subtitle:"Баги, идеи, предложения и вопросы по работе сайта." }
+};
+
+let currentChannel = "flood";
+let selectedMedia = null;
+let refreshTimer = null;
+
+function getLoggedUser(){
+  try{return JSON.parse(localStorage.getItem("user") || "null");}
+  catch(e){return null;}
+}
+function isLoggedIn(){return !!localStorage.getItem("token") && !!getLoggedUser();}
+function authHeaders(){return {"Authorization":`Bearer ${localStorage.getItem("token")}`};}
+function escapeHtml(value){
+  return String(value ?? "").replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch]));
+}
+function roleClass(role){
+  const r = String(role || "user").toLowerCase();
+  return ["admin","developer","moderator","creator","vip"].includes(r) ? `role-${r}` : "role-user";
+}
+function roleNickHtml(username, role, isPartner){
+  return `${isPartner ? '<span class="partner-star">⭐</span>' : ''}<span class="author ${roleClass(role)}">${escapeHtml(username || "Игрок")}</span>`;
+}
+function formatTime(value){
+  const date = new Date(value);
+  if(Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString("ru-RU", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
+}
+function showAlert(text,title="Информация"){
+  document.getElementById("customAlertTitle").textContent = title;
+  document.getElementById("customAlertText").textContent = text;
+  document.getElementById("customAlert").classList.add("show");
+}
+function closeAlert(){document.getElementById("customAlert").classList.remove("show");}
+function canDeleteMessage(message){
+  const user = getLoggedUser();
+  if(!user || !message) return false;
+  const userRole = String(user.role || "user");
+  const messageRole = String(message.role || "user");
+  if(messageRole === "admin") return userRole === "admin";
+  if(["admin","developer","moderator"].includes(userRole)) return true;
+  return Number(message.user_id) === Number(user.id);
+}
+function updateAuthUI(){
+  const user = getLoggedUser();
+  const adminLink = document.getElementById("adminPanelLink");
+  if(adminLink && user && ["admin","developer","moderator"].includes(user.role)) adminLink.style.display = "inline";
+  const authLink = document.getElementById("authLink");
+  if(authLink && user){authLink.textContent = "Профиль";authLink.href = "auth.html";}
+  document.getElementById("authBox").style.display = isLoggedIn() ? "none" : "block";
+  document.getElementById("composer").style.display = isLoggedIn() ? "grid" : "none";
+}
+
+async function loadMessages(){
+  updateAuthUI();
+  const box = document.getElementById("messages");
+  if(!isLoggedIn()){
+    box.innerHTML = '<div class="empty">Войди в аккаунт, чтобы видеть сообщения.</div>';
+    return;
+  }
+  try{
+    const res = await fetch(`/api/site-chats/${currentChannel}/messages`, { headers:authHeaders() });
+    const data = await res.json();
+    if(!data.ok){box.innerHTML = `<div class="empty">${escapeHtml(data.error || "Ошибка загрузки")}</div>`;return;}
+    const messages = data.messages || [];
+    if(!messages.length){box.innerHTML = '<div class="empty">Сообщений пока нет. Будь первым.</div>';return;}
+    box.innerHTML = messages.map(renderMessage).join("");
+    box.scrollTop = box.scrollHeight;
+  }catch(error){
+    box.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
+  }
+}
+
+function renderMessage(m){
+  const del = canDeleteMessage(m) ? `<button class="delete-msg" title="Удалить" onclick="deleteMessage(${Number(m.id)})">×</button>` : "";
+  let media = "";
+  if(m.media_data && m.media_type === "image/webp"){
+    media = `<div class="media"><img src="${m.media_data}" alt="${escapeHtml(m.media_name || "webp")}"><div class="media-name">${escapeHtml(m.media_name || "WEBP")}</div></div>`;
+  }
+  if(m.media_data && m.media_type === "video/webm"){
+    media = `<div class="media"><video src="${m.media_data}" controls playsinline></video><div class="media-name">${escapeHtml(m.media_name || "WEBM")}</div></div>`;
+  }
+  return `
+    <article class="message">
+      ${del}
+      <div class="message-top">
+        ${roleNickHtml(m.username, m.role, m.is_partner)}
+        <span class="time">${escapeHtml(formatTime(m.created_at))}</span>
+      </div>
+      ${m.text ? `<div class="message-text">${escapeHtml(m.text)}</div>` : ""}
+      ${media}
+    </article>
+  `;
+}
+
+function selectChannel(channel){
+  currentChannel = channel;
+  const info = CHANNELS[channel];
+  document.getElementById("chatTitle").textContent = info.title;
+  document.getElementById("chatSubtitle").textContent = info.subtitle;
+  document.querySelectorAll(".tab").forEach(btn => btn.classList.toggle("active", btn.dataset.channel === channel));
+  clearSelectedFile();
+  loadMessages();
+}
+
+document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => selectChannel(btn.dataset.channel)));
+
+document.getElementById("mediaInput").addEventListener("change", async e => {
+  const file = e.target.files?.[0];
+  selectedMedia = null;
+  document.getElementById("filePreview").textContent = "";
+  document.getElementById("clearFileBtn").style.display = "none";
+  if(!file) return;
+  if(!["image/webp","video/webm"].includes(file.type)){
+    e.target.value = "";
+    showAlert("Можно прикреплять только WEBP или WEBM.");
+    return;
+  }
+  if(file.size > 5 * 1024 * 1024){
+    e.target.value = "";
+    showAlert("Файл больше 5 МБ.");
+    return;
+  }
+  const data = await readFileAsDataUrl(file);
+  selectedMedia = { name:file.name, type:file.type, data };
+  document.getElementById("filePreview").textContent = `Выбран файл: ${file.name}`;
+  document.getElementById("clearFileBtn").style.display = "inline-flex";
+});
+function readFileAsDataUrl(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+function clearSelectedFile(){
+  selectedMedia = null;
+  const input = document.getElementById("mediaInput");
+  if(input) input.value = "";
+  document.getElementById("filePreview").textContent = "";
+  document.getElementById("clearFileBtn").style.display = "none";
+}
+
+async function sendMessage(){
+  if(!isLoggedIn()){showAlert("Чтобы писать в чат, войди в аккаунт.");return;}
+  const input = document.getElementById("messageInput");
+  const text = input.value.trim();
+  if(!text && !selectedMedia){showAlert("Сообщение пустое.");return;}
+  const payload = {
+    text,
+    mediaType:selectedMedia?.type || "",
+    mediaName:selectedMedia?.name || "",
+    mediaData:selectedMedia?.data || ""
+  };
+  const res = await fetch(`/api/site-chats/${currentChannel}/messages`, {
+    method:"POST",
+    headers:{...authHeaders(), "Content-Type":"application/json"},
+    body:JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if(!data.ok){showAlert(data.error || "Ошибка отправки");return;}
+  input.value = "";
+  clearSelectedFile();
+  await loadMessages();
+}
+
+async function deleteMessage(id){
+  if(!confirm("Удалить сообщение?")) return;
+  const res = await fetch(`/api/site-chats/${currentChannel}/messages/${id}`, {
+    method:"DELETE",
+    headers:authHeaders()
+  });
+  const data = await res.json();
+  if(!data.ok){showAlert(data.error || "Ошибка удаления");return;}
+  await loadMessages();
+}
+
+const music = document.getElementById("bgMusic");
+const btn = document.getElementById("musicToggle");
+let savedTime = localStorage.getItem("musicTime");
+music.volume = 1;
+music.muted = true;
+btn.textContent = "🔇 Звук: ВЫКЛ";
+if(savedTime) music.currentTime = savedTime;
+btn.addEventListener("click", () => {
+  if(music.paused){
+    music.play();
+    music.muted = false;
+    btn.textContent = "🔊 Звук: ВКЛ";
+  }else{
+    music.muted = !music.muted;
+    btn.textContent = music.muted ? "🔇 Звук: ВЫКЛ" : "🔊 Звук: ВКЛ";
+  }
+});
+setInterval(()=>localStorage.setItem("musicTime", music.currentTime),1000);
+
+window.addEventListener("load", () => {
+  updateAuthUI();
+  loadMessages();
+  refreshTimer = setInterval(loadMessages, 15000);
+});
+</script>
+</body>
+</html>

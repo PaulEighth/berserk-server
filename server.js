@@ -189,6 +189,21 @@ async function ensurePartnerColumn() {
     ALTER TABLE tournament_participants
     ADD COLUMN IF NOT EXISTS contact_info TEXT
   `);
+  await pool.query(`
+  CREATE TABLE IF NOT EXISTS site_chat_messages (
+    id SERIAL PRIMARY KEY,
+    channel TEXT NOT NULL,
+    user_id INTEGER NOT NULL,
+    username TEXT NOT NULL,
+    role TEXT DEFAULT 'user',
+    is_partner BOOLEAN DEFAULT false,
+    text TEXT DEFAULT '',
+    media_type TEXT DEFAULT '',
+    media_name TEXT DEFAULT '',
+    media_data TEXT DEFAULT '',
+    created_at TIMESTAMP DEFAULT NOW()
+  )
+`);
 }
 
 
@@ -1003,6 +1018,187 @@ app.delete("/api/news-requests/:id", verifyToken, requireRoles("admin"), async (
     res.status(500).json({
       ok: false,
       error: error.message
+    });
+  }
+});
+// =========================
+// ЧАТЫ САЙТА
+// =========================
+
+function canDeleteSiteChatMessage(user, message){
+  const userRole = String(user.role || "user");
+  const messageRole = String(message.role || "user");
+
+  if(messageRole === "admin"){
+    return userRole === "admin";
+  }
+
+  if(["admin","developer","moderator"].includes(userRole)){
+    return true;
+  }
+
+  return Number(user.id) === Number(message.user_id);
+}
+
+function isAllowedSiteChatChannel(channel){
+  return ["flood","tech"].includes(channel);
+}
+
+app.get("/api/site-chats/:channel/messages", verifyToken, async (req,res)=>{
+  try{
+    const channel = req.params.channel;
+
+    if(!isAllowedSiteChatChannel(channel)){
+      return res.status(400).json({
+        ok:false,
+        error:"Такого чата нет"
+      });
+    }
+
+    const result = await pool.query(`
+      SELECT *
+      FROM site_chat_messages
+      WHERE channel = $1
+      ORDER BY created_at ASC
+    `,[channel]);
+
+    res.json({
+      ok:true,
+      messages:result.rows
+    });
+
+  }catch(error){
+    res.status(500).json({
+      ok:false,
+      error:error.message
+    });
+  }
+});
+
+app.post("/api/site-chats/:channel/messages", verifyToken, async (req,res)=>{
+  try{
+    const channel = req.params.channel;
+
+    if(!isAllowedSiteChatChannel(channel)){
+      return res.status(400).json({
+        ok:false,
+        error:"Такого чата нет"
+      });
+    }
+
+    const text = String(req.body.text || "").trim();
+    const mediaType = String(req.body.mediaType || "").trim();
+    const mediaName = String(req.body.mediaName || "").trim();
+    const mediaData = String(req.body.mediaData || "").trim();
+
+    if(!text && !mediaData){
+      return res.status(400).json({
+        ok:false,
+        error:"Сообщение пустое"
+      });
+    }
+
+    if(mediaData){
+      if(!["image/webp","video/webm"].includes(mediaType)){
+        return res.status(400).json({
+          ok:false,
+          error:"Можно загружать только WEBP или WEBM"
+        });
+      }
+
+      const sizeApprox = Math.ceil((mediaData.length * 3) / 4);
+
+      if(sizeApprox > 5 * 1024 * 1024){
+        return res.status(400).json({
+          ok:false,
+          error:"Файл больше 5 МБ"
+        });
+      }
+    }
+
+    const result = await pool.query(`
+      INSERT INTO site_chat_messages (
+        channel,
+        user_id,
+        username,
+        role,
+        is_partner,
+        text,
+        media_type,
+        media_name,
+        media_data
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      RETURNING *
+    `,[
+      channel,
+      req.user.id,
+      req.user.username,
+      req.user.role || "user",
+      !!req.user.is_partner,
+      text,
+      mediaType,
+      mediaName,
+      mediaData
+    ]);
+
+    res.json({
+      ok:true,
+      message:result.rows[0]
+    });
+
+  }catch(error){
+    res.status(500).json({
+      ok:false,
+      error:error.message
+    });
+  }
+});
+
+app.delete("/api/site-chats/:channel/messages/:id", verifyToken, async (req,res)=>{
+  try{
+    const channel = req.params.channel;
+
+    if(!isAllowedSiteChatChannel(channel)){
+      return res.status(400).json({
+        ok:false,
+        error:"Такого чата нет"
+      });
+    }
+
+    const messageResult = await pool.query(`
+      SELECT *
+      FROM site_chat_messages
+      WHERE id = $1 AND channel = $2
+    `,[req.params.id, channel]);
+
+    if(messageResult.rows.length === 0){
+      return res.status(404).json({
+        ok:false,
+        error:"Сообщение не найдено"
+      });
+    }
+
+    const message = messageResult.rows[0];
+
+    if(!canDeleteSiteChatMessage(req.user, message)){
+      return res.status(403).json({
+        ok:false,
+        error:"Нет прав удалить это сообщение"
+      });
+    }
+
+    await pool.query(`
+      DELETE FROM site_chat_messages
+      WHERE id = $1 AND channel = $2
+    `,[req.params.id, channel]);
+
+    res.json({ ok:true });
+
+  }catch(error){
+    res.status(500).json({
+      ok:false,
+      error:error.message
     });
   }
 });
