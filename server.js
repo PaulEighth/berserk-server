@@ -2117,11 +2117,12 @@ app.post("/api/tournaments/:id/chat", verifyToken, async (req,res)=>{
       : [];
 
     swissData.tournamentChat.push({
-      author:req.user.username,
-      role:req.user.role,
-      text,
-      time:new Date().toISOString()
-    });
+  author:req.user.username,
+  role:req.user.role,
+  is_partner:!!req.user.is_partner,
+  text,
+  time:new Date().toISOString()
+});
 
     await pool.query(
       "UPDATE tournaments SET swiss_data = $1 WHERE id = $2",
