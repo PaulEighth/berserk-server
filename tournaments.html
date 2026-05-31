@@ -8256,12 +8256,22 @@ window.loadTournamentChat = async function(){
     return;
   }
 
-  box.innerHTML = (data.chat || []).map(m => `
-    <div style="padding:10px;border-bottom:1px solid rgba(255,255,255,.08)">
-      <b>${escapeHtml(m.author || "Игрок")}</b>
-      <div style="margin-top:5px">${escapeHtml(m.text || "")}</div>
-    </div>
-  `).join("");
+  (data.chat || []).forEach(m => {
+  if(m.author && typeof rememberUserRole === "function"){
+    rememberUserRole(
+      m.author,
+      m.role || "user",
+      !!m.is_partner
+    );
+  }
+});
+
+box.innerHTML = (data.chat || []).map(m => `
+  <div style="padding:10px;border-bottom:1px solid rgba(255,255,255,.08)">
+    <b>${typeof roleNickHtml === "function" ? roleNickHtml(m.author || "Игрок") : escapeHtml(m.author || "Игрок")}</b>
+    <div style="margin-top:5px">${escapeHtml(m.text || "")}</div>
+  </div>
+`).join("");
 
   box.scrollTop = box.scrollHeight;
 };
