@@ -571,6 +571,17 @@
 <script>
 const user = JSON.parse(localStorage.getItem("user") || "null");
 const authLink = document.getElementById("authLink");
+const adminLinks = document.querySelectorAll("#adminPanelLink");
+
+adminLinks.forEach(link => {
+  const adminName = String(user?.username || "").trim().toLowerCase();
+
+  if(adminName === "eighth#2020"){
+    link.style.display = "inline-flex";
+  }else{
+    link.style.display = "none";
+  }
+});
 if(authLink && user){
   authLink.textContent = "Профиль";
   authLink.href = "auth.html";
