@@ -6734,8 +6734,9 @@ if($('leaveTournamentBtn')){
 }
       if(t.format === 'swiss'){
   $('fullBracket').innerHTML = `
-    <div style="display:flex;justify-content:flex-start;margin:0 0 14px">
+    <div style="display:flex;justify-content:flex-start;gap:10px;flex-wrap:wrap;margin:0 0 14px">
       <button type="button" class="btn gold" data-random-tournament="${escapeHtml(String(id))}">🎲 Рандом</button>
+      <button type="button" class="btn ghost" onclick="openTournamentChat(${escapeHtml(String(id))})">💬 Чат турнира</button>
     </div>
     ${renderSwissMode(t,id,swissPlayersForTournament(t,id))}
   `;
@@ -6752,8 +6753,9 @@ if($('leaveTournamentBtn')){
       });
 
       $('fullBracket').innerHTML = `
-  <div style="display:flex;justify-content:flex-start;margin:0 0 14px">
+  <div style="display:flex;justify-content:flex-start;gap:10px;flex-wrap:wrap;margin:0 0 14px">
     <button type="button" class="btn gold" data-random-tournament="${escapeHtml(String(id))}">🎲 Рандом</button>
+    <button type="button" class="btn ghost" onclick="openTournamentChat(${escapeHtml(String(id))})">💬 Чат турнира</button>
   </div>
   ${renderFullBracket(id,players,bracketSize)}
 `;
@@ -7001,6 +7003,9 @@ function canDeleteTournamentClient(t){
           + '<div class="card-actions">'
 + '<button class="btn gold" '+(disabled ? 'disabled' : '')+' onclick="openJoinModal('+t.id+')">'+(disabled ? 'Регистрация закрыта' : 'Участвовать')+'</button>'
 + '<button type="button" class="btn ghost track-tournament-btn" data-track-id="'+escapeHtml(String(t.id))+'" onclick="forceOpenTrackModal(\''+escapeHtml(String(t.id))+'\')">Отслеживать</button>'
+
++ '<button type="button" class="btn ghost" onclick="openTournamentChat('+t.id+')">💬 Чат</button>'
+
 + (canManageTournament(t.id) ? '<button type="button" class="btn ghost" onclick="openEditTournament('+t.id+')">Редактировать</button>' : '')
 + '<a class="btn ghost" href="deck-builder_checked.html">Собрать колоду</a>'
 + '</div>'
@@ -7515,6 +7520,82 @@ function showConfirm(text, title='Подтвердите действие'){
     yes.onclick = () => cleanup(true);
     no.onclick = () => cleanup(false);
   });
+}
+let currentTournamentChatId = null;
+
+async function openTournamentChat(id){
+  currentTournamentChatId = id;
+
+  const modal = document.getElementById("tournamentChatModal");
+  if(!modal) return;
+
+  modal.classList.add("show");
+  await loadTournamentChat();
+}
+
+function closeTournamentChat(){
+  const modal = document.getElementById("tournamentChatModal");
+  if(!modal) return;
+
+  modal.classList.remove("show");
+}
+
+async function loadTournamentChat(){
+  const box = document.getElementById("tournamentChatMessages");
+  if(!box || !currentTournamentChatId) return;
+
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`/api/tournaments/${currentTournamentChatId}/chat`, {
+    headers:{
+      Authorization:`Bearer ${token}`
+    }
+  });
+
+  const data = await res.json();
+
+  if(!data.ok){
+    box.innerHTML = `<div class="players-empty">${data.error || "Нет доступа к чату"}</div>`;
+    return;
+  }
+
+  box.innerHTML = (data.chat || []).map(m => `
+    <div style="padding:10px;border-bottom:1px solid rgba(255,255,255,.08)">
+      <b>${escapeHtml(m.author || "Игрок")}</b>
+      <div style="margin-top:5px">${escapeHtml(m.text || "")}</div>
+    </div>
+  `).join("");
+
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendTournamentChatMessage(){
+  const input = document.getElementById("tournamentChatInput");
+  if(!input || !currentTournamentChatId) return;
+
+  const text = input.value.trim();
+  if(!text) return;
+
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`/api/tournaments/${currentTournamentChatId}/chat`, {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:`Bearer ${token}`
+    },
+    body:JSON.stringify({ text })
+  });
+
+  const data = await res.json();
+
+  if(!data.ok){
+    alert(data.error || "Ошибка отправки");
+    return;
+  }
+
+  input.value = "";
+  await loadTournamentChat();
 }
 </script><script>
 history.scrollRestoration = "manual";
@@ -8098,5 +8179,19 @@ document.addEventListener('click', function(e){
   forceOpenTrackModal(btn.dataset.trackId);
 }, true);
 </script>
+<div id="tournamentChatModal" class="track-modal">
+  <div class="track-box">
+    <button class="track-close" onclick="closeTournamentChat()">×</button>
+
+    <h2>Чат турнира</h2>
+
+    <div id="tournamentChatMessages" style="height:400px;overflow:auto;margin:20px 0"></div>
+
+    <div style="display:flex;gap:10px">
+      <input id="tournamentChatInput" class="field" placeholder="Сообщение...">
+      <button class="btn gold" onclick="sendTournamentChatMessage()">Отправить</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

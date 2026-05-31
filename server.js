@@ -1862,6 +1862,49 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
     });
   }
 });
+function isTournamentChatStaff(user){
+  return ["admin","developer","moderator"].includes(user.role);
+}
+
+async function canUseTournamentChat(req, tournamentId){
+
+  const tournamentResult = await pool.query(
+    "SELECT id FROM tournaments WHERE id = $1",
+    [tournamentId]
+  );
+
+  if(tournamentResult.rows.length === 0){
+    return {
+      ok:false,
+      status:404,
+      error:"Турнир не найден"
+    };
+  }
+
+  if(isTournamentChatStaff(req.user)){
+    return { ok:true };
+  }
+
+  const participantResult = await pool.query(
+    `
+    SELECT id
+    FROM tournament_participants
+    WHERE tournament_id = $1
+    AND user_id = $2
+    `,
+    [tournamentId, req.user.id]
+  );
+
+  if(participantResult.rows.length === 0){
+    return {
+      ok:false,
+      status:403,
+      error:"Чат доступен только участникам турнира"
+    };
+  }
+
+  return { ok:true };
+}
 // Получить только чат матч-комнаты
 app.get("/api/tournaments/:id/match-room-chat", async (req, res) => {
   try {
@@ -1992,6 +2035,108 @@ if (!isStaffUser && !isOrganizer && !isMatchPlayer) {
     res.status(500).json({
       ok: false,
       error: error.message
+    });
+  }
+});
+// Общий чат турнира
+app.get("/api/tournaments/:id/chat", verifyToken, async (req,res)=>{
+  try{
+
+    const tournamentId = req.params.id;
+
+    const access = await canUseTournamentChat(req,tournamentId);
+
+    if(!access.ok){
+      return res.status(access.status).json(access);
+    }
+
+    const result = await pool.query(
+      "SELECT swiss_data FROM tournaments WHERE id = $1",
+      [tournamentId]
+    );
+
+    let swissData = {};
+
+    try{
+      swissData =
+        typeof result.rows[0].swiss_data === "string"
+        ? JSON.parse(result.rows[0].swiss_data || "{}")
+        : (result.rows[0].swiss_data || {});
+    }catch(e){}
+
+    res.json({
+      ok:true,
+      chat: swissData.tournamentChat || []
+    });
+
+  }catch(error){
+    res.status(500).json({
+      ok:false,
+      error:error.message
+    });
+  }
+});
+
+app.post("/api/tournaments/:id/chat", verifyToken, async (req,res)=>{
+  try{
+
+    const tournamentId = req.params.id;
+
+    const access = await canUseTournamentChat(req,tournamentId);
+
+    if(!access.ok){
+      return res.status(access.status).json(access);
+    }
+
+    const text = String(req.body.text || "").trim();
+
+    if(!text){
+      return res.status(400).json({
+        ok:false,
+        error:"Пустое сообщение"
+      });
+    }
+
+    const result = await pool.query(
+      "SELECT swiss_data FROM tournaments WHERE id = $1",
+      [tournamentId]
+    );
+
+    let swissData = {};
+
+    try{
+      swissData =
+        typeof result.rows[0].swiss_data === "string"
+        ? JSON.parse(result.rows[0].swiss_data || "{}")
+        : (result.rows[0].swiss_data || {});
+    }catch(e){}
+
+    swissData.tournamentChat =
+      Array.isArray(swissData.tournamentChat)
+      ? swissData.tournamentChat
+      : [];
+
+    swissData.tournamentChat.push({
+      author:req.user.username,
+      role:req.user.role,
+      text,
+      time:new Date().toISOString()
+    });
+
+    await pool.query(
+      "UPDATE tournaments SET swiss_data = $1 WHERE id = $2",
+      [
+        JSON.stringify(swissData),
+        tournamentId
+      ]
+    );
+
+    res.json({ ok:true });
+
+  }catch(error){
+    res.status(500).json({
+      ok:false,
+      error:error.message
     });
   }
 });
