@@ -185,7 +185,10 @@ async function canEditTournamentPlay(req, tournamentId){
   return { ok: true, tournament };
 }
 async function ensurePartnerColumn() {
-  return;
+  await pool.query(`
+    ALTER TABLE tournament_participants
+    ADD COLUMN IF NOT EXISTS contact_info TEXT
+  `);
 }
 
 
@@ -1152,7 +1155,7 @@ isPrivate ? (privatePassword || "") : ""
 app.post("/api/tournaments/:id/join", verifyToken, async (req, res) => {
   try {
     const tournamentId = req.params.id;
-const { decks, password } = req.body;
+const { decks, password, contactInfo } = req.body;
 
     const tournamentResult = await pool.query(
       "SELECT * FROM tournaments WHERE id = $1",
@@ -1227,9 +1230,10 @@ if(
   username,
   role,
   is_partner,
-  decks
+  decks,
+  contact_info
 )
-VALUES ($1,$2,$3,$4,$5,$6)
+VALUES ($1,$2,$3,$4,$5,$6,$7)
       RETURNING *
     `, [
       tournamentId,
@@ -1237,7 +1241,8 @@ req.user.id,
 req.user.username,
 req.user.role || "user",
 !!req.user.is_partner,
-JSON.stringify(decks || [])
+JSON.stringify(decks || []),
+String(contactInfo || "").trim()
     ]);
 
     res.json({
@@ -1586,7 +1591,7 @@ isPrivate ? (privatePassword || "") : ""
 app.post("/api/tournaments/:id/join", verifyToken, async (req, res) => {
   try {
     const tournamentId = req.params.id;
-    const { decks, password } = req.body;
+    const { decks, password, contactInfo } = req.body;
 
     const tournamentResult = await pool.query(
       "SELECT * FROM tournaments WHERE id = $1",
@@ -1661,9 +1666,10 @@ if(
   username,
   role,
   is_partner,
-  decks
+  decks,
+  contact_info
 )
-      VALUES ($1,$2,$3,$4,$5,$6)
+VALUES ($1,$2,$3,$4,$5,$6,$7)
       RETURNING *
     `, [
       tournamentId,
@@ -1671,7 +1677,8 @@ if(
       req.user.username,
       req.user.role || "user",
 !!req.user.is_partner,
-JSON.stringify(decks || [])
+JSON.stringify(decks || []),
+String(contactInfo || "").trim()
     ]);
 
     res.json({
