@@ -53,6 +53,7 @@
       <a href="meta.html#meta">(Мета тех.работа)</a>
       <a href="tournaments.html">Турниры</a>
       <a href="news.html">Новости</a>
+      <a href="chats.html">Чаты</a>
       <a class="active" href="chats.html">Чаты</a>
       <a id="adminPanelLink" href="admin.html" style="display:none">Админ</a>
       <a href="BerserHeroesOnline.html#contacts">Контакты</a>
@@ -304,7 +305,7 @@ async function sendMessage(){
 }
 
 async function deleteMessage(id){
-  if(!confirm("Удалить сообщение?")) return;
+  openDeleteMessageModal(id);
   const res = await fetch(`/api/site-chats/${currentChannel}/messages/${id}`, {
     method:"DELETE",
     headers:authHeaders()
@@ -338,6 +339,58 @@ window.addEventListener("load", () => {
   loadMessages();
   refreshTimer = setInterval(loadMessages, 15000);
 });
+let deleteMessageId = null;
+
+function openDeleteMessageModal(id){
+  deleteMessageId = id;
+  document
+    .getElementById("deleteMessageModal")
+    .classList
+    .add("show");
+}
+
+function closeDeleteMessageModal(){
+  deleteMessageId = null;
+
+  document
+    .getElementById("deleteMessageModal")
+    .classList
+    .remove("show");
+}
+
+async function confirmDeleteMessage(){
+
+  if(!deleteMessageId) return;
+
+  const res = await fetch(
+    `/api/site-chats/${currentChannel}/messages/${deleteMessageId}`,
+    {
+      method:"DELETE",
+      headers:authHeaders()
+    }
+  );
+
+  const data = await res.json();
+
+  if(!data.ok){
+    showAlert(data.error || "Ошибка удаления");
+    return;
+  }
+
+  closeDeleteMessageModal();
+  await loadMessages();
+}
 </script>
+<div class="custom-alert" id="deleteMessageModal">
+  <div class="custom-alert-box">
+    <h3>Удаление сообщения</h3>
+    <p>Вы действительно хотите удалить сообщение?</p>
+
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn red" onclick="closeDeleteMessageModal()">Отмена</button>
+      <button class="btn gold" onclick="confirmDeleteMessage()">Удалить</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
