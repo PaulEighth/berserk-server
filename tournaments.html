@@ -6736,7 +6736,7 @@ if($('leaveTournamentBtn')){
   $('fullBracket').innerHTML = `
     <div style="display:flex;justify-content:flex-start;gap:10px;flex-wrap:wrap;margin:0 0 14px">
       <button type="button" class="btn gold" data-random-tournament="${escapeHtml(String(id))}">🎲 Рандом</button>
-      <button type="button" class="btn ghost" onclick="openTournamentChat(${escapeHtml(String(id))})">💬 Чат турнира</button>
+      <button type="button" class="btn ghost" data-tournament-chat-id="${escapeHtml(String(id))}">💬 Чат турнира</button>
     </div>
     ${renderSwissMode(t,id,swissPlayersForTournament(t,id))}
   `;
@@ -7004,7 +7004,7 @@ function canDeleteTournamentClient(t){
 + '<button class="btn gold" '+(disabled ? 'disabled' : '')+' onclick="openJoinModal('+t.id+')">'+(disabled ? 'Регистрация закрыта' : 'Участвовать')+'</button>'
 + '<button type="button" class="btn ghost track-tournament-btn" data-track-id="'+escapeHtml(String(t.id))+'" onclick="forceOpenTrackModal(\''+escapeHtml(String(t.id))+'\')">Отслеживать</button>'
 
-+ '<button type="button" class="btn ghost" onclick="openTournamentChat('+t.id+')">💬 Чат</button>'
++ '<button type="button" class="btn ghost" data-tournament-chat-id="'+escapeHtml(String(t.id))+'">💬 Чат</button>'
 
 + (canManageTournament(t.id) ? '<button type="button" class="btn ghost" onclick="openEditTournament('+t.id+')">Редактировать</button>' : '')
 + '<a class="btn ghost" href="deck-builder_checked.html">Собрать колоду</a>'
@@ -7191,6 +7191,16 @@ function canDeleteTournamentClient(t){
       e.stopPropagation();
       openTrackModal(btn.dataset.trackId);
     }, true);
+    // Надёжный обработчик кнопки «Чат турнира»
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-tournament-chat-id]');
+  if(!btn) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  openTournamentChat(btn.dataset.tournamentChatId);
+}, true);
 // Надёжный обработчик выхода из турнира.
 document.addEventListener('click', e => {
   const btn = e.target.closest('#leaveTournamentBtn');
