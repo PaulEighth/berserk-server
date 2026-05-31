@@ -6755,7 +6755,7 @@ if($('leaveTournamentBtn')){
       $('fullBracket').innerHTML = `
   <div style="display:flex;justify-content:flex-start;gap:10px;flex-wrap:wrap;margin:0 0 14px">
     <button type="button" class="btn gold" data-random-tournament="${escapeHtml(String(id))}">🎲 Рандом</button>
-    <button type="button" class="btn ghost" onclick="openTournamentChat(${escapeHtml(String(id))})">💬 Чат турнира</button>
+    <button type="button" class="btn ghost" data-tournament-chat-id="${escapeHtml(String(id))}">💬 Чат турнира</button>
   </div>
   ${renderFullBracket(id,players,bracketSize)}
 `;
@@ -8189,7 +8189,7 @@ document.addEventListener('click', function(e){
   forceOpenTrackModal(btn.dataset.trackId);
 }, true);
 </script>
-<div id="tournamentChatModal" class="track-modal">
+<div id="tournamentChatModal" class="track-modal" style="z-index:10008">
   <div class="track-box">
     <button class="track-close" onclick="closeTournamentChat()">×</button>
 
@@ -8203,5 +8203,98 @@ document.addEventListener('click', function(e){
     </div>
   </div>
 </div>
+<script>
+window.currentTournamentChatId = null;
+
+window.openTournamentChat = async function(id){
+  window.currentTournamentChatId = id;
+
+  const modal = document.getElementById("tournamentChatModal");
+  if(!modal){
+    alert("Окно чата не найдено");
+    return;
+  }
+
+  modal.classList.add("show");
+
+  if(typeof window.loadTournamentChat === "function"){
+    await window.loadTournamentChat();
+  }
+};
+
+window.closeTournamentChat = function(){
+  const modal = document.getElementById("tournamentChatModal");
+  if(modal) modal.classList.remove("show");
+};
+
+window.loadTournamentChat = async function(){
+  const box = document.getElementById("tournamentChatMessages");
+  if(!box || !window.currentTournamentChatId) return;
+
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`/api/tournaments/${window.currentTournamentChatId}/chat`, {
+    headers:{
+      Authorization:`Bearer ${token}`
+    }
+  });
+
+  const data = await res.json();
+
+  if(!data.ok){
+    box.innerHTML = `<div class="players-empty">${data.error || "Нет доступа к чату"}</div>`;
+    return;
+  }
+
+  box.innerHTML = (data.chat || []).map(m => `
+    <div style="padding:10px;border-bottom:1px solid rgba(255,255,255,.08)">
+      <b>${escapeHtml(m.author || "Игрок")}</b>
+      <div style="margin-top:5px">${escapeHtml(m.text || "")}</div>
+    </div>
+  `).join("");
+
+  box.scrollTop = box.scrollHeight;
+};
+
+window.sendTournamentChatMessage = async function(){
+  const input = document.getElementById("tournamentChatInput");
+  if(!input || !window.currentTournamentChatId) return;
+
+  const text = input.value.trim();
+  if(!text) return;
+
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`/api/tournaments/${window.currentTournamentChatId}/chat`, {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:`Bearer ${token}`
+    },
+    body:JSON.stringify({ text })
+  });
+
+  const data = await res.json();
+
+  if(!data.ok){
+    alert(data.error || "Ошибка отправки");
+    return;
+  }
+
+  input.value = "";
+  await window.loadTournamentChat();
+};
+
+document.addEventListener("click", function(e){
+  const btn = e.target.closest("[data-tournament-chat-id]");
+  if(!btn) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+  if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+  window.openTournamentChat(btn.dataset.tournamentChatId);
+}, true);
+</script>
 </body>
 </html>
