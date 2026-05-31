@@ -6048,15 +6048,53 @@ function renderFullBracket(id,players,bracketSize){
     }
 
     function groupDeckCards(cards){
-      const grouped = [];
-      (cards || []).forEach(card => {
-        const id = String(card?.id || card?.cardId || getCardName(card));
-        const existing = grouped.find(x => String(x.id) === id);
-        if(existing) existing.count++;
-        else grouped.push({id, card, count:1});
-      });
-      return grouped;
+  const grouped = [];
+
+  (cards || []).forEach(card => {
+    const id = String(card?.id || card?.cardId || getCardName(card));
+
+    const existing = grouped.find(x => String(x.id) === id);
+
+    if(existing){
+      existing.count++;
+    }else{
+      grouped.push({ id, card, count:1 });
     }
+  });
+
+  grouped.sort((a,b)=>{
+
+    const aHero = String(a.card?.type || "")
+      .toLowerCase()
+      .includes("герой");
+
+    const bHero = String(b.card?.type || "")
+      .toLowerCase()
+      .includes("герой");
+
+    if(aHero && !bHero) return -1;
+    if(!aHero && bHero) return 1;
+
+    const aCost = Number.isFinite(Number(a.card?.cost))
+      ? Number(a.card.cost)
+      : 999;
+
+    const bCost = Number.isFinite(Number(b.card?.cost))
+      ? Number(b.card.cost)
+      : 999;
+
+    if(aCost !== bCost){
+      return aCost - bCost;
+    }
+
+    return String(a.card?.name || "").localeCompare(
+      String(b.card?.name || ""),
+      "ru"
+    );
+  });
+
+  return grouped;
+}
 
     function openDeckView(tournamentId, playerNick, deckIndex){
       const decks = getSubmittedDecksArray(tournamentId, playerNick);
