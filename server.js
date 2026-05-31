@@ -693,11 +693,15 @@ app.get("/api/news/:id/comments", async (req, res) => {
   try {
 
     const result = await pool.query(`
-      SELECT *
-      FROM news_comments
-      WHERE news_id = $1
-      ORDER BY created_at ASC
-    `, [req.params.id]);
+  SELECT
+    c.*,
+    COALESCE(u.role, c.author_role) AS author_role,
+    COALESCE(u.is_partner, c.author_is_partner) AS author_is_partner
+  FROM news_comments c
+  LEFT JOIN users u ON u.id = c.user_id
+  WHERE c.news_id = $1
+  ORDER BY c.created_at ASC
+`, [req.params.id]);
 
     res.json({
       ok: true,
