@@ -726,9 +726,14 @@ async function togglePartner(userId, isPartner){
       showInfo("Ошибка", data.error || "Не удалось изменить партнёрскую звезду.");
       return;
     }
-
+if(data.username === currentUser.username){
+  const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  savedUser.is_partner = !!data.is_partner;
+  localStorage.setItem("user", JSON.stringify(savedUser));
+}
     showInfo("Готово", `${data.username}: ${data.is_partner ? "звезда выдана" : "звезда убрана"}.`);
     loadUsers();
+    setupAuthButton();
   }catch(error){
     console.error(error);
     showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
