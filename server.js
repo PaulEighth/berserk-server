@@ -186,6 +186,15 @@ async function canEditTournamentPlay(req, tournamentId){
 }
 async function ensurePartnerColumn() {
   await pool.query(`
+  ALTER TABLE tournaments
+  ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'open'
+`);
+
+await pool.query(`
+  ALTER TABLE tournaments
+  ADD COLUMN IF NOT EXISTS registration_open BOOLEAN DEFAULT true
+`);
+  await pool.query(`
     ALTER TABLE tournament_participants
     ADD COLUMN IF NOT EXISTS contact_info TEXT
   `);
@@ -1381,17 +1390,19 @@ const { decks, password, contactInfo } = req.body;
     }
 
     const tournament = tournamentResult.rows[0];
-    const tournamentStartRaw = tournament.start_date || tournament.date;
+    const registrationOpen =
+  tournament.registration_open === true ||
+  tournament.registration_open === "true" ||
+  tournament.registration_open === 1 ||
+  tournament.registration_open === "1" ||
+  tournament.registration_open === null ||
+  tournament.registration_open === undefined;
 
-if(tournamentStartRaw){
-  const tournamentDate = new Date(tournamentStartRaw);
-
-  if(!Number.isNaN(tournamentDate.getTime()) && Date.now() >= tournamentDate.getTime()){
-    return res.status(403).json({
-      ok:false,
-      error:"Турнир уже закрыт. Время регистрации окончено."
-    });
-  }
+if(!registrationOpen){
+  return res.status(403).json({
+    ok:false,
+    error:"Регистрация на турнир закрыта"
+  });
 }
 const isMainAdmin =
   String(req.user.username || "").trim() === "Eighth#2020";
@@ -1817,17 +1828,19 @@ app.post("/api/tournaments/:id/join", verifyToken, async (req, res) => {
     }
 
     const tournament = tournamentResult.rows[0];
-    const tournamentStartRaw = tournament.start_date || tournament.date;
+    const registrationOpen =
+  tournament.registration_open === true ||
+  tournament.registration_open === "true" ||
+  tournament.registration_open === 1 ||
+  tournament.registration_open === "1" ||
+  tournament.registration_open === null ||
+  tournament.registration_open === undefined;
 
-if(tournamentStartRaw){
-  const tournamentDate = new Date(tournamentStartRaw);
-
-  if(!Number.isNaN(tournamentDate.getTime()) && Date.now() >= tournamentDate.getTime()){
-    return res.status(403).json({
-      ok:false,
-      error:"Турнир уже закрыт. Время регистрации окончено."
-    });
-  }
+if(!registrationOpen){
+  return res.status(403).json({
+    ok:false,
+    error:"Регистрация на турнир закрыта"
+  });
 }
 const isMainAdmin =
   String(req.user.username || "").trim() === "Eighth#2020";

@@ -2942,6 +2942,17 @@ html body .bracket-cell.alive{
   background:#e8c270;
   border-radius:999px;
 }
+.tag.white{
+  background:rgba(255,255,255,.10);
+  border-color:rgba(255,255,255,.28);
+  color:#ffffff;
+}
+
+.tag.orange{
+  background:rgba(224,120,48,.14);
+  border-color:rgba(224,120,48,.35);
+  color:#ffd0ad;
+}
 </style>
 </head>
 <body>
@@ -3089,6 +3100,8 @@ html body .bracket-cell.alive{
       </div>
 
       <div class="track-delete-actions">
+  <button type="button" class="btn ghost" id="toggleRegistrationBtn" style="display:none">Турнир открыт</button>
+  <button type="button" class="btn ghost" id="changeStatusBtn" style="display:none">Изменить статус</button>
   <button type="button" class="btn danger" id="leaveTournamentBtn" style="display:none">Покинуть турнир</button>
   <button type="button" class="btn danger" id="deleteTournamentBtn">Удалить турнир</button>
 </div>
@@ -3211,7 +3224,12 @@ html body .bracket-cell.alive{
   <script>
     let tournaments = [];
 
-    const statusMap = {open:['Регистрация открыта','green'],soon:['Скоро',''],closed:['Мест нет','red'],finished:['Завершён','']};
+    const statusMap = {
+  open:['Регистрация открыта','green'],
+  soon:['Скоро','white'],
+  closed:['Нет мест','orange'],
+  finished:['Завершён','red']
+};
     const formatMap = {bo1:'BO1',bo3:'BO3',bo5:'BO5',bo7:'BO7',swiss:'Швейцарка',single:'Олимпийка'};
     const $ = id => document.getElementById(id);
 
@@ -3379,6 +3397,11 @@ function getMoneyPrizeValue(text){
     places: maxPlayers,
     free: Math.max(0, maxPlayers - taken),
     status: t.status || "open",
+    registrationOpen:
+  t.registration_open !== false &&
+  t.registration_open !== "false" &&
+  t.registration_open !== 0 &&
+  t.registration_open !== "0",
 
     isPrivate: !!t.is_private,
 privatePassword: t.private_password || "",
@@ -3698,6 +3721,7 @@ function roleNickHtml(nick){
       const nick = user?.username || getCurrentUserNick();
 
       if(isAdmin()) return true;
+      if(["admin","developer","moderator","creator"].includes(getUserRole())) return true;
 
       const rights = t.editRights || "organizer";
       const organizer = String(t.organizer || "").toLowerCase();
@@ -3924,7 +3948,7 @@ return String(img).replace(/\.png$/i, ".webp");
       if(!t) return;
 
       const freeNow = Number(t.free || 0);
-      if(t.status === 'closed' || t.status === 'finished' || freeNow <= 0){
+      if(!t.registrationOpen || t.status === 'closed' || t.status === 'finished' || freeNow <= 0){
         showAlert('Регистрация закрыта или мест нет');
         return;
       }
@@ -4035,7 +4059,7 @@ selectedDecks = selectedDeckIds
   return;
 }
 
-      if(t.status === 'closed' || t.status === 'finished' || Number(t.free || 0) <= 0){
+      if(!t.registrationOpen || t.status === 'closed' || t.status === 'finished' || Number(t.free || 0) <= 0){
         showAlert('Регистрация закрыта или мест нет');
         return;
       }
@@ -6774,8 +6798,81 @@ function isCurrentUserInTournament(id){
     );
   });
 }
+function openTournamentStatusModal(id){
+  const statuses = [
+    ["open", "Регистрация открыта"],
+    ["soon", "Скоро"],
+    ["closed", "Нет мест"],
+    ["finished", "Завершён"]
+  ];
 
+  let modal = document.getElementById("tournamentStatusModal");
 
+  if(!modal){
+    document.body.insertAdjacentHTML("beforeend", `
+      <div class="custom-alert" id="tournamentStatusModal">
+        <div class="custom-alert-box">
+          <h3>Изменить статус</h3>
+          <p>Выбери новый статус турнира</p>
+          <div id="tournamentStatusButtons" style="display:grid;gap:10px"></div>
+          <button class="btn ghost" onclick="document.getElementById('tournamentStatusModal').classList.remove('show')" style="margin-top:14px">Отмена</button>
+        </div>
+      </div>
+    `);
+
+    modal = document.getElementById("tournamentStatusModal");
+  }
+
+  const box = document.getElementById("tournamentStatusButtons");
+
+  box.innerHTML = statuses.map(([value, label]) => `
+    <button class="btn ghost" onclick="updateTournamentStatus('${id}', '${value}');document.getElementById('tournamentStatusModal').classList.remove('show')">
+      ${label}
+    </button>
+  `).join("");
+
+  modal.classList.add("show");
+}
+async function updateTournamentStatus(id, status){
+  const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${id}/status`, {
+    method:"PATCH",
+    headers:authHeaders(),
+    body:JSON.stringify({status})
+  });
+
+  const data = await response.json();
+
+  if(!data.ok){
+    showAlert(data.error || "Не удалось изменить статус");
+    return;
+  }
+
+  await loadTournamentsFromServer();
+  renderTrackModal(id);
+  applyFilters();
+}
+
+async function toggleTournamentRegistration(id){
+  const t = tournaments.find(x => String(x.id) === String(id));
+  if(!t) return;
+
+  const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${id}/registration`, {
+    method:"PATCH",
+    headers:authHeaders(),
+    body:JSON.stringify({registrationOpen: !t.registrationOpen})
+  });
+
+  const data = await response.json();
+
+  if(!data.ok){
+    showAlert(data.error || "Не удалось изменить регистрацию");
+    return;
+  }
+
+  await loadTournamentsFromServer();
+  renderTrackModal(id);
+  applyFilters();
+}
     function renderTrackModal(id){
       currentTrackTournamentId = id;
       const t=tournaments.find(item=>String(item.id)===String(id));
@@ -6808,6 +6905,18 @@ const players = getPlayers(id);
       if(bracketSizeRow) bracketSizeRow.style.display = 'none';
 if($('deleteTournamentBtn')){
   $('deleteTournamentBtn').onclick = () => openDeleteTournamentModal(id);
+}
+const canManageThisTournament = canManageTournament(id);
+
+if($('changeStatusBtn')){
+  $('changeStatusBtn').style.display = canManageThisTournament ? "inline-flex" : "none";
+  $('changeStatusBtn').onclick = () => openTournamentStatusModal(id);
+}
+
+if($('toggleRegistrationBtn')){
+  $('toggleRegistrationBtn').style.display = canManageThisTournament ? "inline-flex" : "none";
+  $('toggleRegistrationBtn').textContent = t.registrationOpen ? "Турнир открыт" : "Турнир закрыт";
+  $('toggleRegistrationBtn').onclick = () => toggleTournamentRegistration(id);
 }
 if($('leaveTournamentBtn')){
   const canLeave = isCurrentUserInTournament(id);
