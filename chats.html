@@ -193,23 +193,12 @@ function userStarHtml(user){
   return "";
 }
 function medalsHtml(user){
-  if(!user || !user.medals) return "";
+  const medals = user?.medals || {};
 
-  let html = "";
-
-  if(user.medals.gold > 0){
-    html += `<span title="Золото">🥇${user.medals.gold}</span> `;
-  }
-
-  if(user.medals.silver > 0){
-    html += `<span title="Серебро">🥈${user.medals.silver}</span> `;
-  }
-
-  if(user.medals.bronze > 0){
-    html += `<span title="Бронза">🥉${user.medals.bronze}</span> `;
-  }
-
-  return html;
+  return Object.entries(medals)
+    .filter(([,count]) => Number(count) > 0)
+    .map(([icon,count]) => `${icon}${count > 1 ? "x" + count : ""}`)
+    .join(" ") + (Object.keys(medals).length ? " " : "");
 }
 function roleNickHtml(username, role, isPartner, medals = {}){
   const nick = String(username || "Игрок");
@@ -255,9 +244,9 @@ function updateAuthUI(){
   if(authLink && user){
 
   authLink.innerHTML =
-    medalsHtml(user) +
-    userStarHtml(user) +
-    user.username;
+  medalsHtml(user) +
+  userStarHtml(user) +
+  `<span class="${roleClass(user.role)}">${user.username}</span>`;
 
   authLink.classList.remove("gold");
   authLink.classList.add("ghost");
