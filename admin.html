@@ -619,11 +619,19 @@ if(search){
               ${user.role || "user"}
             </span>
           </td>
-          <td>${renderRoleSelect(user)}</td>
-          <td>${renderMedalEditor(user)}</td>
           <td>
-            <div class="actions">
-              <button class="btn gold" onclick="changeRole(${user.id})">Сохранить</button>
+  ${user.username === ADMIN_USERNAME
+    ? `<span class="role-pill" style="color:${roleColors.admin}">admin навсегда</span>`
+    : renderRoleSelect(user)
+  }
+</td>
+<td>${renderMedalEditor(user)}</td>
+<td>
+  <div class="actions">
+    ${user.username === ADMIN_USERNAME
+      ? ""
+      : `<button class="btn gold" onclick="changeRole(${user.id})">Сохранить</button>`
+    }
 
 ${user.username === ADMIN_USERNAME ? "" : `
   <button class="btn ghost" onclick="togglePartner(${user.id}, ${user.is_partner ? "false" : "true"})">
