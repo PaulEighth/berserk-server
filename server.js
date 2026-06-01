@@ -1119,6 +1119,7 @@ app.get("/api/site-chats/:channel/messages", verifyToken, async (req,res)=>{
         COALESCE(u.username, m.username) AS username,
         COALESCE(u.role, m.role) AS role,
         COALESCE(u.is_partner, m.is_partner) AS is_partner,
+        COALESCE(u.medals, '{}'::jsonb) AS medals,
         m.text,
         m.media_type,
         m.media_name,

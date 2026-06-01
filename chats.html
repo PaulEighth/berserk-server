@@ -179,15 +179,21 @@ function roleClass(role){
   const r = String(role || "user").toLowerCase();
   return ["admin","developer","moderator","creator","vip"].includes(r) ? `role-${r}` : "role-user";
 }
-function roleNickHtml(username, role, isPartner){
+function roleNickHtml(username, role, isPartner, medals = {}){
   const nick = String(username || "Игрок");
+
+  const medalsPart =
+    Object.entries(medals || {})
+      .filter(([,count]) => Number(count) > 0)
+      .map(([icon,count]) => `${icon}${count > 1 ? count : ""}`)
+      .join(" ");
 
   const star =
     nick.toLowerCase() === "eighth#2020"
       ? '<span class="admin-star">⭐</span>'
       : (isPartner ? '<span class="partner-star">⭐</span>' : '');
 
-  return `${star}<span class="author ${roleClass(role)}">${escapeHtml(nick)}</span>`;
+  return `${medalsPart ? medalsPart + " " : ""}${star}<span class="author ${roleClass(role)}">${escapeHtml(nick)}</span>`;
 }
 function formatTime(value){
   const date = new Date(value);
@@ -252,7 +258,12 @@ function renderMessage(m){
     <article class="message">
       ${del}
       <div class="message-top">
-        ${roleNickHtml(m.username, m.role, m.is_partner)}
+        ${roleNickHtml(
+  m.username,
+  m.role,
+  m.is_partner,
+  m.medals
+)}
         <span class="time">${escapeHtml(formatTime(m.created_at))}</span>
       </div>
       ${m.text ? `<div class="message-text">${escapeHtml(m.text)}</div>` : ""}
