@@ -818,7 +818,8 @@ if(data.username === currentUser.username){
       const authBtn = document.querySelector('a[href="auth.html"]');
 
       if(currentUser && authBtn){
-        authBtn.innerHTML = userStarHtml(currentUser) + currentUser.username;
+        const freshUser = JSON.parse(localStorage.getItem("user") || "null");
+authBtn.innerHTML = medalsHtml(freshUser || currentUser) + userStarHtml(freshUser || currentUser) + (freshUser?.username || currentUser.username);
         authBtn.classList.remove("gold");
         authBtn.classList.add("ghost");
         authBtn.style.background = "rgba(255,255,255,.06)";
