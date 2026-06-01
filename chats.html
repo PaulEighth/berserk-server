@@ -82,7 +82,14 @@
     </div>
     <div style="display:flex;gap:14px;align-items:center">
       <a class="btn ghost" href="https://t.me/Paul_Eighth" target="_blank" style="border:1px solid #d6a84f;color:#d6a84f;background:transparent">@Paul_Eighth</a>
-      <a class="btn gold" href="auth.html" id="authLink">Войти</a>
+      <a
+  class="btn gold"
+  href="auth.html"
+  id="authLink"
+  style="visibility:hidden"
+>
+  Войти
+</a>
     </div>
   </nav>
 
@@ -247,6 +254,7 @@ function updateAuthUI(){
   medalsHtml(user) +
   userStarHtml(user) +
   `<span class="${roleClass(user.role)}">${user.username}</span>`;
+  authLink.style.visibility = "visible";
 
   authLink.classList.remove("gold");
   authLink.classList.add("ghost");
@@ -403,7 +411,9 @@ btn.addEventListener("click", () => {
   }
 });
 setInterval(()=>localStorage.setItem("musicTime", music.currentTime),1000);
-
+document.addEventListener("DOMContentLoaded", () => {
+  updateAuthUI();
+});
 window.addEventListener("load", () => {
   updateAuthUI();
   loadMessages();
