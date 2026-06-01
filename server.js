@@ -521,10 +521,24 @@ app.get("/admin/users", requireAdmin, async (req, res) => {
 });
 
 app.patch("/admin/users/:id/role", requireAdmin, async (req, res) => {
+  
   try {
     const { role } = req.body;
     const { id } = req.params;
+const targetUser = await pool.query(
+  "SELECT username FROM users WHERE id = $1",
+  [id]
+);
 
+if (targetUser.rows.length === 0) {
+  return res.status(404).json({ error: "Пользователь не найден" });
+}
+
+if (targetUser.rows[0].username === ADMIN_USERNAME) {
+  return res.status(403).json({
+    error: "Роль Eighth#2020 нельзя изменить"
+  });
+}
     const allowedRoles = [
   "user",
   "admin",

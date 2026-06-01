@@ -317,6 +317,27 @@
   outline:none;
   font-weight:800;
 }
+.users-stats{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.stat-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  height:38px;
+  padding:0 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(232,194,112,.16);
+  font-weight:950;
+}
+
+.stat-pill b{
+  color:var(--gold2);
+}
   </style>
 </head>
 
@@ -344,6 +365,14 @@
   </header>
 
   <main class="wrap">
+    <section class="panel">
+  <div class="topline">
+    <h2>Статистика аккаунтов</h2>
+  </div>
+  <div id="usersStats" class="users-stats">
+    Загрузка...
+  </div>
+</section>
     <section class="panel">
       <div class="topline">
         <h2>Игроки</h2>
@@ -538,6 +567,29 @@ function renderMedalEditor(user){
     </div>
   `;
 }
+function renderUsersStats(users){
+  const box = document.getElementById("usersStats");
+  if(!box) return;
+
+  const counts = {};
+  users.forEach(user => {
+    const role = user.role || "user";
+    counts[role] = (counts[role] || 0) + 1;
+  });
+
+  const orderedRoles = ["admin","developer","moderator","creator","vip","user","banned"];
+
+  box.innerHTML = `
+    <span class="stat-pill">
+      Всего аккаунтов: <b>${users.length}</b>
+    </span>
+    ${orderedRoles.map(role => `
+      <span class="stat-pill" style="color:${roleColors[role] || "#ffffff"}">
+        ${role}: <b>${counts[role] || 0}</b>
+      </span>
+    `).join("")}
+  `;
+}
     function renderUsers(users){
       const body = document.getElementById("usersBody");
       const search = String(document.getElementById("userSearchInput")?.value || "").trim().toLowerCase();
@@ -605,6 +657,7 @@ ${user.username === ADMIN_USERNAME ? "" : `<button class="btn ghost" onclick="qu
         }
 
         allUsers = data;
+renderUsersStats(allUsers);
 renderUsers(allUsers);
       }catch(error){
         console.error(error);
@@ -614,7 +667,12 @@ renderUsers(allUsers);
 
     async function changeRole(userId){
       if(!checkAdmin()) return;
+const protectedUser = allUsers.find(u => Number(u.id) === Number(userId));
 
+if(protectedUser?.username === ADMIN_USERNAME){
+  showInfo("Запрещено", "Роль Eighth#2020 нельзя изменить.");
+  return;
+}
       const role = document.getElementById(`role-${userId}`).value;
 
       try{
