@@ -1632,6 +1632,77 @@ req.params.id
     });
   }
 });
+app.patch("/api/tournaments/:id/status", verifyToken, async (req,res)=>{
+  try{
+    const access = await canManageTournament(req, req.params.id);
+
+    if(!access.ok){
+      return res.status(access.status).json({
+        ok:false,
+        error:access.error
+      });
+    }
+
+    const { status } = req.body;
+    const allowed = ["open","soon","closed","finished"];
+
+    if(!allowed.includes(status)){
+      return res.status(400).json({
+        ok:false,
+        error:"Неверный статус"
+      });
+    }
+
+    const result = await pool.query(`
+      UPDATE tournaments
+      SET status = $1
+      WHERE id = $2
+      RETURNING *
+    `,[status, req.params.id]);
+
+    res.json({
+      ok:true,
+      tournament:result.rows[0]
+    });
+
+  }catch(error){
+    res.status(500).json({
+      ok:false,
+      error:error.message
+    });
+  }
+});
+
+app.patch("/api/tournaments/:id/registration", verifyToken, async (req,res)=>{
+  try{
+    const access = await canManageTournament(req, req.params.id);
+
+    if(!access.ok){
+      return res.status(access.status).json({
+        ok:false,
+        error:access.error
+      });
+    }
+
+    const result = await pool.query(`
+      UPDATE tournaments
+      SET registration_open = $1
+      WHERE id = $2
+      RETURNING *
+    `,[!!req.body.registrationOpen, req.params.id]);
+
+    res.json({
+      ok:true,
+      tournament:result.rows[0]
+    });
+
+  }catch(error){
+    res.status(500).json({
+      ok:false,
+      error:error.message
+    });
+  }
+});
 // Удалить турнир
 app.delete("/api/tournaments/:id", verifyToken, async (req, res) => {
   try {

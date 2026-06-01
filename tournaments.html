@@ -7194,7 +7194,7 @@ function canDeleteTournamentClient(t){
         const percent = Math.max(0, Math.min(100, Math.round(busy / t.places * 100)));
         const disabled = t.status === 'closed' || t.status === 'finished' || free <= 0;
         return '<article class="tournament-card">'
-          + '<div class="tournament-top"><span class="tag">'+escapeHtml(formatMap[t.format])+'</span>'+statusTag(disabled && t.status === 'open' ? 'closed' : t.status)+'</div>'
+          + '<div class="tournament-top"><span class="tag">'+escapeHtml(formatMap[t.format])+'</span>'+statusTag(t.status)+'</div>'
           + '<h3>'+escapeHtml(t.title)+'</h3><p class="desc">'+escapeHtml(t.description)+'</p>'
           + '<div class="info-grid">'
           + '<div class="info-row"><span>Дата</span><span>'+formatDate(t.date)+'</span></div>'
