@@ -588,6 +588,25 @@ function userStarHtml(user){
 
   return "";
 }
+function medalsHtml(user){
+  if(!user?.medals) return "";
+
+  const medals = typeof user.medals === "string"
+    ? JSON.parse(user.medals || "{}")
+    : user.medals;
+
+  const medalList = ["🥇","🎖️","🏅","🏆","🥈","🥉"];
+
+  return medalList.map(medal => {
+    const count = Number(medals[medal] || 0);
+
+    if(count <= 0) return "";
+
+    return count > 1
+      ? `${medal}x${count}`
+      : medal;
+  }).join("");
+}
 function findAuthButton(){
   const buttons = document.querySelectorAll("a.btn");
   for (const btn of buttons) {
@@ -608,7 +627,10 @@ function findAuthButton(){
 const authBtn = findAuthButton();
 
 if(currentUser && authBtn){
-  authBtn.innerHTML = userStarHtml(currentUser) + currentUser.username;
+  authBtn.innerHTML =
+  medalsHtml(currentUser) +
+  userStarHtml(currentUser) +
+  currentUser.username;
   authBtn.href = "#";
   authBtn.classList.remove("gold");
   authBtn.classList.add("ghost");

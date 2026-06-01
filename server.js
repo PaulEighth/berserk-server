@@ -48,7 +48,7 @@ try {
 }
 
     const result = await pool.query(
-      "SELECT id, username, email, role, is_partner FROM users WHERE id = $1",
+      "SELECT id, username, email, role, is_partner, medals FROM users WHERE id = $1",
       [decoded.id]
     );
 
@@ -347,7 +347,7 @@ app.post("/api/register", async (req, res) => {
   `
   INSERT INTO users (username, email, password)
   VALUES ($1, $2, $3)
-  RETURNING id, username, email, role, is_partner, created_at
+  RETURNING id, username, email, role, is_partner, medals, created_at
   `,
   [username, email, hashedPassword]
 );
@@ -483,7 +483,8 @@ const isPasswordCorrect = await bcrypt.compare(
   username: user.username,
   email: user.email,
   role: user.role,
-  is_partner: !!user.is_partner
+  is_partner: !!user.is_partner,
+  medals: user.medals || {}
 }
 
     });
