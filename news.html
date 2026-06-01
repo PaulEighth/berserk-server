@@ -1370,14 +1370,17 @@ const item = {
   Authorization: `Bearer ${localStorage.getItem("token") || ""}`
 },
         body: JSON.stringify({
-          title: item.title,
-          text: item.text,
-          cover: item.cover,
-          extra_images: item.extraImages || [],
-          author_name: item.author,
-          author_role: item.author_role || "user",
-          author_is_partner: !!item.author_is_partner
-        })
+  title: item.title,
+  text: item.text,
+  cover: item.cover,
+  extra_images: item.extraImages || [],
+
+  author_id: loggedUser?.id || null,
+
+  author_name: item.author,
+  author_role: item.author_role || "user",
+  author_is_partner: !!item.author_is_partner
+})
       });
 
       const data = await response.json();

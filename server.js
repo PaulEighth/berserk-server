@@ -670,7 +670,7 @@ app.get("/api/news", async (req, res) => {
     COALESCE(u.is_partner, n.author_is_partner, false) AS author_is_partner,
     COALESCE(u.medals, '{}'::jsonb) AS author_medals
   FROM news n
-  LEFT JOIN users u ON u.id = n.author_id
+  LEFT JOIN users u ON u.id = n.author_id OR LOWER(u.username) = LOWER(n.author_name)
   ORDER BY n.created_at DESC
 `);
 
