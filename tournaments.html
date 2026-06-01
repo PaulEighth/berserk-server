@@ -6903,6 +6903,18 @@ applyFilters();
     showAlert("Ошибка выхода из турнира");
   }
 }
+function toDateTimeLocal(value){
+  if(!value) return "";
+
+  const d = new Date(value);
+
+  if(!Number.isNaN(d.getTime())){
+    const pad = n => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  return String(value).replace(" ", "T").slice(0, 16);
+}
 function openEditTournament(id){
   const t = tournaments.find(item => String(item.id) === String(id));
 
@@ -6915,8 +6927,8 @@ function openEditTournament(id){
 
   if($("requestTitle")) $("requestTitle").value = t.title || "";
   if($("requestOrganizer")) $("requestOrganizer").value = t.organizer || "";
-  if($("requestStartDate")) $("requestStartDate").value = String(t.date || "").replace(" ", "T");
-  if($("requestEndDate")) $("requestEndDate").value = String(t.endDate || "").replace(" ", "T");
+  if($("requestStartDate")) $("requestStartDate").value = toDateTimeLocal(t.date);
+if($("requestEndDate")) $("requestEndDate").value = toDateTimeLocal(t.endDate);
   if($("requestFormat")) $("requestFormat").value = t.format || "bo1";
   if($("requestDeckMode")) $("requestDeckMode").value = t.deckMode || "none";
   if($("requestMatchFormat")) $("requestMatchFormat").value = t.matchFormat || "bo1";
