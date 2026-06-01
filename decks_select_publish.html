@@ -1585,7 +1585,8 @@ const response = await fetch(`https://berserk-server.com/api/decks/${id}/vote`, 
 
     closeModal();
     renderAll();
-    showSuccess(data.deck);
+    const publishedDeck = publishedDecks.find(d => String(d.id) === String(data.deck.id)) || data.deck;
+showSuccess(publishedDeck);
 
     showToast("Колода опубликована на сервере");
 
@@ -1798,13 +1799,22 @@ const roleColors = {
   creator: "#ff9d42",
   banned: "#ff4d4d"
 };
+function parseMedals(user){
+  if(!user?.medals) return {};
+
+  if(typeof user.medals === "string"){
+    try{
+      return JSON.parse(user.medals || "{}");
+    }catch(e){
+      return {};
+    }
+  }
+
+  return user.medals || {};
+}
+
 function medalsHtml(user){
-  if(!user?.medals) return "";
-
-  const medals = typeof user.medals === "string"
-    ? JSON.parse(user.medals || "{}")
-    : user.medals;
-
+  const medals = parseMedals(user);
   const medalList = ["🥇","🎖️","🏅","🏆","🥈","🥉"];
 
   return medalList.map(medal => {
@@ -1843,10 +1853,12 @@ const authBtn = findAuthButton();
 
 if(currentUser && authBtn){
 
-  authBtn.innerHTML =
-  medalsHtml(currentUser) +
-  userStarHtml(currentUser) +
-  currentUser.username;
+  const freshUser = JSON.parse(localStorage.getItem("user") || "null");
+
+authBtn.innerHTML =
+  medalsHtml(freshUser || currentUser) +
+  userStarHtml(freshUser || currentUser) +
+  (freshUser?.username || currentUser.username);
 
   authBtn.classList.remove("gold");
   authBtn.classList.add("ghost");
