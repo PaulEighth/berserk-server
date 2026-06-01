@@ -767,9 +767,14 @@ async function saveMedals(userId){
       showInfo("Ошибка", data.error || "Не удалось изменить медали.");
       return;
     }
-
+if(data.username === currentUser.username){
+  const savedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  savedUser.medals = data.medals || {};
+  localStorage.setItem("user", JSON.stringify(savedUser));
+}
     showInfo("Готово", `Медали игрока ${data.username} обновлены.`);
     loadUsers();
+    setupAuthButton();
   }catch(error){
     console.error(error);
     showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
