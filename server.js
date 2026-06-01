@@ -186,6 +186,10 @@ async function canEditTournamentPlay(req, tournamentId){
 }
 async function ensurePartnerColumn() {
   await pool.query(`
+  ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS medals JSONB DEFAULT '{}'
+`);
+  await pool.query(`
   ALTER TABLE tournaments
   ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'open'
 `);
@@ -506,7 +510,7 @@ const isPasswordCorrect = await bcrypt.compare(
 app.get("/admin/users", requireAdmin, async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, username, email, role, is_partner, created_at FROM users ORDER BY id"
+      "SELECT id, username, email, role, is_partner, medals, created_at FROM users ORDER BY id"
     );
 
     res.json(result.rows);
@@ -591,6 +595,28 @@ app.patch("/admin/users/:id/partner", requireAdmin, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Ошибка смены партнёрской звезды" });
+  }
+});
+app.patch("/admin/users/:id/medals", requireAdmin, async (req, res) => {
+  try {
+    const { medals } = req.body;
+    const { id } = req.params;
+
+    const safeMedals = medals && typeof medals === "object" ? medals : {};
+
+    const result = await pool.query(
+      "UPDATE users SET medals = $1 WHERE id = $2 RETURNING id, username, email, role, is_partner, medals",
+      [JSON.stringify(safeMedals), id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Пользователь не найден" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Ошибка изменения медалей" });
   }
 });
 app.delete("/admin/users/:id", requireAdmin, async (req, res) => {

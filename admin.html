@@ -307,6 +307,16 @@
       .btn{width:100%}
       .actions{display:grid}
     }
+    .search-field{
+  width:260px;
+  padding:12px 14px;
+  border-radius:999px;
+  border:1px solid rgba(232,194,112,.18);
+  background:rgba(255,255,255,.06);
+  color:var(--text);
+  outline:none;
+  font-weight:800;
+}
   </style>
 </head>
 
@@ -337,8 +347,10 @@
     <section class="panel">
       <div class="topline">
         <h2>Игроки</h2>
-        <button class="btn gold" onclick="loadUsers()">Обновить список</button>
-      </div>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+  <input id="userSearchInput" class="search-field" placeholder="Поиск по нику или #">
+  <button class="btn gold" onclick="loadUsers()">Обновить список</button>
+</div>
 
       <div class="table-wrap">
         <table>
@@ -349,6 +361,7 @@
               <th>Email</th>
               <th>Роль</th>
               <th>Новая роль</th>
+              <th>Медали</th>
               <th>Действия</th>
             </tr>
           </thead>
@@ -389,7 +402,8 @@
   creator: "#ff9d42",
   banned: "#ff4d4d"
 };
-
+const medalList = ["🥇","🎖️","🏅","🏆","🥈","🥉"];
+let allUsers = [];
     const roles = [
   "user",
   "developer",
@@ -479,9 +493,60 @@ function userStarHtml(user){
 </select>
       `;
     }
+function parseMedals(user){
+  if(!user.medals) return {};
 
+  if(typeof user.medals === "string"){
+    try{
+      return JSON.parse(user.medals || "{}");
+    }catch(e){
+      return {};
+    }
+  }
+
+  return user.medals || {};
+}
+
+function medalsHtml(user){
+  const medals = parseMedals(user);
+
+  return medalList.map(medal => {
+    const count = Number(medals[medal] || 0);
+    if(count <= 0) return "";
+    return count > 1 ? `${medal}x${count}` : medal;
+  }).join("");
+}
+
+function renderMedalEditor(user){
+  const medals = parseMedals(user);
+
+  return `
+    <div style="display:grid;gap:6px;min-width:220px">
+      ${medalList.map(medal => `
+        <label style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:20px">${medal}</span>
+          <input
+            id="medal-${user.id}-${medal}"
+            type="number"
+            min="0"
+            value="${Number(medals[medal] || 0)}"
+            style="width:70px;padding:8px;border-radius:10px;background:#111622;color:#fff;border:1px solid rgba(232,194,112,.18)"
+          >
+        </label>
+      `).join("")}
+      <button class="btn ghost" onclick="saveMedals(${user.id})">Сохранить медали</button>
+    </div>
+  `;
+}
     function renderUsers(users){
       const body = document.getElementById("usersBody");
+      const search = String(document.getElementById("userSearchInput")?.value || "").trim().toLowerCase();
+
+if(search){
+  users = users.filter(user =>
+    String(user.username || "").toLowerCase().includes(search)
+  );
+}
 
       if(!users.length){
         body.innerHTML = `
@@ -495,7 +560,7 @@ function userStarHtml(user){
       body.innerHTML = users.map(user => `
         <tr>
           <td>${user.id}</td>
-          <td style="color:${roleColors[user.role] || "#ffffff"}">${userStarHtml(user)}${user.username}</td>
+          <td style="color:${roleColors[user.role] || "#ffffff"}">${medalsHtml(user)}${userStarHtml(user)}${user.username}</td>
           <td class="muted">${user.email || "—"}</td>
           <td>
             <span class="role-pill" style="color:${roleColors[user.role] || "#ffffff"}">
@@ -503,6 +568,7 @@ function userStarHtml(user){
             </span>
           </td>
           <td>${renderRoleSelect(user)}</td>
+          <td>${renderMedalEditor(user)}</td>
           <td>
             <div class="actions">
               <button class="btn gold" onclick="changeRole(${user.id})">Сохранить</button>
@@ -538,7 +604,8 @@ ${user.username === ADMIN_USERNAME ? "" : `<button class="btn ghost" onclick="qu
           return;
         }
 
-        renderUsers(data);
+        allUsers = data;
+renderUsers(allUsers);
       }catch(error){
         console.error(error);
         showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
@@ -595,6 +662,42 @@ async function togglePartner(userId, isPartner){
     }
 
     showInfo("Готово", `${data.username}: ${data.is_partner ? "звезда выдана" : "звезда убрана"}.`);
+    loadUsers();
+  }catch(error){
+    console.error(error);
+    showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
+  }
+}
+async function saveMedals(userId){
+  if(!checkAdmin()) return;
+
+  const medals = {};
+
+  medalList.forEach(medal => {
+    const value = Number(document.getElementById(`medal-${userId}-${medal}`)?.value || 0);
+    if(value > 0){
+      medals[medal] = value;
+    }
+  });
+
+  try{
+    const response = await fetch(`${API_URL}/admin/users/${userId}/medals`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-username": currentUser.username
+      },
+      body: JSON.stringify({ medals })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      showInfo("Ошибка", data.error || "Не удалось изменить медали.");
+      return;
+    }
+
+    showInfo("Готово", `Медали игрока ${data.username} обновлены.`);
     loadUsers();
   }catch(error){
     console.error(error);
@@ -659,6 +762,11 @@ async function togglePartner(userId, isPartner){
 
     setupAuthButton();
     loadUsers();
+    document.addEventListener("input", e => {
+  if(e.target?.id === "userSearchInput"){
+    renderUsers(allUsers);
+  }
+});
   </script>
 </body>
 </html>
