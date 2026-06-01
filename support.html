@@ -421,6 +421,40 @@
       .btn{width:100%}
       .music-toggle{left:20px;right:auto}
     }
+  .role-user{
+  color:#ffffff;
+}
+
+.role-admin{
+  color:#6f3cff;
+  text-shadow:0 0 16px rgba(111,60,255,.35);
+}
+
+.role-developer{
+  color:#0f7b43;
+}
+
+.role-moderator{
+  color:#57d46a;
+}
+
+.role-creator{
+  color:#ff9d42;
+}
+
+.role-vip{
+  color:#59c8ff;
+}
+
+.partner-star{
+  color:#f0d28b;
+  margin-right:5px;
+}
+
+.admin-star{
+  color:#6f3cff;
+  margin-right:5px;
+}
   </style>
 </head>
 <body>
@@ -440,14 +474,21 @@
       <a href="tournaments.html">Турниры</a>
       <a href="news.html">Новости</a>
       <a href="chats.html">Чаты</a>
-      <a id="adminPanelLink" href="admin.html" style="display:none">Админ</a>
       <a class="active" href="support.html">Поддержка</a>
+      <a id="adminPanelLink" href="admin.html" style="display:none">Админ</a>
       <a href="BerserHeroesOnline.html#contacts">Контакты</a>
     </div>
 
     <div style="display:flex;gap:14px;align-items:center">
       <a class="btn ghost" href="https://t.me/Paul_Eighth" target="_blank" style="border:1px solid #d6a84f;color:#d6a84f;background:transparent">@Paul_Eighth</a>
-      <a class="btn gold" href="auth.html" id="authLink">Войти</a>
+      <a
+  class="btn gold"
+  href="auth.html"
+  id="authLink"
+  style="visibility:hidden"
+>
+  Войти
+</a>
     </div>
   </nav>
 
@@ -613,6 +654,100 @@ btn.addEventListener("click", () => {
 setInterval(() => {
   localStorage.setItem("musicTime", music.currentTime);
 }, 1000);
+function roleClass(role){
+  const r = String(role || "user").toLowerCase();
+
+  return [
+    "admin",
+    "developer",
+    "moderator",
+    "creator",
+    "vip"
+  ].includes(r)
+    ? `role-${r}`
+    : "role-user";
+}
+
+function medalsHtml(user){
+  const medals = user?.medals || {};
+
+  return Object.entries(medals)
+    .filter(([,count]) => Number(count) > 0)
+    .map(([icon,count]) => `${icon}${count > 1 ? "x"+count : ""}`)
+    .join(" ") + (Object.keys(medals).length ? " " : "");
+}
+
+function userStarHtml(user){
+  if(!user) return "";
+
+  if(
+    String(user.username || "").toLowerCase() ===
+    "eighth#2020"
+  ){
+    return '<span class="admin-star">⭐</span>';
+  }
+
+  if(user.is_partner){
+    return '<span class="partner-star">⭐</span>';
+  }
+
+  return "";
+}
+
+function updateAuthUI(){
+
+  const user =
+    JSON.parse(localStorage.getItem("user") || "null");
+
+  const authLink =
+    document.getElementById("authLink");
+
+  if(!authLink) return;
+
+  if(user){
+
+    authLink.innerHTML =
+      medalsHtml(user) +
+      userStarHtml(user) +
+      `<span class="${roleClass(user.role)}">${user.username}</span>`;
+
+    authLink.classList.remove("gold");
+    authLink.classList.add("ghost");
+
+    authLink.href = "#";
+
+    authLink.style.visibility = "visible";
+
+    authLink.onclick = e=>{
+      e.preventDefault();
+
+      if(document.getElementById("logoutModal")){
+        document.getElementById("logoutModal").style.display="flex";
+      }
+    };
+
+  }else{
+
+    authLink.style.visibility = "visible";
+
+  }
+
+  const adminLink =
+    document.getElementById("adminPanelLink");
+
+  if(
+    adminLink &&
+    user &&
+    ["admin","developer","moderator"].includes(user.role)
+  ){
+    adminLink.style.display = "inline";
+  }
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  updateAuthUI();
+});
 </script>
 </body>
 </html>
