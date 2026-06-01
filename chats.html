@@ -179,6 +179,38 @@ function roleClass(role){
   const r = String(role || "user").toLowerCase();
   return ["admin","developer","moderator","creator","vip"].includes(r) ? `role-${r}` : "role-user";
 }
+function userStarHtml(user){
+  if(!user) return "";
+
+  if(user.username === "Eighth#2020"){
+    return '<span style="color:#6f3cff;filter:drop-shadow(0 0 8px #6f3cff)">⭐</span> ';
+  }
+
+  if(user.is_partner){
+    return '<span style="color:#f0d28b;filter:drop-shadow(0 0 8px #f0d28b)">⭐</span> ';
+  }
+
+  return "";
+}
+function medalsHtml(user){
+  if(!user || !user.medals) return "";
+
+  let html = "";
+
+  if(user.medals.gold > 0){
+    html += `<span title="Золото">🥇${user.medals.gold}</span> `;
+  }
+
+  if(user.medals.silver > 0){
+    html += `<span title="Серебро">🥈${user.medals.silver}</span> `;
+  }
+
+  if(user.medals.bronze > 0){
+    html += `<span title="Бронза">🥉${user.medals.bronze}</span> `;
+  }
+
+  return html;
+}
 function roleNickHtml(username, role, isPartner, medals = {}){
   const nick = String(username || "Игрок");
 
@@ -220,7 +252,23 @@ function updateAuthUI(){
   const adminLink = document.getElementById("adminPanelLink");
   if(adminLink && user && ["admin","developer","moderator"].includes(user.role)) adminLink.style.display = "inline";
   const authLink = document.getElementById("authLink");
-  if(authLink && user){authLink.textContent = "Профиль";authLink.href = "auth.html";}
+  if(authLink && user){
+
+  authLink.innerHTML =
+    medalsHtml(user) +
+    userStarHtml(user) +
+    user.username;
+
+  authLink.classList.remove("gold");
+  authLink.classList.add("ghost");
+
+  authLink.href = "#";
+
+  authLink.onclick = e => {
+    e.preventDefault();
+    document.getElementById("logoutModal").style.display = "flex";
+  };
+}
   document.getElementById("authBox").style.display = isLoggedIn() ? "none" : "block";
   document.getElementById("composer").style.display = isLoggedIn() ? "grid" : "none";
 }
