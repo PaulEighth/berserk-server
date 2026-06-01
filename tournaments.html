@@ -3409,6 +3409,7 @@ privatePassword: t.private_password || "",
     organizer: t.organizer_name || "Организатор",
     organizer_role: t.organizer_role || "user",
     organizer_is_partner: !!t.organizer_is_partner,
+    organizer_medals: t.organizer_medals || {},
 
         prize: t.prize_1 || "Без приза",
     prizeValue: getMoneyPrizeValue(t.prize_1 || ""),
@@ -3450,7 +3451,7 @@ bracketData: Array.isArray(t.bracket) ? t.bracket : [],
     tournamentDeckSubmits = {};
 
     data.participants.forEach(p => {
-  rememberUserRole(p.username, p.role || "user", !!p.is_partner);
+  rememberUserRole(p.username, p.role || "user", !!p.is_partner, p.medals || {});
 
   const tournamentId = String(p.tournament_id);
   if(!registrations[tournamentId]){
@@ -3571,7 +3572,7 @@ function authHeaders(extra = {}){
       catch(e){}
     }
 
-    function rememberUserRole(username, role, is_partner=false){
+    function rememberUserRole(username, role, is_partner=false, medals={}){
   const nick = normalizeNick(String(username || ""));
   if(!nick) return;
 
@@ -3579,7 +3580,8 @@ function authHeaders(extra = {}){
 
   cache[nick.toLowerCase()] = {
     role: role || "user",
-    is_partner: !!is_partner
+    is_partner: !!is_partner,
+    medals: medals || {}
   };
 
   saveRoleCache(cache);
@@ -3629,24 +3631,51 @@ function authHeaders(extra = {}){
   return typeof item === "object" && !!item.is_partner;
 }
 
-function userStarHtmlByNick(nick){
-  const normalized = normalizeNick(String(nick || ""));
-  if(!normalized) return "";
+function parseMedals(user){
+  if(!user?.medals) return {};
 
-  if(normalized.toLowerCase() === "eighth#2020"){
-    return '<span style="color:#6f3cff;filter:drop-shadow(0 0 8px #6f3cff)">⭐</span> ';
+  if(typeof user.medals === "string"){
+    try{
+      return JSON.parse(user.medals || "{}");
+    }catch(e){
+      return {};
+    }
   }
 
-  if(isPartnerByNick(normalized)){
-    return '<span style="color:#f0d28b;filter:drop-shadow(0 0 8px #f0d28b)">⭐</span> ';
+  return user.medals || {};
+}
+
+function medalsHtml(user){
+  const medals = parseMedals(user);
+  const medalList = ["🥇","🎖️","🏅","🏆","🥈","🥉"];
+
+  return medalList.map(medal => {
+    const count = Number(medals[medal] || 0);
+    if(count <= 0) return "";
+    return count > 1 ? `${medal}x${count}` : medal;
+  }).join("");
+}
+
+function medalsByNickHtml(nick){
+  const normalized = normalizeNick(String(nick || "")).toLowerCase();
+  const current = getLoggedUser();
+
+  if(current?.username && normalizeNick(current.username).toLowerCase() === normalized){
+    return medalsHtml(current);
   }
 
-  return "";
+  const cache = getRoleCache();
+  const item = cache[normalized];
+
+  return medalsHtml(item || {});
 }
 
 function roleNickHtml(nick){
   if(!nick) return "Свободно";
-  return userStarHtmlByNick(nick) + `<span class="role-colored-nick" style="color:${escapeHtml(getNickColor(nick))}">${escapeHtml(nick)}</span>`;
+
+  return medalsByNickHtml(nick) +
+    userStarHtmlByNick(nick) +
+    `<span class="role-colored-nick" style="color:${escapeHtml(getNickColor(nick))}">${escapeHtml(nick)}</span>`;
 }
 
     async function warmTournamentRoleCache(){
@@ -6890,7 +6919,7 @@ const players = getPlayers(id);
         `<div class="info-row"><span>Название</span><span>${escapeHtml(t.title)}</span></div>
          <div class="info-row"><span>Дата начала</span><span>${formatDate(t.date)}</span></div>
          <div class="info-row"><span>Дата окончания</span><span>${t.endDate?formatDate(t.endDate):'—'}</span></div>
-         <div class="info-row"><span>Организатор</span><span>${escapeHtml(t.organizer)}</span></div>
+         <div class="info-row"><span>Организатор</span><span>${roleNickHtml(t.organizer)}</span></div>
          <div class="info-row"><span>Права</span><span>${t.editRights === 'participants' ? 'Участники турнира могут редактировать' : 'Только организатор'}</span></div>
          <div class="info-row"><span>Формат</span><span>${escapeHtml(t.mode)}</span></div>
          <div class="info-row"><span>Колоды</span><span>${deckModeLabel(t.deckMode)}</span></div>
@@ -7198,7 +7227,7 @@ function canDeleteTournamentClient(t){
           + '<h3>'+escapeHtml(t.title)+'</h3><p class="desc">'+escapeHtml(t.description)+'</p>'
           + '<div class="info-grid">'
           + '<div class="info-row"><span>Дата</span><span>'+formatDate(t.date)+'</span></div>'
-          + '<div class="info-row"><span>Организатор</span><span>'+escapeHtml(t.organizer)+'</span></div>'
+          + '<div class="info-row"><span>Организатор</span><span>'+roleNickHtml(t.organizer)+'</span></div>'
           + '<div class="info-row prize-info-row"><span>Призы</span><span>'+escapeHtml(prizeText(t)).replace(/\s*\|\s*/g, '<br>')+'</span></div>'
           + '<div class="info-row"><span>Формат</span><span>'+escapeHtml(t.mode)+'</span></div>'
           + '<div class="info-row"><span>Колоды</span><span>'+escapeHtml(deckModeLabel(t.deckMode))+'</span></div>'
@@ -8033,7 +8062,12 @@ adminLinks.forEach(link => {
 
 if(currentUser && authBtn){
 
-  authBtn.innerHTML = userStarHtml(currentUser) + currentUser.username;
+  const freshUser = JSON.parse(localStorage.getItem("user") || "null");
+
+authBtn.innerHTML =
+  medalsHtml(freshUser || currentUser) +
+  userStarHtml(freshUser || currentUser) +
+  (freshUser?.username || currentUser.username);
 
   authBtn.classList.remove("gold");
   authBtn.classList.add("ghost");

@@ -1271,15 +1271,25 @@ app.delete("/api/site-chats/:channel/messages/:id", verifyToken, async (req,res)
 app.get("/api/tournaments", async (req, res) => {
   try {
     const tournamentsResult = await pool.query(`
-      SELECT *
-      FROM tournaments
-      ORDER BY created_at DESC
+      SELECT
+  t.*,
+  COALESCE(u.medals, '{}'::jsonb) AS organizer_medals,
+  COALESCE(u.role, t.organizer_role, 'user') AS organizer_role,
+  COALESCE(u.is_partner, t.organizer_is_partner, false) AS organizer_is_partner
+FROM tournaments t
+LEFT JOIN users u ON u.id = t.organizer_id
+ORDER BY t.created_at DESC
     `);
 
     const participantsResult = await pool.query(`
-      SELECT *
-      FROM tournament_participants
-      ORDER BY joined_at ASC
+      SELECT
+  p.*,
+  COALESCE(u.medals, '{}'::jsonb) AS medals,
+  COALESCE(u.role, p.role, 'user') AS role,
+  COALESCE(u.is_partner, p.is_partner, false) AS is_partner
+FROM tournament_participants p
+LEFT JOIN users u ON u.id = p.user_id
+ORDER BY p.joined_at ASC
     `);
 
     const matchesResult = await pool.query(`
@@ -1784,15 +1794,25 @@ if(!access.ok){
 app.get("/api/tournaments", async (req, res) => {
   try {
     const tournamentsResult = await pool.query(`
-      SELECT *
-      FROM tournaments
-      ORDER BY created_at DESC
+      SELECT
+  t.*,
+  COALESCE(u.medals, '{}'::jsonb) AS organizer_medals,
+  COALESCE(u.role, t.organizer_role, 'user') AS organizer_role,
+  COALESCE(u.is_partner, t.organizer_is_partner, false) AS organizer_is_partner
+FROM tournaments t
+LEFT JOIN users u ON u.id = t.organizer_id
+ORDER BY t.created_at DESC
     `);
 
     const participantsResult = await pool.query(`
-      SELECT *
-      FROM tournament_participants
-      ORDER BY joined_at ASC
+      SELECT
+  p.*,
+  COALESCE(u.medals, '{}'::jsonb) AS medals,
+  COALESCE(u.role, p.role, 'user') AS role,
+  COALESCE(u.is_partner, p.is_partner, false) AS is_partner
+FROM tournament_participants p
+LEFT JOIN users u ON u.id = p.user_id
+ORDER BY p.joined_at ASC
     `);
 
     const matchesResult = await pool.query(`
@@ -2636,11 +2656,13 @@ app.get("/api/decks", async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT
-  d.*,
-  COALESCE(u.medals, '{}'::jsonb) AS author_medals
-FROM decks d
-LEFT JOIN users u ON u.id = d.author_id
-ORDER BY d.created_at DESC
+        d.*,
+        COALESCE(u.role, d.author_role, 'user') AS author_role,
+        COALESCE(u.is_partner, d.author_is_partner, false) AS author_is_partner,
+        COALESCE(u.medals, '{}'::jsonb) AS author_medals
+      FROM decks d
+      LEFT JOIN users u ON u.id = d.author_id
+      ORDER BY d.created_at DESC
     `);
 
     res.json({
