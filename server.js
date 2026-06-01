@@ -2635,9 +2635,12 @@ app.delete("/api/player-decks/:id", verifyToken, async (req, res) => {
 app.get("/api/decks", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT *
-      FROM decks
-      ORDER BY created_at DESC
+      SELECT
+  d.*,
+  COALESCE(u.medals, '{}'::jsonb) AS author_medals
+FROM decks d
+LEFT JOIN users u ON u.id = d.author_id
+ORDER BY d.created_at DESC
     `);
 
     res.json({
