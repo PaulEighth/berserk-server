@@ -854,7 +854,30 @@ function getNewsAuthorColor(news){
 
   return newsRoleColors[news.author_role || "user"] || "#ffffff";
 }
+function parseMedals(user){
+  if(!user?.medals) return {};
 
+  if(typeof user.medals === "string"){
+    try{
+      return JSON.parse(user.medals || "{}");
+    }catch(e){
+      return {};
+    }
+  }
+
+  return user.medals || {};
+}
+
+function medalsHtml(user){
+  const medals = parseMedals(user);
+  const medalList = ["🥇","🎖️","🏅","🏆","🥈","🥉"];
+
+  return medalList.map(medal => {
+    const count = Number(medals[medal] || 0);
+    if(count <= 0) return "";
+    return count > 1 ? `${medal}x${count}` : medal;
+  }).join("");
+}
 function newsAuthorStarHtml(news){
   const author = String(news.author || "").trim().toLowerCase();
 
@@ -870,7 +893,7 @@ function newsAuthorStarHtml(news){
 }
 
 function newsAuthorHtml(news){
-  return `<span style="color:${escapeHtml(getNewsAuthorColor(news))}">${newsAuthorStarHtml(news)}${escapeHtml(news.author || "Автор")}</span>`;
+  return `<span style="color:${escapeHtml(getNewsAuthorColor(news))}">${medalsHtml({ medals: news.author_medals || {} })}${newsAuthorStarHtml(news)}${escapeHtml(news.author || "Автор")}</span>`;
 }
 
 function canDeleteComment(news, comment){
@@ -909,6 +932,7 @@ async function loadNewsComments(){
       author: comment.author_name,
       author_role: comment.author_role || "user",
       author_is_partner: !!comment.author_is_partner,
+      author_medals: comment.author_medals || {},
       text: comment.text,
       date: new Date(comment.created_at).toLocaleString("ru-RU")
     }));
@@ -942,10 +966,10 @@ function renderNewsComments(){
           <div class="news-comment-author" style="color:${escapeHtml(getNewsAuthorColor({
             author_role: comment.author_role || "user"
           }))}">
-            ${newsAuthorStarHtml({
-              author: comment.author,
-              author_is_partner: comment.author_is_partner
-            })}${escapeHtml(comment.author || "Игрок")}
+            ${medalsHtml({ medals: comment.author_medals || {} })}${newsAuthorStarHtml({
+  author: comment.author,
+  author_is_partner: comment.author_is_partner
+})}${escapeHtml(comment.author || "Игрок")}
           </div>
 
           ${
@@ -1067,6 +1091,7 @@ async function loadNewsFromServer(){
       author: n.author_name,
       author_role: n.author_role || "user",
       author_is_partner: !!n.author_is_partner,
+      author_medals: n.author_medals || {},
 
       cover: n.cover,
 
@@ -2056,7 +2081,12 @@ const authBtn = findAuthButton();
 
 if(currentUser && authBtn){
 
-  authBtn.innerHTML = userStarHtml(currentUser) + currentUser.username;
+  const freshUser = JSON.parse(localStorage.getItem("user") || "null");
+
+authBtn.innerHTML =
+  medalsHtml(freshUser || currentUser) +
+  userStarHtml(freshUser || currentUser) +
+  (freshUser?.username || currentUser.username);
 
   authBtn.classList.remove("gold");
   authBtn.classList.add("ghost");
