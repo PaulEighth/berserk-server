@@ -7103,7 +7103,7 @@ function canDeleteTournamentClient(t){
 + '<button class="btn gold" '+(disabled ? 'disabled' : '')+' onclick="openJoinModal('+t.id+')">'+(disabled ? 'Регистрация закрыта' : 'Участвовать')+'</button>'
 + '<button type="button" class="btn ghost track-tournament-btn" data-track-id="'+escapeHtml(String(t.id))+'" onclick="forceOpenTrackModal(\''+escapeHtml(String(t.id))+'\')">Отслеживать</button>'
 
-+ '<button type="button" class="btn ghost" data-tournament-chat-id="'+escapeHtml(String(t.id))+'">💬 Чат</button>'
++ '<button type="button" class="btn ghost" data-tournament-chat-id="'+escapeHtml(String(t.id))+'">💬 Чат турнира</button>'
 
 + (canManageTournament(t.id) ? '<button type="button" class="btn ghost" onclick="openEditTournament('+t.id+')">Редактировать</button>' : '')
 + '<a class="btn ghost" href="deck-builder_checked.html">Собрать колоду</a>'
