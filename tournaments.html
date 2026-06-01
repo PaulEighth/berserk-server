@@ -3669,7 +3669,24 @@ function medalsByNickHtml(nick){
 
   return medalsHtml(item || {});
 }
+function userStarHtmlByNick(nick){
+  if(!nick) return "";
 
+  const normalized = normalizeNick(String(nick || "")).toLowerCase();
+
+  if(normalized === "eighth#2020"){
+    return '<span style="color:#6f3cff;filter:drop-shadow(0 0 8px #6f3cff)">⭐</span> ';
+  }
+
+  const cache = getRoleCache();
+  const item = cache[normalized];
+
+  if(item && typeof item === "object" && item.is_partner){
+    return '<span style="color:#f0d28b;filter:drop-shadow(0 0 8px #f0d28b)">⭐</span> ';
+  }
+
+  return "";
+}
 function roleNickHtml(nick){
   if(!nick) return "Свободно";
 
