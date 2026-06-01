@@ -2586,7 +2586,7 @@ deck_code || ""
 });
 app.patch("/api/decks/:id", verifyToken, async (req, res) => {
   try {
-    const { description, deck_code } = req.body;
+    const { title, description, deck_code } = req.body;
 
     const deckResult = await pool.query(
       "SELECT * FROM decks WHERE id = $1",
@@ -2607,17 +2607,19 @@ app.patch("/api/decks/:id", verifyToken, async (req, res) => {
     if (!isOwner && !isAdmin) {
       return res.status(403).json({
         ok: false,
-        error: "Редактировать описание может только автор колоды"
+        error: "Редактировать колоду может только автор колоды"
       });
     }
 
     const result = await pool.query(`
   UPDATE decks
-  SET description = $1,
-      deck_code = $2
-  WHERE id = $3
+  SET title = $1,
+      description = $2,
+      deck_code = $3
+  WHERE id = $4
   RETURNING *
 `, [
+  title || deck.title,
   description || "",
   deck_code || "",
   req.params.id
@@ -2752,10 +2754,11 @@ app.patch("/api/decks/:id/vote", verifyToken, async (req, res) => {
     const updated = await pool.query(
       `
       UPDATE decks
-      SET likes = $1,
-          dislikes = $2
-      WHERE id = $3
-      RETURNING *
+SET title = $1,
+    description = $2,
+    deck_code = $3
+WHERE id = $4
+RETURNING *
       `,
       [likes, dislikes, deckId]
     );
