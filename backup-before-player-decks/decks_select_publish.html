@@ -561,76 +561,33 @@ function authHeaders(){
     }
     function getHero(deckCards){return deckCards.find(c=>String(c.type).toLowerCase().includes('герой'))||deckCards[0]||null}
     function getFirstFour(deckCards,hero){return deckCards.filter(c=>!hero||String(c.id)!==String(hero.id)).slice(0,4)}
-    function deckScore(deck){return(deck.likes||0)-(deck.dislikes||0)}
-    async function loadPublishedDecksFromServer(){
-  try{
-    const response = await fetch("https://berserk-server.com/api/decks");
-    const data = await response.json();
+    function deckPercent(deck){
+  const likes = deck.likes || 0;
+  const dislikes = deck.dislikes || 0;
+  const total = likes + dislikes;
 
-    if(!data.ok){
-      throw new Error(data.error || "Не удалось загрузить колоды");
-    }
+  if(total === 0) return 0;
 
-    publishedDecks = data.decks.map(deck => ({
-      id: String(deck.id),
-      title: deck.title,
-      description: deck.description || "",
-
-      cards: Array.isArray(deck.cards)
-        ? deck.cards
-        : JSON.parse(deck.cards || "[]"),
-
-      previewIds: Array.isArray(deck.preview_ids)
-        ? deck.preview_ids
-        : JSON.parse(deck.preview_ids || "[]"),
-
-      author: deck.author_name,
-      author_role: deck.author_role || "user",
-      author_is_partner: !!deck.author_is_partner,
-
-      likes: deck.likes || 0,
-      dislikes: deck.dislikes || 0,
-      created_at: deck.created_at
-    }));
-
-  }catch(error){
-    console.error(error);
-    showToast("Не удалось загрузить колоды с сервера");
-  }
+  return Math.round((likes / total) * 100);
 }
-    async function loadCards(){
-      try {
-        const files = [
-          'cards/cards-dark.json',
-          'cards/cards-forest.json',
-          'cards/cards-mountains.json',
-          'cards/cards-steppes.json',
-          'cards/cards-swamp.json',
-          'cards/cards-neutral.json'
-        ];
 
-        const responses = await Promise.all(
-          files.map(file => fetch(file, { cache:'no-store' }))
-        );
+function percentColor(percent){
+  if(percent <= 35) return "#8b0000";
+  if(percent <= 50) return "#ff4d4d";
+  if(percent <= 65) return "#ffd54f";
+  if(percent <= 80) return "#8bc34a";
+  return "#4caf50";
+}
 
-        responses.forEach((res, i) => {
-          if(!res.ok) throw new Error(files[i] + ' не найден');
-        });
+function deckScore(deck){
+  const likes = deck.likes || 0;
+  const dislikes = deck.dislikes || 0;
+  const total = likes + dislikes;
 
-        const dataArray = await Promise.all(
-          responses.map(res => res.json())
-        );
+  if(total === 0) return 0;
 
-        cards = dataArray.flat().map(normalizeCard);
-
-      } catch(e) {
-        console.error(e);
-        cards = [];
-        showToast('Ошибка загрузки карт');
-      }
-
-      renderAll();
-    }
+  return (likes / total) * Math.log10(total + 1);
+}
     function getAvailableDecks(){
       const result=[];
       const player=JSON.parse(localStorage.getItem(PLAYER_DECKS_KEY)||'[]');
@@ -845,7 +802,9 @@ function deckAuthorStarHtml(deck){
 }
     function renderDeckCard(deck,rank){
       const deckCards=deckCardsFromIds(deck);
-      return `<article class="deck-card" onclick="openDeckView('${deck.id}','published')" style="cursor:pointer"><h3>${rank?rank+'. ':''}${escapeHtml(deck.title)}</h3><div class="meta">Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorStarHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b> · карт: ${deck.cards.length}</div><p class="meta">${escapeHtml(deck.description||'Описание не добавлено.')}</p>${deckPreviewHtml(deckCards, deck.previewIds || [])}<div class="votes"><button class="vote ${myVotes[deck.id]==='up'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','up')">👍 ${deck.likes||0}</button><button class="vote ${myVotes[deck.id]==='down'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','down')">👎 ${deck.dislikes||0}</button><span class="score">Рейтинг: ${deckScore(deck)}</span><button class="vote" onclick="event.stopPropagation(); openDeckView('${deck.id}','published')">Состав</button></div></article>`;
+      return `<article class="deck-card" onclick="openDeckView('${deck.id}','published')" style="cursor:pointer"><h3>${rank?rank+'. ':''}${escapeHtml(deck.title)}</h3><div class="meta">Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorStarHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b> · карт: ${deck.cards.length}</div><p class="meta">${escapeHtml(deck.description||'Описание не добавлено.')}</p>${deckPreviewHtml(deckCards, deck.previewIds || [])}<div class="votes"><button class="vote ${myVotes[deck.id]==='up'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','up')">👍 ${deck.likes||0}</button><button class="vote ${myVotes[deck.id]==='down'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','down')">👎 ${deck.dislikes||0}</button><span class="score" style="color:${percentColor(deckPercent(deck))}">
+  ${deckPercent(deck)}%
+</span><button class="vote" onclick="event.stopPropagation(); openDeckView('${deck.id}','published')">Состав</button></div></article>`;
     }
 
     function openDeckView(id,kind='published'){
@@ -979,7 +938,7 @@ $('viewDeckActions').innerHTML = isLocal
     function renderTopDecks(){const top=[...publishedDecks].sort((a,b)=>deckScore(b)-deckScore(a)).slice(0,5);$('topDecks').innerHTML=top.length?top.map((d,i)=>renderDeckCard(d,i+1)).join(''):'<div class="empty">Топ появится после публикации колод.</div>'}
     function updateStats(){
       const local=makeLocalDecks();
-      const sortedByLikes=[...publishedDecks].sort((a,b)=>(b.likes||0)-(a.likes||0)||deckScore(b)-deckScore(a));
+      const sortedByLikes=[...publishedDecks].sort((a,b)=>deckScore(b)-deckScore(a));
       const best=sortedByLikes[0];
       const myBest=sortedByLikes[0];
 
