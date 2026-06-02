@@ -2945,16 +2945,15 @@ app.patch("/api/decks/:id/vote", verifyToken, async (req, res) => {
     const dislikes = Number(counts.rows[0].dislikes || 0);
 
     const updated = await pool.query(
-      `
-      UPDATE decks
-SET title = $1,
-    description = $2,
-    deck_code = $3
-WHERE id = $4
-RETURNING *
-      `,
-      [likes, dislikes, deckId]
-    );
+  `
+  UPDATE decks
+  SET likes = $1,
+      dislikes = $2
+  WHERE id = $3
+  RETURNING *
+  `,
+  [likes, dislikes, deckId]
+);
 
     res.json({
       ok:true,
