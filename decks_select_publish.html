@@ -649,7 +649,33 @@ function authHeaders(){
 }
     function getHero(deckCards){return deckCards.find(c=>String(c.type).toLowerCase().includes('герой'))||deckCards[0]||null}
     function getFirstFour(deckCards,hero){return deckCards.filter(c=>!hero||String(c.id)!==String(hero.id)).slice(0,4)}
-    function deckScore(deck){return(deck.likes||0)-(deck.dislikes||0)}
+    function deckPercent(deck){
+  const likes = deck.likes || 0;
+  const dislikes = deck.dislikes || 0;
+  const total = likes + dislikes;
+
+  if(total === 0) return 0;
+
+  return Math.round((likes / total) * 100);
+}
+
+function percentColor(percent){
+  if(percent <= 35) return "#8b0000";
+  if(percent <= 50) return "#ff4d4d";
+  if(percent <= 65) return "#ffd54f";
+  if(percent <= 80) return "#8bc34a";
+  return "#4caf50";
+}
+
+function deckScore(deck){
+  const likes = deck.likes || 0;
+  const dislikes = deck.dislikes || 0;
+  const total = likes + dislikes;
+
+  if(total === 0) return 0;
+
+  return (likes / total) * Math.log10(total + 1);
+}
     async function loadPlayerDecksFromServer(){
   serverPlayerDecks = [];
 
@@ -1056,7 +1082,9 @@ const copyCodeBtn = `<button class="vote" onclick="event.stopPropagation(); copy
     <div class="votes">
       <button class="vote ${myVotes[deck.id]==='up'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','up')">👍 ${deck.likes||0}</button>
       <button class="vote ${myVotes[deck.id]==='down'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','down')">👎 ${deck.dislikes||0}</button>
-      <span class="score">Рейтинг: ${deckScore(deck)}</span>
+      <span class="score" style="color:${percentColor(deckPercent(deck))}">
+  ${deckPercent(deck)}%
+</span>
       <button class="vote" onclick="event.stopPropagation(); openDeckView('${deck.id}','published')">Состав</button>
 ${copyCodeBtn}
 ${editBtn}
@@ -1451,7 +1479,7 @@ found.description = description;
     function renderTopDecks(){const top=[...publishedDecks].sort((a,b)=>deckScore(b)-deckScore(a));$('topDecks').innerHTML=top.length?top.map((d,i)=>renderDeckCard(d,i+1)).join(''):'<div class="empty">Топ появится после публикации колод.</div>'}
     function updateStats(){
       const local=getAvailableDecks();
-      const sortedByLikes=[...publishedDecks].sort((a,b)=>(b.likes||0)-(a.likes||0)||deckScore(b)-deckScore(a));
+      const sortedByLikes=[...publishedDecks].sort((a,b)=>deckScore(b)-deckScore(a));
       const best=sortedByLikes[0];
       const myBest=sortedByLikes[0];
 
