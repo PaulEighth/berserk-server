@@ -654,7 +654,7 @@ function authHeaders(){
   const dislikes = deck.dislikes || 0;
   const total = likes + dislikes;
 
-  if(total === 0) return 0;
+  if(total === 0) return null;
 
   return Math.round((likes / total) * 100);
 }
@@ -1082,9 +1082,10 @@ const copyCodeBtn = `<button class="vote" onclick="event.stopPropagation(); copy
     <div class="votes">
       <button class="vote ${myVotes[deck.id]==='up'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','up')">👍 ${deck.likes||0}</button>
       <button class="vote ${myVotes[deck.id]==='down'?'active':''}" onclick="event.stopPropagation(); voteDeck('${deck.id}','down')">👎 ${deck.dislikes||0}</button>
-      <span class="score" style="color:${percentColor(deckPercent(deck))}">
-  ${deckPercent(deck)}%
-</span>
+      ${deckPercent(deck) === null
+  ? `<span class="score" style="color:#b8ae9f">Процент ещё не выявлен</span>`
+  : `<span class="score" style="color:${percentColor(deckPercent(deck))}">${deckPercent(deck)}%</span>`
+}
       <button class="vote" onclick="event.stopPropagation(); openDeckView('${deck.id}','published')">Состав</button>
 ${copyCodeBtn}
 ${editBtn}
