@@ -23,6 +23,7 @@ function requireAdmin(req, res, next) {
 
 const JWT_SECRET = "berserk_secret_key";
 const PORT = process.env.PORT || 3000;
+const SITE_URL = "https://berserk-server.com";
 async function verifyToken(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
@@ -242,7 +243,42 @@ app.get("/api/status", (req, res) => {
     project: "Berserk Heroes Online"
   });
 });
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain");
+  res.send(`User-agent: *
+Allow: /
 
+Sitemap: ${SITE_URL}/sitemap.xml
+`);
+});
+
+app.get("/sitemap.xml", (req, res) => {
+  res.type("application/xml");
+
+  const pages = [
+    "",
+    "/BerserHeroesOnline.html",
+    "/deck-builder_checked.html",
+    "/decks_select_publish.html",
+    "/tournaments.html",
+    "/news.html",
+    "/chats.html",
+    "/support.html",
+    "/auth.html"
+  ];
+
+  const urls = pages.map(page => `
+  <url>
+    <loc>${SITE_URL}${page}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>${page === "" ? "1.0" : "0.8"}</priority>
+  </url>`).join("");
+
+  res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`);
+});
 
 
 // =========================
