@@ -1461,12 +1461,13 @@ found.description = description;
   ? `${escapeHtml(myBest.title)} 👍 ${myBest.likes || 0}`
   : '—';
       $('hallOfFameDeck').innerHTML = best
-  ? `${escapeHtml(best.title)} 👍 ${best.likes || 0}<br><span style="font-size:14px">Автор: ${roleNickHtml(
-      best.author,
-      best.author_role,
-      best.author_is_partner,
-      best.author_medals || {}
-    )}</span>`
+  ? `${escapeHtml(best.title)} 👍 ${best.likes || 0}
+     <br>
+     <span style="font-size:14px">
+       Автор: <b style="color:${escapeHtml(getDeckAuthorColor(best))}">
+         ${deckAuthorMedalsHtml(best)}${deckAuthorStarHtml(best)}${escapeHtml(best.author || "Не указан")}
+       </b>
+     </span>`
   : '—';
     }
     async function voteDeck(id, type){
