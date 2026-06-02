@@ -1457,8 +1457,17 @@ found.description = description;
 
       $('myDecksCount').textContent=local.length;
       $('siteDecksCount').textContent=publishedDecks.length;
-      $('myBestDeck').textContent=myBest ? `${myBest.title} 👍 ${myBest.likes||0}` : '—';
-      $('hallOfFameDeck').textContent=best ? `${best.title} 👍 ${best.likes||0}` : '—';
+      $('myBestDeck').innerHTML = myBest
+  ? `${escapeHtml(myBest.title)} 👍 ${myBest.likes || 0}`
+  : '—';
+      $('hallOfFameDeck').innerHTML = best
+  ? `${escapeHtml(best.title)} 👍 ${best.likes || 0}<br><span style="font-size:14px">Автор: ${roleNickHtml(
+      best.author,
+      best.author_role,
+      best.author_is_partner,
+      best.author_medals || {}
+    )}</span>`
+  : '—';
     }
     async function voteDeck(id, type){
   const old = myVotes[id];
