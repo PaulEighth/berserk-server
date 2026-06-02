@@ -607,7 +607,19 @@ function authHeaders(){
 
       no.onclick=close;
     }
+function formatDeckDate(value){
+  if(!value) return "дата неизвестна";
 
+  const date = new Date(value);
+
+  if(isNaN(date.getTime())) return "дата неизвестна";
+
+  return date.toLocaleDateString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
     function escapeHtml(str){return String(str??'').replace(/[&<>'"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[s]))}
     function toArray(value){if(Array.isArray(value))return value.filter(Boolean);if(value===undefined||value===null||value==='')return[];return String(value).split(/[,;\/|]+/).map(s=>s.trim()).filter(Boolean)}
     function normalizeElement(value){return String(value||'').trim().toLowerCase()}
@@ -1076,7 +1088,11 @@ const copyCodeBtn = `<button class="vote" onclick="event.stopPropagation(); copy
 
   return `<article class="deck-card" onclick="openDeckView('${deck.id}','published')" style="cursor:pointer">
     <h3>${rank?rank+'. ':''}${escapeHtml(deck.title)}</h3>
-    <div class="meta">Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorMedalsHtml(deck)}${deckAuthorStarHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b> · карт: ${deckCardCount(deck)}</div>
+    <div class="meta">
+  Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorMedalsHtml(deck)}${deckAuthorStarHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b>
+  · карт: ${deckCardCount(deck)}
+  · опубликовано: ${formatDeckDate(deck.created_at)}
+</div>
     <p class="meta deck-description-preview">${escapeHtml(deck.description||'Описание не добавлено.')}</p>
     ${deckPreviewHtml(deckCards, deck.previewIds || [])}
     <div class="votes">
@@ -1110,6 +1126,7 @@ ${editBtn}
   (isLocal?'Локальная колода':'Опубликованная колода') +
   ' · Автор: <b style="color:' + escapeHtml(getDeckAuthorColor(deck)) + '">' + deckAuthorMedalsHtml(deck) + deckAuthorStarHtml(deck) + escapeHtml(deck.author||'Не указан') + '</b> · карт: ' +
   deckCardCount(deck) +
+' · опубликовано: ' + formatDeckDate(deck.created_at) +
   (deck.description ? '<div class="deck-description-full">' + escapeHtml(deck.description) + '</div>' : '');
       $('viewDeckCards').innerHTML=deckCards.length?groupDeckCards(deckCards).map(({card,count})=>`<article style="background:rgba(255,255,255,.045);border:1px solid rgba(232,194,112,.15);border-radius:16px;padding:8px;text-align:center;position:relative"><div style="position:absolute;right:7px;top:7px;background:rgba(7,9,15,.86);border:1px solid rgba(240,210,139,.28);border-radius:999px;padding:4px 8px;font-size:12px;font-weight:950;color:#f0d28b">${count}x</div><img src="${escapeHtml(card.image||'')}" alt="${escapeHtml(card.name)}" title="${escapeHtml(card.name)}" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#111" onerror="this.style.visibility='hidden'"><div style="font-size:12px;font-weight:900;line-height:1.25;margin-top:7px;color:#f4efe6">${escapeHtml(card.name)}</div></article>`).join(''):'<div class="empty">Карты не найдены. Проверь cards.json и id карт.</div>';
       const canDeletePublished =
