@@ -2901,11 +2901,15 @@ app.patch("/api/decks/:id/vote", verifyToken, async (req, res) => {
       const previousType = oldVote.rows[0].vote_type;
 
       if (previousType === type) {
-        return res.status(400).json({
-          ok:false,
-          error:"Ты уже поставил эту оценку"
-        });
-      }
+  await pool.query(
+    `
+    DELETE FROM deck_votes
+    WHERE deck_id = $1
+    AND user_id = $2
+    `,
+    [deckId, userId]
+  );
+} else {
 
       await pool.query(
         `
@@ -2916,6 +2920,7 @@ app.patch("/api/decks/:id/vote", verifyToken, async (req, res) => {
         `,
         [type, deckId, userId]
       );
+      }
 
     } else {
 

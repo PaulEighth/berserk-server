@@ -1500,11 +1500,7 @@ found.description = description;
     }
     async function voteDeck(id, type){
   const old = myVotes[id];
-
-  if(old === type){
-    showToast("Ты уже поставил эту оценку");
-    return;
-  }
+const isCancel = old === type;
 
   try{
     if(!isLoggedIn()){
@@ -1524,8 +1520,13 @@ const response = await fetch(`https://berserk-server.com/api/decks/${id}/vote`, 
       throw new Error(data.error || "Не удалось поставить оценку");
     }
 
-    myVotes[id] = type;
-    saveVotes();
+    if(isCancel){
+  delete myVotes[id];
+} else {
+  myVotes[id] = type;
+}
+
+saveVotes();
 
     await loadPublishedDecksFromServer();
     renderAll();
