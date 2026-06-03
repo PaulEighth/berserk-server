@@ -221,7 +221,7 @@ function roleNickHtml(username, role, isPartner, medals = {}){
       ? '<span class="admin-star">⭐</span>'
       : (isPartner ? '<span class="partner-star">⭐</span>' : '');
 
-  return `${medalsPart ? medalsPart + " " : ""}${star}<span class="author ${roleClass(role)}">${escapeHtml(nick)}</span>`;
+  return `${star}<span class="author ${roleClass(role)}">${medalsPart ? medalsPart + " " : ""}${escapeHtml(nick)}</span>`;
 }
 function formatTime(value){
   const date = new Date(value);
@@ -251,9 +251,8 @@ function updateAuthUI(){
   if(authLink && user){
 
   authLink.innerHTML =
-  medalsHtml(user) +
   userStarHtml(user) +
-  `<span class="${roleClass(user.role)}">${user.username}</span>`;
+  `<span class="${roleClass(user.role)}">${medalsHtml(user)}${user.username}</span>`;
   authLink.style.visibility = "visible";
 
   authLink.classList.remove("gold");

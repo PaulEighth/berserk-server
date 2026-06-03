@@ -667,15 +667,28 @@ function roleClass(role){
     ? `role-${r}`
     : "role-user";
 }
+function parseMedals(user){
+  if(!user?.medals) return {};
 
+  if(typeof user.medals === "string"){
+    try{
+      return JSON.parse(user.medals || "{}");
+    }catch(e){
+      return {};
+    }
+  }
+
+  return user.medals || {};
+}
 function medalsHtml(user){
   const medals = parseMedals(user);
   const medalList = ["🏆","🥇","🥈","🥉","🎖️","🏅"];
 
-  return Object.entries(medals)
-    .filter(([,count]) => Number(count) > 0)
-    .map(([icon,count]) => `${icon}${count > 1 ? "x"+count : ""}`)
-    .join(" ") + (Object.keys(medals).length ? " " : "");
+  return medalList.map(medal => {
+    const count = Number(medals[medal] || 0);
+    if(count <= 0) return "";
+    return count > 1 ? `${medal}x${count}` : medal;
+  }).join(" ");
 }
 
 function userStarHtml(user){
@@ -708,9 +721,8 @@ function updateAuthUI(){
   if(user){
 
     authLink.innerHTML =
-      medalsHtml(user) +
-      userStarHtml(user) +
-      `<span class="${roleClass(user.role)}">${user.username}</span>`;
+  userStarHtml(user) +
+  `<span class="${roleClass(user.role)}">${medalsHtml(user)} ${user.username}</span>`;
 
     authLink.classList.remove("gold");
     authLink.classList.add("ghost");
