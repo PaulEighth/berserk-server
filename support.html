@@ -669,7 +669,8 @@ function roleClass(role){
 }
 
 function medalsHtml(user){
-  const medals = user?.medals || {};
+  const medals = parseMedals(user);
+  const medalList = ["🏆","🥇","🥈","🥉","🎖️","🏅"];
 
   return Object.entries(medals)
     .filter(([,count]) => Number(count) > 0)

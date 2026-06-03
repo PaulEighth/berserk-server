@@ -870,7 +870,7 @@ function parseMedals(user){
 
 function medalsHtml(user){
   const medals = parseMedals(user);
-  const medalList = ["🥇","🎖️","🏅","🏆","🥈","🥉"];
+  const medalList = ["🏆","🥇","🥈","🥉","🎖️","🏅"];
 
   return medalList.map(medal => {
     const count = Number(medals[medal] || 0);
