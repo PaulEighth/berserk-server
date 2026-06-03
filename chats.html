@@ -251,8 +251,7 @@ function updateAuthUI(){
   if(authLink && user){
 
   authLink.innerHTML =
-  userStarHtml(user) +
-  `<span class="${roleClass(user.role)}">${medalsHtml(user)}${user.username}</span>`;
+  `<span class="${roleClass(user.role)}">${medalsHtml(user)} ${userStarHtml(user)}${user.username}</span>`;
   authLink.style.visibility = "visible";
 
   authLink.classList.remove("gold");

@@ -720,9 +720,8 @@ function updateAuthUI(){
 
   if(user){
 
-    authLink.innerHTML =
-  userStarHtml(user) +
-  `<span class="${roleClass(user.role)}">${medalsHtml(user)} ${user.username}</span>`;
+   authLink.innerHTML =
+  `<span class="${roleClass(user.role)}">${medalsHtml(user)} ${userStarHtml(user)}${user.username}</span>`;
 
     authLink.classList.remove("gold");
     authLink.classList.add("ghost");
