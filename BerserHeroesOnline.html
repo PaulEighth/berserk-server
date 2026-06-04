@@ -346,17 +346,26 @@
       </div>
 
       <!-- Баннер -->
-      <div class="panel" style="
-        min-height:320px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        color:#777;
-        font-size:24px;
-        font-weight:900;
-      ">
-        Здесь могла быть ваша реклама
-      </div>
+      <div class="panel ad-banner">
+  <div>
+    <div class="kicker">Реклама</div>
+
+    <h3 style="
+      margin:10px 0 8px;
+      font-size:32px;
+      color:#fff;
+    ">
+      Здесь могла быть ваша реклама
+    </h3>
+
+    <p style="
+      margin:0;
+      color:#b8ae9f;
+    ">
+      Баннер партнёра, турнира или сообщества БГО
+    </p>
+  </div>
+</div>
 
     </div>
 
@@ -374,7 +383,25 @@
     <div class="reviews-grid" id="reviewsGrid"></div>
   </div>
 </section>
+.ad-banner{
+  height:150px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 
+  background:
+    radial-gradient(
+      circle at 20% 50%,
+      rgba(214,168,79,.12),
+      transparent 40%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.08),
+      rgba(255,255,255,.03)
+    );
+}
 <style>
 .reviews-grid {
   display: grid;
