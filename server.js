@@ -357,10 +357,18 @@ app.post("/api/register", async (req, res) => {
 
 
 
-    const existingUser = await pool.query(
-      "SELECT id FROM users WHERE username = $1 OR email = $2",
-      [username, email]
-    );
+    const tag = username.split("#")[1];
+
+const existingUser = await pool.query(
+  `
+  SELECT id, username, email
+  FROM users
+  WHERE LOWER(username) = LOWER($1)
+     OR LOWER(email) = LOWER($2)
+     OR split_part(username, '#', 2) = $3
+  `,
+  [username, email, tag]
+);
 
 
 
@@ -368,7 +376,7 @@ app.post("/api/register", async (req, res) => {
 
       return res.status(400).json({
         ok: false,
-        error: "Такой ник или email уже занят"
+        error: "Такой ник, email или номер после # уже занят"
       });
 
     }
