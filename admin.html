@@ -418,6 +418,17 @@
     </div>
   </div>
 
+  <div class="modal" id="deleteModal">
+    <div class="modal-box">
+      <h3>Удалить аккаунт?</h3>
+      <p id="deleteModalText"></p>
+      <div class="modal-actions">
+        <button class="btn red" id="confirmDeleteBtn">Удалить</button>
+        <button class="btn ghost" onclick="closeDeleteModal()">Отмена</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API_URL = "https://berserk-server.onrender.com";
     const ADMIN_USERNAME = "Eighth#2020";
@@ -805,33 +816,39 @@ async function deleteUser(userId, username){
 
   document.getElementById("deleteModal").classList.add("show");
 }
-document.getElementById("confirmDeleteBtn").addEventListener("click", async () => {
-  if(!deleteTargetUserId) return;
+document.addEventListener("DOMContentLoaded", () => {
+  const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
 
-  try{
-    const response = await fetch(`${API_URL}/admin/users/${deleteTargetUserId}`, {
-      method: "DELETE",
-      headers: {
-        "x-admin-username": currentUser.username
+  if(confirmDeleteBtn){
+    confirmDeleteBtn.addEventListener("click", async () => {
+      if(!deleteTargetUserId) return;
+
+      try{
+        const response = await fetch(`${API_URL}/admin/users/${deleteTargetUserId}`, {
+          method: "DELETE",
+          headers: {
+            "x-admin-username": currentUser.username
+          }
+        });
+
+        const data = await response.json();
+
+        if(!response.ok){
+          closeDeleteModal();
+          showInfo("Ошибка", data.error || "Не удалось удалить аккаунт.");
+          return;
+        }
+
+        closeDeleteModal();
+        showInfo("Готово", `Аккаунт ${data.user.username} удалён.`);
+        loadUsers();
+
+      }catch(error){
+        console.error(error);
+        closeDeleteModal();
+        showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
       }
     });
-
-    const data = await response.json();
-
-    if(!response.ok){
-      closeDeleteModal();
-      showInfo("Ошибка", data.error || "Не удалось удалить аккаунт.");
-      return;
-    }
-
-    closeDeleteModal();
-    showInfo("Готово", `Аккаунт ${data.user.username} удалён.`);
-    loadUsers();
-
-  }catch(error){
-    console.error(error);
-    closeDeleteModal();
-    showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
   }
 });
     function setupAuthButton(){
@@ -866,17 +883,6 @@ authBtn.innerHTML = medalsHtml(freshUser || currentUser) + userStarHtml(freshUse
 });
 
   </script>
-
-<div class="modal" id="deleteModal">
-  <div class="modal-box">
-    <h3>Удалить аккаунт?</h3>
-    <p id="deleteModalText"></p>
-    <div class="modal-actions">
-      <button class="btn red" id="confirmDeleteBtn">Удалить</button>
-      <button class="btn ghost" onclick="closeDeleteModal()">Отмена</button>
-    </div>
-  </div>
-</div>
 
 </body>
 </html>
