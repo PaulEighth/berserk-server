@@ -234,18 +234,64 @@
 </div>
   <div style="width:50%; color:white; margin-left:60px;">
 
-  <h2 style="font-size:32px; margin-bottom:20px;">
-    Комфорт для новичков и опытных игроков
+  <h2 style="
+    font-size:38px;
+    margin:0 0 26px;
+    color:#fff;
+    text-align:center;
+  ">
+    Роли
   </h2>
 
-  <h3>Опыт</h3>
-  <p>Фокус на реальных игровых сценариях, колодах и понятной подаче информации</p>
+  <div style="
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  ">
 
-  <h3>Комфорт</h3>
-  <p>Тёмный интерфейс, крупные блоки, аккуратная типографика и адаптация под телефон</p>
+    <div class="role-info-card">
+      <h3 style="color:#6f3cff;">Админ</h3>
+      <p>▫️ Фулл контроль</p>
+    </div>
 
-  <h3>Индивидуальный подход</h3>
-  <p>Можно быстро связаться с основателем и предложить раздел, турнир или новость</p>
+    <div class="role-info-card">
+      <h3 style="color:#0f7b43;">Девелопер</h3>
+      <p>▫️ 95% прав на сайте</p>
+      <p>▫️ + Все прочие права описанные ниже</p>
+      <p>▫️ Имеет право заходить в закрытые турниры даже если в них нет места или турнир закрытый</p>
+      <p>▫️ Только официальные разработчики БГО</p>
+    </div>
+
+    <div class="role-info-card">
+      <h3 style="color:#57d46a;">Модератор</h3>
+      <p>▫️ 95% прав на сайте</p>
+      <p>▫️ + Все прочие права описанные ниже</p>
+      <p>▫️ Имеет право заходить в закрытые турниры даже если в них нет места или турнир закрытый</p>
+    </div>
+
+    <div class="role-info-card">
+      <h3 style="color:#ff9d42;">Креатив</h3>
+      <p>▫️ Возможность публиковать новости</p>
+      <p>▫️ Возможность опубликовывать новости</p>
+    </div>
+
+    <div class="role-info-card">
+      <h3 style="color:#59c8ff;">VIP</h3>
+      <p>▫️ Чуть больше уважения, чем у обычного игрока</p>
+      <p>▫️ Дополнительных прав нет</p>
+    </div>
+
+    <div class="role-info-card">
+      <h3 style="color:#ffffff;">Юзер</h3>
+      <p>▫️ Чиловый игрок</p>
+    </div>
+
+    <div class="role-info-card" style="grid-column:1 / -1;">
+      <h3 style="color:#ff4d4d;">Банед</h3>
+      <p>▫️ Любимчик проекта ❤️</p>
+    </div>
+
+  </div>
 
 </div>
 
@@ -335,6 +381,28 @@
     rgba(240,210,139,.75),
     transparent
   );
+}
+.role-info-card{
+  min-height:130px;
+  padding:18px;
+  border-radius:20px;
+  background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.035));
+  border:1px solid rgba(232,194,112,.14);
+  box-shadow:0 16px 42px rgba(0,0,0,.22);
+}
+
+.role-info-card h3{
+  margin:0 0 12px;
+  font-size:24px;
+  font-weight:950;
+  text-shadow:0 0 16px currentColor;
+}
+
+.role-info-card p{
+  margin:6px 0;
+  color:#d7cec0;
+  line-height:1.45;
+  font-size:15px;
 }
 </style>
 
