@@ -228,6 +228,10 @@ await pool.query(`
     UNIQUE (community_id, user_id)
   )
 `);
+await pool.query(`
+  DELETE FROM community_votes
+  WHERE vote_type = 'down'
+`);
 }
 
 
@@ -1400,12 +1404,12 @@ app.post("/api/community/vote", verifyToken, async (req, res) => {
       });
     }
 
-    if(!["up","down"].includes(voteType)){
-      return res.status(400).json({
-        ok:false,
-        error:"Неверный тип оценки"
-      });
-    }
+    if(voteType !== "up"){
+  return res.status(400).json({
+    ok:false,
+    error:"Теперь доступны только лайки"
+  });
+}
 
     const existing = await pool.query(`
       SELECT *
