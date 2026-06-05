@@ -444,6 +444,7 @@
 };
 const medalList = ["🏆","🥇","🥈","🥉","🎖️","🏅"];
 let allUsers = [];
+let currentRoleFilter = "all";
     const roles = [
   "user",
   "developer",
@@ -578,11 +579,13 @@ function renderMedalEditor(user){
     </div>
   `;
 }
+
 function renderUsersStats(users){
   const box = document.getElementById("usersStats");
   if(!box) return;
 
   const counts = {};
+
   users.forEach(user => {
     const role = user.role || "user";
     counts[role] = (counts[role] || 0) + 1;
@@ -591,19 +594,36 @@ function renderUsersStats(users){
   const orderedRoles = ["admin","developer","moderator","creator","vip","user","banned"];
 
   box.innerHTML = `
-    <span class="stat-pill">
+    <span class="stat-pill"
+          style="cursor:pointer;${currentRoleFilter === "all" ? "border-color:rgba(240,210,139,.65);background:rgba(214,168,79,.18);" : ""}"
+          onclick="filterByRole('all')">
       Всего аккаунтов: <b>${users.length}</b>
     </span>
+
     ${orderedRoles.map(role => `
-      <span class="stat-pill" style="color:${roleColors[role] || "#ffffff"}">
+      <span class="stat-pill"
+            style="cursor:pointer;color:${roleColors[role] || "#ffffff"};${currentRoleFilter === role ? "border-color:rgba(240,210,139,.65);background:rgba(214,168,79,.18);" : ""}"
+            onclick="filterByRole('${role}')">
         ${role}: <b>${counts[role] || 0}</b>
       </span>
     `).join("")}
   `;
 }
-    function renderUsers(users){
+
+function filterByRole(role){
+  currentRoleFilter = role;
+  renderUsersStats(allUsers);
+  renderUsers(allUsers);
+}
+
+function renderUsers(users){
       const body = document.getElementById("usersBody");
       const search = String(document.getElementById("userSearchInput")?.value || "").trim().toLowerCase();
+      if(currentRoleFilter !== "all"){
+  users = users.filter(
+    user => (user.role || "user") === currentRoleFilter
+  );
+}
 
 if(search){
   users = users.filter(user =>
