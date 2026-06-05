@@ -141,7 +141,7 @@
       </div>
 
       <div class="links-list">
-        <article class="community-card" data-id="youtube-example-1">
+        <article class="community-card" data-id="youtube-example-21">
           <div class="person-main">
             <div class="person-name">Shedy#2157</div>
             <div class="person-desc">Обзоры, стримы</div>
@@ -155,7 +155,7 @@
         </article>
 
         <div class="links-list">
-        <article class="community-card" data-id="youtube-example-1">
+        <article class="community-card" data-id="youtube-example-20">
           <div class="person-main">
             <div class="person-name">ValdisMinski#2583</div>
             <div class="person-desc">Обзоры, стримы</div>
@@ -169,7 +169,7 @@
         </article>
 
         <div class="links-list">
-        <article class="community-card" data-id="youtube-example-1">
+        <article class="community-card" data-id="youtube-example-19">
           <div class="person-main">
             <div class="person-name">aJleHxauD#2061</div>
             <div class="person-desc">Обзоры, стримы</div>
@@ -588,27 +588,27 @@
       return "#4caf50";
     }
 
-    function getVotes(){
-  try{return JSON.parse(localStorage.getItem("communityVotes") || "{}")}catch(e){return {}}
-}
+    const COMMUNITY_API = "/api/community";
 
-function saveVotes(votes){
-  localStorage.setItem("communityVotes", JSON.stringify(votes));
-}
+let communityVotesCache = {};
+let communityMyVotesCache = {};
 
-function getMyVotes(){
-  try{return JSON.parse(localStorage.getItem("communityMyVotes") || "{}")}catch(e){return {}}
-}
+async function loadCommunityVotes(){
+  const token = localStorage.getItem("token");
 
-function saveMyVotes(votes){
-  localStorage.setItem("communityMyVotes", JSON.stringify(votes));
+  const response = await fetch(COMMUNITY_API + "/votes", {
+    headers: token ? { "Authorization":"Bearer " + token } : {}
+  });
+
+  const data = await response.json();
+
+  communityVotesCache = data.votes || {};
+  communityMyVotesCache = data.myVotes || {};
 }
 
 function updateCard(card){
   const id = card.dataset.id;
-  const votes = getVotes();
-  const myVotes = getMyVotes();
-  const item = votes[id] || { likes:0, dislikes:0 };
+  const item = communityVotesCache[id] || { likes:0, dislikes:0 };
   const likes = Number(item.likes || 0);
   const dislikes = Number(item.dislikes || 0);
   const percent = getPercent(likes, dislikes);
@@ -620,8 +620,8 @@ function updateCard(card){
   card.querySelector(".likes").textContent = likes;
   card.querySelector(".dislikes").textContent = dislikes;
 
-  likeBtn.classList.toggle("active", myVotes[id] === "up");
-  dislikeBtn.classList.toggle("active", myVotes[id] === "down");
+  likeBtn.classList.toggle("active", communityMyVotesCache[id] === "up");
+  dislikeBtn.classList.toggle("active", communityMyVotesCache[id] === "down");
 
   if(percent === null){
     percentBox.textContent = "Не оценено";
@@ -632,39 +632,51 @@ function updateCard(card){
   }
 }
 
-function voteCommunityLink(card, type){
-  const id = card.dataset.id;
-  const votes = getVotes();
-  const myVotes = getMyVotes();
+async function voteCommunityLink(card, type){
+  const token = localStorage.getItem("token");
 
-  votes[id] = votes[id] || { likes:0, dislikes:0 };
-  const previous = myVotes[id];
-
-  if(previous === type){
-    if(type === "up") votes[id].likes = Math.max(0, Number(votes[id].likes || 0) - 1);
-    else votes[id].dislikes = Math.max(0, Number(votes[id].dislikes || 0) - 1);
-    delete myVotes[id];
-  }else{
-    if(previous === "up") votes[id].likes = Math.max(0, Number(votes[id].likes || 0) - 1);
-    if(previous === "down") votes[id].dislikes = Math.max(0, Number(votes[id].dislikes || 0) - 1);
-
-    if(type === "up") votes[id].likes = Number(votes[id].likes || 0) + 1;
-    else votes[id].dislikes = Number(votes[id].dislikes || 0) + 1;
-
-    myVotes[id] = type;
+  if(!token){
+    alert("Чтобы голосовать, нужно войти в аккаунт.");
+    return;
   }
 
-  saveVotes(votes);
-  saveMyVotes(myVotes);
-  updateCard(card);
+  const response = await fetch(COMMUNITY_API + "/vote", {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":"Bearer " + token
+    },
+    body:JSON.stringify({
+      communityId: card.dataset.id,
+      voteType: type
+    })
+  });
+
+  const data = await response.json();
+
+  if(!data.ok){
+    alert(data.error || "Ошибка голосования");
+    return;
+  }
+
+  communityVotesCache = data.votes || {};
+  communityMyVotesCache = data.myVotes || {};
+
+  document.querySelectorAll(".community-card").forEach(updateCard);
 }
 
-document.querySelectorAll(".community-card").forEach(card => {
-  updateCard(card);
-  card.querySelectorAll(".vote-btn").forEach(btn => {
-    btn.addEventListener("click", () => voteCommunityLink(card, btn.dataset.vote));
+async function initCommunityVotes(){
+  await loadCommunityVotes();
+
+  document.querySelectorAll(".community-card").forEach(card => {
+    updateCard(card);
+
+    card.querySelectorAll(".vote-btn").forEach(btn => {
+      btn.addEventListener("click", () => voteCommunityLink(card, btn.dataset.vote));
+    });
   });
-});
+}
+
 initCommunityVotes();
 
     setupAuthButton();

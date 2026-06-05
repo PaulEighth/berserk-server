@@ -1314,6 +1314,123 @@ app.delete("/api/site-chats/:channel/messages/:id", verifyToken, async (req,res)
     });
   }
 });
+async function getCommunityVotesPayload(userId){
+  const counts = await pool.query(`
+    SELECT
+      community_id,
+      COUNT(*) FILTER (WHERE vote_type = 'up') AS likes,
+      COUNT(*) FILTER (WHERE vote_type = 'down') AS dislikes
+    FROM community_votes
+    GROUP BY community_id
+  `);
+
+  const votes = {};
+
+  counts.rows.forEach(row => {
+    votes[row.community_id] = {
+      likes: Number(row.likes || 0),
+      dislikes: Number(row.dislikes || 0)
+    };
+  });
+
+  const myVotes = {};
+
+  if(userId){
+    const mine = await pool.query(`
+      SELECT community_id, vote_type
+      FROM community_votes
+      WHERE user_id = $1
+    `, [userId]);
+
+    mine.rows.forEach(row => {
+      myVotes[row.community_id] = row.vote_type;
+    });
+  }
+
+  return { votes, myVotes };
+}
+
+app.get("/api/community/votes", async (req, res) => {
+  try {
+    let userId = null;
+
+    const authHeader = req.headers.authorization;
+    if(authHeader && authHeader.startsWith("Bearer ")){
+      try{
+        const token = authHeader.split(" ")[1];
+        const decoded = jwt.verify(token, JWT_SECRET, { ignoreExpiration:true });
+        userId = decoded.id;
+      }catch(e){}
+    }
+
+    const payload = await getCommunityVotesPayload(userId);
+
+    res.json({
+      ok:true,
+      ...payload
+    });
+
+  } catch(error) {
+    res.status(500).json({
+      ok:false,
+      error:error.message
+    });
+  }
+});
+
+app.post("/api/community/vote", verifyToken, async (req, res) => {
+  try {
+    const communityId = String(req.body.communityId || "").trim();
+    const voteType = String(req.body.voteType || "").trim();
+
+    if(!communityId){
+      return res.status(400).json({
+        ok:false,
+        error:"Нет ID карточки"
+      });
+    }
+
+    if(!["up","down"].includes(voteType)){
+      return res.status(400).json({
+        ok:false,
+        error:"Неверный тип оценки"
+      });
+    }
+
+    const existing = await pool.query(`
+      SELECT *
+      FROM community_votes
+      WHERE community_id = $1 AND user_id = $2
+    `, [communityId, req.user.id]);
+
+    if(existing.rows.length && existing.rows[0].vote_type === voteType){
+      await pool.query(`
+        DELETE FROM community_votes
+        WHERE community_id = $1 AND user_id = $2
+      `, [communityId, req.user.id]);
+    }else{
+      await pool.query(`
+        INSERT INTO community_votes (community_id, user_id, vote_type)
+        VALUES ($1,$2,$3)
+        ON CONFLICT (community_id, user_id)
+        DO UPDATE SET vote_type = EXCLUDED.vote_type
+      `, [communityId, req.user.id, voteType]);
+    }
+
+    const payload = await getCommunityVotesPayload(req.user.id);
+
+    res.json({
+      ok:true,
+      ...payload
+    });
+
+  } catch(error) {
+    res.status(500).json({
+      ok:false,
+      error:error.message
+    });
+  }
+});
 // =========================
 // ТУРНИРЫ
 // =========================
