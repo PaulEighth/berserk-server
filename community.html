@@ -588,33 +588,27 @@
       return "#4caf50";
     }
 
-    const COMMUNITY_API = "https://berserk-server.com/api/community";
+    function getVotes(){
+  try{return JSON.parse(localStorage.getItem("communityVotes") || "{}")}catch(e){return {}}
+}
 
-let communityVotesCache = {};
-let communityMyVotesCache = {};
+function saveVotes(votes){
+  localStorage.setItem("communityVotes", JSON.stringify(votes));
+}
 
-async function loadCommunityVotes(){
-  try{
-    const response = await fetch(COMMUNITY_API + "/votes", {
-      headers:{
-        "Authorization":"Bearer " + localStorage.getItem("token")
-      }
-    });
+function getMyVotes(){
+  try{return JSON.parse(localStorage.getItem("communityMyVotes") || "{}")}catch(e){return {}}
+}
 
-    const data = await response.json();
-
-    communityVotesCache = data.votes || {};
-    communityMyVotesCache = data.myVotes || {};
-  }catch(error){
-    console.error("Ошибка загрузки голосов:", error);
-    communityVotesCache = {};
-    communityMyVotesCache = {};
-  }
+function saveMyVotes(votes){
+  localStorage.setItem("communityMyVotes", JSON.stringify(votes));
 }
 
 function updateCard(card){
   const id = card.dataset.id;
-  const item = communityVotesCache[id] || { likes:0, dislikes:0 };
+  const votes = getVotes();
+  const myVotes = getMyVotes();
+  const item = votes[id] || { likes:0, dislikes:0 };
   const likes = Number(item.likes || 0);
   const dislikes = Number(item.dislikes || 0);
   const percent = getPercent(likes, dislikes);
@@ -626,8 +620,8 @@ function updateCard(card){
   card.querySelector(".likes").textContent = likes;
   card.querySelector(".dislikes").textContent = dislikes;
 
-  likeBtn.classList.toggle("active", communityMyVotesCache[id] === "up");
-  dislikeBtn.classList.toggle("active", communityMyVotesCache[id] === "down");
+  likeBtn.classList.toggle("active", myVotes[id] === "up");
+  dislikeBtn.classList.toggle("active", myVotes[id] === "down");
 
   if(percent === null){
     percentBox.textContent = "Не оценено";
@@ -638,58 +632,39 @@ function updateCard(card){
   }
 }
 
-async function voteCommunityLink(card, type){
-  const token = localStorage.getItem("token");
-
-  if(!token){
-    alert("Чтобы голосовать, нужно войти в аккаунт.");
-    return;
-  }
-
+function voteCommunityLink(card, type){
   const id = card.dataset.id;
+  const votes = getVotes();
+  const myVotes = getMyVotes();
 
-  try{
-    const response = await fetch(COMMUNITY_API + "/vote", {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "Authorization":"Bearer " + token
-      },
-      body:JSON.stringify({
-        id,
-        vote:type
-      })
-    });
+  votes[id] = votes[id] || { likes:0, dislikes:0 };
+  const previous = myVotes[id];
 
-    const data = await response.json();
+  if(previous === type){
+    if(type === "up") votes[id].likes = Math.max(0, Number(votes[id].likes || 0) - 1);
+    else votes[id].dislikes = Math.max(0, Number(votes[id].dislikes || 0) - 1);
+    delete myVotes[id];
+  }else{
+    if(previous === "up") votes[id].likes = Math.max(0, Number(votes[id].likes || 0) - 1);
+    if(previous === "down") votes[id].dislikes = Math.max(0, Number(votes[id].dislikes || 0) - 1);
 
-    if(!data.ok){
-      throw new Error(data.error || "Ошибка голосования");
-    }
+    if(type === "up") votes[id].likes = Number(votes[id].likes || 0) + 1;
+    else votes[id].dislikes = Number(votes[id].dislikes || 0) + 1;
 
-    communityVotesCache = data.votes || {};
-    communityMyVotesCache = data.myVotes || {};
-
-    document.querySelectorAll(".community-card").forEach(updateCard);
-
-  }catch(error){
-    console.error(error);
-    alert(error.message || "Не удалось поставить оценку.");
+    myVotes[id] = type;
   }
+
+  saveVotes(votes);
+  saveMyVotes(myVotes);
+  updateCard(card);
 }
 
-async function initCommunityVotes(){
-  await loadCommunityVotes();
-
-  document.querySelectorAll(".community-card").forEach(card => {
-    updateCard(card);
-
-    card.querySelectorAll(".vote-btn").forEach(btn => {
-      btn.addEventListener("click", () => voteCommunityLink(card, btn.dataset.vote));
-    });
+document.querySelectorAll(".community-card").forEach(card => {
+  updateCard(card);
+  card.querySelectorAll(".vote-btn").forEach(btn => {
+    btn.addEventListener("click", () => voteCommunityLink(card, btn.dataset.vote));
   });
-}
-
+});
 initCommunityVotes();
 
     setupAuthButton();
