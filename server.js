@@ -218,6 +218,16 @@ await pool.query(`
     created_at TIMESTAMP DEFAULT NOW()
   )
 `);
+await pool.query(`
+  CREATE TABLE IF NOT EXISTS community_votes (
+    id SERIAL PRIMARY KEY,
+    community_id TEXT NOT NULL,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    vote_type TEXT NOT NULL CHECK (vote_type IN ('up','down')),
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (community_id, user_id)
+  )
+`);
 }
 
 
