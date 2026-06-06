@@ -232,6 +232,11 @@ await pool.query(`
   DELETE FROM community_votes
   WHERE vote_type = 'down'
 `);
+
+await pool.query(`
+  ALTER TABLE decks
+  ADD COLUMN IF NOT EXISTS update_history JSONB DEFAULT '[]'
+`);
 }
 
 
@@ -2918,14 +2923,7 @@ deck_code || ""
 });
 app.patch("/api/decks/:id", verifyToken, async (req, res) => {
   try {
-    const {
-  title,
-  description,
-  deck_code,
-  cards,
-  preview_ids,
-  update_history
-} = req.body;
+    const { title, description, deck_code, cards, preview_ids } = req.body;
 
     const deckResult = await pool.query(
       "SELECT * FROM decks WHERE id = $1",
@@ -2933,104 +2931,149 @@ app.patch("/api/decks/:id", verifyToken, async (req, res) => {
     );
 
     if (deckResult.rows.length === 0) {
-      return res.status(404).json({
-        ok: false,
-        error: "Колода не найдена"
-      });
+      return res.status(404).json({ ok:false, error:"Колода не найдена" });
     }
 
     const deck = deckResult.rows[0];
+
     const isOwner = Number(deck.author_id) === Number(req.user.id);
     const isAdmin = ["admin", "developer", "moderator"].includes(req.user.role);
 
     if (!isOwner && !isAdmin) {
       return res.status(403).json({
-        ok: false,
-        error: "Редактировать колоду может только автор колоды"
+        ok:false,
+        error:"Редактировать колоду может только автор колоды"
       });
     }
 
     function parseArray(value){
-  if(Array.isArray(value)) return value;
-  try{return JSON.parse(value || "[]");}
-  catch(e){return [];}
-}
+      if(Array.isArray(value)) return value;
+      try{return JSON.parse(value || "[]");}
+      catch(e){return [];}
+    }
 
-function countIds(list){
-  const result = {};
-  parseArray(list).forEach(id=>{
-    const key = String(typeof id === "object" ? id.id : id);
-    result[key] = (result[key] || 0) + 1;
-  });
-  return result;
-}
+    function countIds(list){
+      const result = {};
+      parseArray(list).forEach(id=>{
+        const key = String(typeof id === "object" ? id.id : id);
+        result[key] = (result[key] || 0) + 1;
+      });
+      return result;
+    }
 
-const oldCards = parseArray(deck.cards).map(String);
-const newCards = Array.isArray(cards) ? cards.map(String) : oldCards;
+    const oldCards = parseArray(deck.cards).map(String);
+    const newCards = Array.isArray(cards) ? cards.map(String) : oldCards;
 
-const oldMap = countIds(oldCards);
-const newMap = countIds(newCards);
-const allIds = [...new Set([...Object.keys(oldMap), ...Object.keys(newMap)])];
+    const oldMap = countIds(oldCards);
+    const newMap = countIds(newCards);
+    const allIds = [...new Set([...Object.keys(oldMap), ...Object.keys(newMap)])];
 
-const added = [];
-const removed = [];
+    const added = [];
+    const removed = [];
 
-allIds.forEach(id=>{
-  const diff = (newMap[id] || 0) - (oldMap[id] || 0);
-
-  if(diff > 0){
-    added.push({ id, count: diff });
-  }
-
-  if(diff < 0){
-    removed.push({ id, count: Math.abs(diff) });
-  }
-});
-
-const oldHistory = parseArray(deck.update_history);
-const finalHistory =
-  added.length || removed.length
-    ? [
-        ...oldHistory,
-        {
-          date: new Date().toISOString(),
-          added,
-          removed
-        }
-      ]
-    : oldHistory;
-
-const result = await pool.query(`
-  UPDATE decks
-  SET
-    title = $1,
-    description = $2,
-    deck_code = $3,
-    cards = $4,
-    preview_ids = $5,
-    update_history = $6
-  WHERE id = $7
-  RETURNING *
-`, [
-  title || deck.title,
-  description ?? deck.description ?? "",
-  deck_code ?? deck.deck_code ?? "",
-  JSON.stringify(newCards),
-  JSON.stringify(Array.isArray(preview_ids) ? preview_ids : parseArray(deck.preview_ids)),
-  JSON.stringify(finalHistory),
-  req.params.id
-]);
-
-    res.json({
-      ok: true,
-      deck: result.rows[0]
+    allIds.forEach(id=>{
+      const diff = (newMap[id] || 0) - (oldMap[id] || 0);
+      if(diff > 0) added.push({ id, count:diff });
+      if(diff < 0) removed.push({ id, count:Math.abs(diff) });
     });
+
+    const oldHistory = parseArray(deck.update_history);
+
+    const finalHistory =
+      added.length || removed.length
+        ? [
+            ...oldHistory,
+            {
+              date:new Date().toISOString(),
+              author_id:req.user.id,
+              author_name:req.user.username,
+              added,
+              removed
+            }
+          ]
+        : oldHistory;
+
+    const result = await pool.query(`
+      UPDATE decks
+      SET
+        title = $1,
+        description = $2,
+        deck_code = $3,
+        cards = $4,
+        preview_ids = $5,
+        update_history = $6
+      WHERE id = $7
+      RETURNING *
+    `, [
+      title || deck.title,
+      description ?? deck.description ?? "",
+      deck_code ?? deck.deck_code ?? "",
+      JSON.stringify(newCards),
+      JSON.stringify(Array.isArray(preview_ids) ? preview_ids : parseArray(deck.preview_ids)),
+      JSON.stringify(finalHistory),
+      req.params.id
+    ]);
+
+    res.json({ ok:true, deck:result.rows[0] });
 
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      error: error.message
-    });
+    res.status(500).json({ ok:false, error:error.message });
+  }
+});
+app.delete("/api/decks/:id/history/:index", verifyToken, async (req, res) => {
+  try {
+    const deckResult = await pool.query(
+      "SELECT * FROM decks WHERE id = $1",
+      [req.params.id]
+    );
+
+    if(deckResult.rows.length === 0){
+      return res.status(404).json({ ok:false, error:"Колода не найдена" });
+    }
+
+    const deck = deckResult.rows[0];
+
+    const isOwner = Number(deck.author_id) === Number(req.user.id);
+    const isAdmin = ["admin", "developer", "moderator"].includes(req.user.role);
+
+    if(!isOwner && !isAdmin){
+      return res.status(403).json({
+        ok:false,
+        error:"Удалить обновление может только автор колоды или модерация"
+      });
+    }
+
+    let history = [];
+    try{
+      history = Array.isArray(deck.update_history)
+        ? deck.update_history
+        : JSON.parse(deck.update_history || "[]");
+    }catch(e){
+      history = [];
+    }
+
+    const index = Number(req.params.index);
+
+    if(!Number.isInteger(index) || index < 0 || index >= history.length){
+      return res.status(400).json({ ok:false, error:"Такого обновления нет" });
+    }
+
+    history.splice(index, 1);
+
+    const result = await pool.query(`
+      UPDATE decks
+      SET update_history = $1
+      WHERE id = $2
+      RETURNING *
+    `, [
+      JSON.stringify(history),
+      req.params.id
+    ]);
+
+    res.json({ ok:true, deck:result.rows[0] });
+
+  }catch(error){
+    res.status(500).json({ ok:false, error:error.message });
   }
 });
 // Удалить опубликованную колоду
