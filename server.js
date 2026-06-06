@@ -2950,7 +2950,57 @@ app.patch("/api/decks/:id", verifyToken, async (req, res) => {
       });
     }
 
-    const result = await pool.query(`
+    function parseArray(value){
+  if(Array.isArray(value)) return value;
+  try{return JSON.parse(value || "[]");}
+  catch(e){return [];}
+}
+
+function countIds(list){
+  const result = {};
+  parseArray(list).forEach(id=>{
+    const key = String(typeof id === "object" ? id.id : id);
+    result[key] = (result[key] || 0) + 1;
+  });
+  return result;
+}
+
+const oldCards = parseArray(deck.cards).map(String);
+const newCards = Array.isArray(cards) ? cards.map(String) : oldCards;
+
+const oldMap = countIds(oldCards);
+const newMap = countIds(newCards);
+const allIds = [...new Set([...Object.keys(oldMap), ...Object.keys(newMap)])];
+
+const added = [];
+const removed = [];
+
+allIds.forEach(id=>{
+  const diff = (newMap[id] || 0) - (oldMap[id] || 0);
+
+  if(diff > 0){
+    added.push({ id, count: diff });
+  }
+
+  if(diff < 0){
+    removed.push({ id, count: Math.abs(diff) });
+  }
+});
+
+const oldHistory = parseArray(deck.update_history);
+const finalHistory =
+  added.length || removed.length
+    ? [
+        ...oldHistory,
+        {
+          date: new Date().toISOString(),
+          added,
+          removed
+        }
+      ]
+    : oldHistory;
+
+const result = await pool.query(`
   UPDATE decks
   SET
     title = $1,
@@ -2963,11 +3013,11 @@ app.patch("/api/decks/:id", verifyToken, async (req, res) => {
   RETURNING *
 `, [
   title || deck.title,
-  description || "",
-  deck_code || "",
-  JSON.stringify(cards || []),
-  JSON.stringify(preview_ids || []),
-  JSON.stringify(update_history || []),
+  description ?? deck.description ?? "",
+  deck_code ?? deck.deck_code ?? "",
+  JSON.stringify(newCards),
+  JSON.stringify(Array.isArray(preview_ids) ? preview_ids : parseArray(deck.preview_ids)),
+  JSON.stringify(finalHistory),
   req.params.id
 ]);
 

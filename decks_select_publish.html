@@ -1172,24 +1172,99 @@ function renderDeckHistory(deck){
   const last = history[history.length - 1];
   const added = Array.isArray(last.added) ? last.added : [];
   const removed = Array.isArray(last.removed) ? last.removed : [];
-  const when = last.date ? new Date(last.date).toLocaleString('ru-RU') : '';
+  const when = last.date ? formatDeckDate(last.date) : '';
 
   if(!added.length && !removed.length) return '';
 
-  const removedHtml = removed.map(item =>
-    `<span class="deck-change-pill removed">❌ ${escapeHtml(item.name || cardNameById(item.id))}${item.count > 1 ? ' x' + item.count : ''}</span>`
-  ).join('');
+  function historyCard(item,type){
+    const card = cardById(item.id);
+    const name = item.name || card?.name || ('Карта ' + item.id);
+    const image = card?.image || '';
+    const isAdd = type === 'added';
 
-  const addedHtml = added.map(item =>
-    `<span class="deck-change-pill added">✅ ${escapeHtml(item.name || cardNameById(item.id))}${item.count > 1 ? ' x' + item.count : ''}</span>`
-  ).join('');
+    return `
+      <article style="
+        position:relative;
+        background:${isAdd ? 'rgba(123,216,143,.10)' : 'rgba(255,107,107,.10)'};
+        border:1px solid ${isAdd ? 'rgba(123,216,143,.28)' : 'rgba(255,107,107,.28)'};
+        border-radius:18px;
+        padding:10px;
+        text-align:center;
+      ">
+        <div style="
+          position:absolute;
+          left:8px;
+          top:8px;
+          color:${isAdd ? '#7bd88f' : '#ff6b6b'};
+          font-size:22px;
+          font-weight:950;
+        ">${isAdd ? '✓' : '✕'}</div>
 
-  return `<div class="deck-history">
-    <h3>История обновления колоды</h3>
-    <div class="deck-history-time">${when ? 'Изменено: ' + escapeHtml(when) : ''}</div>
-    ${removedHtml ? `<div class="deck-history-list" style="margin-bottom:8px">${removedHtml}</div>` : ''}
-    ${addedHtml ? `<div class="deck-history-list">${addedHtml}</div>` : ''}
-  </div>`;
+        <div style="
+          position:absolute;
+          right:8px;
+          top:8px;
+          background:rgba(7,9,15,.88);
+          border:1px solid rgba(240,210,139,.32);
+          color:var(--gold2);
+          border-radius:999px;
+          padding:4px 8px;
+          font-size:12px;
+          font-weight:950;
+        ">${item.count || 1}x</div>
+
+        <img src="${escapeHtml(image)}" alt="${escapeHtml(name)}" style="
+          width:76px;
+          height:102px;
+          object-fit:cover;
+          border-radius:12px;
+          background:#111;
+          border:1px solid rgba(232,194,112,.18);
+        " onerror="this.style.visibility='hidden'">
+
+        <div style="
+          margin-top:8px;
+          font-size:13px;
+          font-weight:900;
+          line-height:1.25;
+          color:#fff;
+        ">${escapeHtml(name)}</div>
+      </article>
+    `;
+  }
+
+  return `
+    <section style="
+      margin:18px 0 22px;
+      padding:18px;
+      border-radius:24px;
+      background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.045));
+      border:1px solid rgba(232,194,112,.15);
+      box-shadow:0 22px 60px rgba(0,0,0,.22);
+    ">
+      <h3 style="margin:0 0 8px;color:var(--gold2);font-size:24px">
+        История обновления колоды
+      </h3>
+
+      <div class="meta" style="margin-bottom:16px">
+        Изменено: ${escapeHtml(when)}
+      </div>
+
+      ${added.length ? `
+        <h4 style="margin:0 0 10px;color:#7bd88f;font-size:18px">➕ Добавлены:</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;margin-bottom:18px">
+          ${added.map(item=>historyCard(item,'added')).join('')}
+        </div>
+      ` : ''}
+
+      ${removed.length ? `
+        <h4 style="margin:0 0 10px;color:#ff6b6b;font-size:18px">➖ Удалены:</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px">
+          ${removed.map(item=>historyCard(item,'removed')).join('')}
+        </div>
+      ` : ''}
+    </section>
+  `;
 }
 
 function editPublishedDeckCards(deckId){
