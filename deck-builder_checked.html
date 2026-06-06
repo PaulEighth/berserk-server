@@ -908,6 +908,57 @@ function authHeaders(){
     "Authorization": `Bearer ${localStorage.getItem("token")}`
   };
 }
+function countCardsById(list){
+  const result = {};
+  (list || []).forEach(item => {
+    const id = typeof item === 'object' ? item.id : item;
+    if(id === undefined || id === null) return;
+    const key = String(id);
+    result[key] = (result[key] || 0) + 1;
+  });
+  return result;
+}
+
+function findCardNameById(id){
+  const found = cards.find(card => String(card.id) === String(id));
+  return found ? found.name : ('Карта ' + id);
+}
+
+function buildDeckChangeHistory(oldCards, newCards){
+  const oldMap = countCardsById(oldCards || []);
+  const newMap = countCardsById(newCards || []);
+  const ids = [...new Set([...Object.keys(oldMap), ...Object.keys(newMap)])];
+
+  const added = [];
+  const removed = [];
+
+  ids.forEach(id => {
+    const diff = (newMap[id] || 0) - (oldMap[id] || 0);
+    if(diff > 0){
+      added.push({ id, name: findCardNameById(id), count: diff });
+    }
+    if(diff < 0){
+      removed.push({ id, name: findCardNameById(id), count: Math.abs(diff) });
+    }
+  });
+
+  return { added, removed };
+}
+
+function makePreviewIdsForUpdatedDeck(newCards, oldPreviewIds){
+  const newIds = newCards.map(card => String(card.id));
+  const uniqueNewIds = [...new Set(newIds)];
+  const kept = (oldPreviewIds || []).map(String).filter(id => uniqueNewIds.includes(id));
+  const filled = [...kept];
+
+  for(const id of uniqueNewIds){
+    if(filled.length >= 4) break;
+    if(!filled.includes(id)) filled.push(id);
+  }
+
+  return filled.slice(0, 4);
+}
+
 async function saveEditedDeck(){
   if(!editingDeckData){
     showCustomAlert('Нет колоды для редактирования.');
@@ -925,6 +976,56 @@ async function saveEditedDeck(){
     return;
   }
 
+  const newCardIds = deck.map(card => String(card.id));
+  const previewIds = makePreviewIdsForUpdatedDeck(deck, editingDeckData.previewIds || []);
+
+  if(editingDeckData.mode === 'published'){
+    const diff = buildDeckChangeHistory(editingDeckData.originalCards || [], newCardIds);
+    const oldHistory = Array.isArray(editingDeckData.updateHistory) ? editingDeckData.updateHistory : [];
+    const updateHistory = (diff.added.length || diff.removed.length)
+      ? [...oldHistory, {
+          date:new Date().toISOString(),
+          added:diff.added,
+          removed:diff.removed
+        }]
+      : oldHistory;
+
+    try{
+      const response = await fetch(`https://berserk-server.com/api/decks/${editingDeckData.publishedId || editingDeckData.serverId}`, {
+        method:'PATCH',
+        headers:authHeaders(),
+        body:JSON.stringify({
+          title:editingDeckData.title || 'Колода',
+          description:editingDeckData.description || '',
+          deck_code:editingDeckData.deckCode || '',
+          cards:newCardIds,
+          preview_ids:previewIds,
+          update_history:updateHistory
+        })
+      });
+
+      const data = await response.json();
+
+      if(!data.ok){
+        throw new Error(data.error || 'Не удалось обновить опубликованную колоду');
+      }
+
+      localStorage.removeItem('bhoEditingDeckV1');
+      editingDeckData = null;
+      localStorage.removeItem('bho_deck_builder_deck');
+      showCustomAlert('Опубликованная колода обновлена. Лайки и оценки сохранены.');
+      setTimeout(() => {
+        window.location.href = 'decks_select_publish.html#deck';
+      }, 900);
+      return;
+
+    }catch(error){
+      console.error(error);
+      showCustomAlert(error.message || 'Ошибка обновления опубликованной колоды.');
+      return;
+    }
+  }
+
   const playerDecks = JSON.parse(localStorage.getItem('bhoPlayerDecksV1') || '[]');
 
   const updatedDeck = {
@@ -933,8 +1034,8 @@ async function saveEditedDeck(){
     title: editingDeckData.title || 'Колода',
     description: editingDeckData.description || '',
     createdAt: editingDeckData.createdAt || new Date().toISOString(),
-    cards: deck.map(card => card.id),
-    previewIds: editingDeckData.previewIds || []
+    cards: newCardIds,
+    previewIds
   };
 
   if(updatedDeck.serverId){
@@ -1330,6 +1431,7 @@ const createBtn = $('createDeck');
 
 if(editingDeckData){
   saveEditedBtn.style.display = 'inline-flex';
+  saveEditedBtn.textContent = editingDeckData.mode === 'published' ? 'Сохранить изменения опубликованной колоды' : 'Сохранить изменения';
   createBtn.textContent = 'Создать колоду';
 } else {
   saveEditedBtn.style.display = 'none';

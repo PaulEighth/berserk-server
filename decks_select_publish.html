@@ -280,6 +280,52 @@
   background:#e8c270;
   border-radius:999px;
 }
+
+.deck-history{
+  margin:14px 0 18px;
+  padding:14px;
+  border-radius:20px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(232,194,112,.14);
+}
+.deck-history h3{
+  margin:0 0 10px;
+  color:var(--gold2);
+  font-size:18px;
+  letter-spacing:-.03em;
+}
+.deck-history-time{
+  color:var(--muted);
+  font-size:13px;
+  font-weight:850;
+  margin-bottom:10px;
+}
+.deck-history-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.deck-change-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 10px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:900;
+  border:1px solid rgba(255,255,255,.10);
+}
+.deck-change-pill.added{
+  color:#bdf6ca;
+  background:rgba(123,216,143,.12);
+  border-color:rgba(123,216,143,.24);
+}
+.deck-change-pill.removed{
+  color:#ffd3d3;
+  background:rgba(255,107,107,.12);
+  border-color:rgba(255,107,107,.24);
+}
+
 </style>
 </head>
 <body>
@@ -778,7 +824,10 @@ author_medals: deck.author_medals || {},
 
       likes: deck.likes || 0,
       dislikes: deck.dislikes || 0,
-      created_at: deck.created_at
+      created_at: deck.created_at,
+      updateHistory: Array.isArray(deck.update_history)
+        ? deck.update_history
+        : JSON.parse(deck.update_history || deck.change_history || "[]")
     }));
 
   }catch(error){
@@ -1104,11 +1153,81 @@ async function copyDeckCode(deckId){
     showToast("Не удалось скопировать код");
   }
 }
+
+function cardNameById(id){
+  const card = cardById(id);
+  return card ? card.name : ('Карта ' + id);
+}
+
+function normalizeHistoryList(value){
+  if(Array.isArray(value)) return value;
+  try{return JSON.parse(value || '[]')}catch(e){return []}
+}
+
+function renderDeckHistory(deck){
+  const history = normalizeHistoryList(deck.updateHistory || deck.update_history || deck.change_history);
+  if(!history.length) return '';
+
+  const last = history[history.length - 1];
+  const added = Array.isArray(last.added) ? last.added : [];
+  const removed = Array.isArray(last.removed) ? last.removed : [];
+  const when = last.date ? new Date(last.date).toLocaleString('ru-RU') : '';
+
+  if(!added.length && !removed.length) return '';
+
+  const removedHtml = removed.map(item =>
+    `<span class="deck-change-pill removed">❌ ${escapeHtml(item.name || cardNameById(item.id))}${item.count > 1 ? ' x' + item.count : ''}</span>`
+  ).join('');
+
+  const addedHtml = added.map(item =>
+    `<span class="deck-change-pill added">✅ ${escapeHtml(item.name || cardNameById(item.id))}${item.count > 1 ? ' x' + item.count : ''}</span>`
+  ).join('');
+
+  return `<div class="deck-history">
+    <h3>История обновления колоды</h3>
+    <div class="deck-history-time">${when ? 'Изменено: ' + escapeHtml(when) : ''}</div>
+    ${removedHtml ? `<div class="deck-history-list" style="margin-bottom:8px">${removedHtml}</div>` : ''}
+    ${addedHtml ? `<div class="deck-history-list">${addedHtml}</div>` : ''}
+  </div>`;
+}
+
+function editPublishedDeckCards(deckId){
+  const deck = publishedDecks.find(d => String(d.id) === String(deckId));
+
+  if(!deck){
+    showToast('Колода не найдена');
+    return;
+  }
+
+  if(!canEditPublishedDeck(deck)){
+    showAuthRequiredModal('Недостаточно прав для обновления этой колоды.');
+    return;
+  }
+
+  const deckCards = deckCardsFromIds(deck);
+  localStorage.setItem(BUILDER_KEY, JSON.stringify(deckCards));
+  localStorage.setItem('bhoEditingDeckV1', JSON.stringify({
+    mode:'published',
+    publishedId:deck.id,
+    id:'published_' + deck.id,
+    serverId:deck.id,
+    title:deck.title || 'Колода',
+    description:deck.description || '',
+    deckCode:deck.deckCode || '',
+    previewIds:deck.previewIds || [],
+    createdAt:deck.created_at || new Date().toISOString(),
+    originalCards:(deck.cards || []).map(id => String(id)),
+    updateHistory:normalizeHistoryList(deck.updateHistory || deck.update_history || deck.change_history)
+  }));
+
+  window.location.href = 'deck-builder_checked.html';
+}
+
 function renderDeckCard(deck,rank){
   const deckCards = deckCardsFromIds(deck);
 const copyCodeBtn = `<button class="vote" onclick="event.stopPropagation(); copyDeckCode('${deck.id}')">📋 Скопировать код</button>`;
   const editBtn = canEditPublishedDeck(deck)
-    ? `<button class="vote" onclick="event.stopPropagation(); editPublishedDeckText('${deck.id}')">Редактировать</button>`
+    ? `<button class="vote" onclick="event.stopPropagation(); editPublishedDeckText('${deck.id}')">Редактировать</button><button class="vote" onclick="event.stopPropagation(); editPublishedDeckCards('${deck.id}')">Обновить колоду</button>`
     : '';
 
   return `<article class="deck-card" onclick="openDeckView('${deck.id}','published')" style="cursor:pointer">
@@ -1153,7 +1272,7 @@ ${editBtn}
   deckCardCount(deck) +
 ' · опубликовано: ' + formatDeckDate(deck.created_at) +
   (deck.description ? '<div class="deck-description-full">' + escapeHtml(deck.description) + '</div>' : '');
-      $('viewDeckCards').innerHTML=deckCards.length?groupDeckCards(deckCards).map(({card,count})=>`<article style="background:rgba(255,255,255,.045);border:1px solid rgba(232,194,112,.15);border-radius:16px;padding:8px;text-align:center;position:relative"><div style="position:absolute;right:7px;top:7px;background:rgba(7,9,15,.86);border:1px solid rgba(240,210,139,.28);border-radius:999px;padding:4px 8px;font-size:12px;font-weight:950;color:#f0d28b">${count}x</div><img src="${escapeHtml(card.image||'')}" alt="${escapeHtml(card.name)}" title="${escapeHtml(card.name)}" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#111" onerror="this.style.visibility='hidden'"><div style="font-size:12px;font-weight:900;line-height:1.25;margin-top:7px;color:#f4efe6">${escapeHtml(card.name)}</div></article>`).join(''):'<div class="empty">Карты не найдены. Проверь cards.json и id карт.</div>';
+      $('viewDeckCards').innerHTML = (!isLocal ? renderDeckHistory(deck) : '') + (deckCards.length?groupDeckCards(deckCards).map(({card,count})=>`<article style="background:rgba(255,255,255,.045);border:1px solid rgba(232,194,112,.15);border-radius:16px;padding:8px;text-align:center;position:relative"><div style="position:absolute;right:7px;top:7px;background:rgba(7,9,15,.86);border:1px solid rgba(240,210,139,.28);border-radius:999px;padding:4px 8px;font-size:12px;font-weight:950;color:#f0d28b">${count}x</div><img src="${escapeHtml(card.image||'')}" alt="${escapeHtml(card.name)}" title="${escapeHtml(card.name)}" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#111" onerror="this.style.visibility='hidden'"><div style="font-size:12px;font-weight:900;line-height:1.25;margin-top:7px;color:#f4efe6">${escapeHtml(card.name)}</div></article>`).join(''):'<div class="empty">Карты не найдены. Провь cards.json и id карт.</div>');
       const canDeletePublished =
   !isLocal &&
   currentUser &&
@@ -1167,8 +1286,8 @@ ${editBtn}
 
 $('viewDeckActions').innerHTML = isLocal
   ? `<button class="btn gold" onclick="editLocalDeck('${deck.id}')">Редактировать</button><button class="btn ghost" onclick="preparePublishFromLocal('${deck.id}')">Опубликовать</button><button class="btn red" onclick="deleteLocalDeck('${deck.id}')">Удалить у себя</button>`
-  : canDeletePublished
-    ? `<button class="btn red" onclick="deletePublishedDeck('${deck.id}')">Удалить опубликованную колоду</button>`
+  : canEditPublishedDeck(deck)
+    ? `<button class="btn gold" onclick="editPublishedDeckCards('${deck.id}')">Обновить колоду</button><button class="btn ghost" onclick="editPublishedDeckText('${deck.id}')">Редактировать текст</button>${canDeletePublished ? `<button class="btn red" onclick="deletePublishedDeck('${deck.id}')">Удалить опубликованную колоду</button>` : ``}`
     : ``;
       $('viewDeckModal').classList.add('show');
       $('viewDeckModal').setAttribute('aria-hidden','false');
