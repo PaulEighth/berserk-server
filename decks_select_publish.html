@@ -1443,7 +1443,7 @@ function renderDeckUpdateHistory(deck){
   deckCardCount(deck) +
 ' · опубликовано: ' + formatDeckDate(deck.created_at) +
   (deck.description ? '<div class="deck-description-full">' + escapeHtml(deck.description) + '</div>' : '');
-      $('viewDeckHistory').innerHTML = !isLocal ? renderDeckHistory(deck) : '';
+      $('viewDeckHistory').innerHTML = '';
 
 $('viewDeckCards').innerHTML = deckCards.length
   ? groupDeckCards(deckCards).map(({card,count})=>`
@@ -1454,6 +1454,7 @@ $('viewDeckCards').innerHTML = deckCards.length
     </article>
   `).join('')
   : '<div class="empty">Карты не найдены. Провь cards.json и id карт.</div>';
+  $('viewDeckHistory').innerHTML = !isLocal ? renderDeckHistory(deck) : '';
       const canDeletePublished =
   !isLocal &&
   currentUser &&
@@ -1986,6 +1987,46 @@ showSuccess(publishedDeck);
   await loadPublishedDecksFromServer();
   renderAll();
 })();
+async function deleteDeckHistoryItem(deckId,index){
+
+  try{
+
+    const response = await fetch(
+      `${API_BASE}/decks/${deckId}/history/${index}`,
+      {
+        method:'DELETE',
+        headers:authHeaders()
+      }
+    );
+
+    const data = await response.json();
+
+    if(!data.ok){
+      showToast(data.error || 'Не удалось удалить обновление');
+      return;
+    }
+
+    const deck = publishedDecks.find(
+      d => String(d.id) === String(deckId)
+    );
+
+    if(deck){
+
+      deck.update_history =
+        data.deck.update_history || [];
+
+      deck.updateHistory =
+        data.deck.update_history || [];
+
+      $('viewDeckHistory').innerHTML =
+        renderDeckHistory(deck);
+    }
+
+  }catch(error){
+    console.error(error);
+    showToast('Ошибка удаления обновления');
+  }
+}
   </script><script>
 history.scrollRestoration = "manual";
 
