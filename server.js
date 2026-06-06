@@ -2918,7 +2918,14 @@ deck_code || ""
 });
 app.patch("/api/decks/:id", verifyToken, async (req, res) => {
   try {
-    const { title, description, deck_code } = req.body;
+    const {
+  title,
+  description,
+  deck_code,
+  cards,
+  preview_ids,
+  update_history
+} = req.body;
 
     const deckResult = await pool.query(
       "SELECT * FROM decks WHERE id = $1",
@@ -2945,15 +2952,22 @@ app.patch("/api/decks/:id", verifyToken, async (req, res) => {
 
     const result = await pool.query(`
   UPDATE decks
-  SET title = $1,
-      description = $2,
-      deck_code = $3
-  WHERE id = $4
+  SET
+    title = $1,
+    description = $2,
+    deck_code = $3,
+    cards = $4,
+    preview_ids = $5,
+    update_history = $6
+  WHERE id = $7
   RETURNING *
 `, [
   title || deck.title,
   description || "",
   deck_code || "",
+  JSON.stringify(cards || []),
+  JSON.stringify(preview_ids || []),
+  JSON.stringify(update_history || []),
   req.params.id
 ]);
 
