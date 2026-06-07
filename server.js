@@ -660,7 +660,43 @@ const isPasswordCorrect = await bcrypt.compare(
 });
 
 
+app.get("/api/users/by-nick/:username", async (req, res) => {
+  try {
+    const username = decodeURIComponent(req.params.username || "").trim();
 
+    if(!username){
+      return res.status(400).json({
+        ok:false,
+        error:"Ник не указан"
+      });
+    }
+
+    const result = await pool.query(`
+      SELECT id, username, role, is_partner, medals
+      FROM users
+      WHERE LOWER(username) = LOWER($1)
+      LIMIT 1
+    `, [username]);
+
+    if(result.rows.length === 0){
+      return res.status(404).json({
+        ok:false,
+        error:"Пользователь не найден"
+      });
+    }
+
+    res.json({
+      ok:true,
+      user:result.rows[0]
+    });
+
+  } catch(error) {
+    res.status(500).json({
+      ok:false,
+      error:error.message
+    });
+  }
+});
 // =========================
 // СТАРТ СЕРВЕРА
 // =========================
