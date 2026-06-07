@@ -1289,7 +1289,7 @@ author: n.author_name,
       document.getElementById('modalCover').src = n.cover || placeholder(n.title);
       document.getElementById('modalTitle').textContent = n.title;
       document.getElementById('modalTags').innerHTML = `<span class="news-date">${escapeHtml(n.date || '')}</span><span class="tag">${newsAuthorHtml(n)}</span>`;
-      document.getElementById('modalText').innerHTML = String(n.text || '').split('\n').filter(Boolean).map(p=>`<p>${escapeHtml(p)}</p>`).join('');
+      document.getElementById('modalText').innerHTML = newsTextToSafeHtml(n.text || '');
       document.getElementById('modalGallery').innerHTML = renderMediaGallery(currentOpenMediaList) || '<p class="slot-note">Дополнительных изображений нет.</p>';
       let modalActions = '';
 
