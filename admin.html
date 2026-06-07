@@ -662,8 +662,15 @@ function filterByRole(role){
 
 function renderUsers(users){
       const body = document.getElementById("usersBody");
-      const search = String(document.getElementById("userSearchInput")?.value || "").trim().toLowerCase();
-      if(currentMedalFilter !== "all"){
+const search = String(document.getElementById("userSearchInput")?.value || "").trim().toLowerCase();
+
+if(currentRoleFilter !== "all"){
+  users = users.filter(
+    user => (user.role || "user") === currentRoleFilter
+  );
+}
+
+if(currentMedalFilter !== "all"){
   users = users.filter(user => {
     const medals = parseMedals(user);
     return Number(medals[currentMedalFilter] || 0) > 0;
