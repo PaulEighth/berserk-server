@@ -1272,10 +1272,14 @@ loadNewsComments();
         return;
       }
 
-      if(mode === "edit" && !canEditNews()){
-        showAuthRequiredModal("Недостаточно прав. Редактировать новости могут admin, developer и moderator.");
-        return;
-      }
+      if(mode === "edit"){
+  const editNewsItem = NEWS[editIndex];
+
+  if(!canEditNews(editNewsItem)){
+    showAuthRequiredModal("Недостаточно прав. Редактировать новость может автор, admin, developer или moderator.");
+    return;
+  }
+}
 
       formMode = mode;
       editingNewsIndex = editIndex;
@@ -1330,10 +1334,14 @@ loadNewsComments();
         return;
       }
 
-      if(formMode === "edit" && !canEditNews()){
-        showAuthRequiredModal("Недостаточно прав. Редактировать новости могут admin, developer и moderator.");
-        return;
-      }
+      if(formMode === "edit"){
+  const editNewsItem = editingNewsIndex !== null ? NEWS[editingNewsIndex] : null;
+
+  if(!canEditNews(editNewsItem)){
+    showAuthRequiredModal("Недостаточно прав. Редактировать новость может автор, admin, developer или moderator.");
+    return;
+  }
+}
 
       const title = document.getElementById('newsTitleInput').value.trim();
       const author = document.getElementById('newsAuthorInput').value.trim();
@@ -1706,12 +1714,15 @@ function renderRequests(){
   }
 }
 function editPublishedNews(){
-      if(!canEditNews()){
-        showAuthRequiredModal("Недостаточно прав. Редактировать новости могут admin, developer и moderator.");
+      if(currentOpenNewsIndex === null || previewingRequest) return;
+
+      const news = NEWS[currentOpenNewsIndex];
+
+      if(!canEditNews(news)){
+        showAuthRequiredModal("Недостаточно прав. Редактировать новость может автор, admin, developer или moderator.");
         return;
       }
 
-      if(currentOpenNewsIndex === null || previewingRequest) return;
       openForm('edit', currentOpenNewsIndex);
       formModal.style.zIndex = '26000';
     }
