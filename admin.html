@@ -372,6 +372,7 @@
   <div id="usersStats" class="users-stats">
     Загрузка...
   </div>
+  <div id="medalFilters" class="users-stats" style="margin-top:14px"></div>
 </section>
     <section class="panel">
       <div class="topline">
@@ -443,8 +444,19 @@
   banned: "#ff4d4d"
 };
 const medalList = ["🏆","🥇","🥈","🥉","🎖️","🏅"];
+
+const medalNames = {
+  "🏆":"Победитель турнира",
+  "🥇":"Топ 1 в конце сезона",
+  "🥈":"Топ 2 в конце сезона",
+  "🥉":"Топ 3 в конце сезона",
+  "🎖️":"Донат 5000руб.",
+  "🏅":"Помощь в развитии проекта"
+};
+
 let allUsers = [];
 let currentRoleFilter = "all";
+let currentMedalFilter = "all";
     const roles = [
   "user",
   "developer",
@@ -609,7 +621,33 @@ function renderUsersStats(users){
     `).join("")}
   `;
 }
+function renderMedalFilters(users){
+  const box = document.getElementById("medalFilters");
+  if(!box) return;
 
+  box.innerHTML = `
+    <span class="stat-pill"
+          style="cursor:pointer;${currentMedalFilter === "all" ? "border-color:rgba(240,210,139,.65);background:rgba(214,168,79,.18);" : ""}"
+          onclick="filterByMedal('all')">
+      Все медали
+    </span>
+
+    ${medalList.map(medal => `
+      <span class="stat-pill"
+            style="cursor:pointer;${currentMedalFilter === medal ? "border-color:rgba(240,210,139,.65);background:rgba(214,168,79,.18);" : ""}"
+            onclick="filterByMedal('${medal}')">
+        <span style="font-size:18px">${medal}</span>
+        <span>${medalNames[medal]}</span>
+      </span>
+    `).join("")}
+  `;
+}
+
+function filterByMedal(medal){
+  currentMedalFilter = medal;
+  renderMedalFilters(allUsers);
+  renderUsers(allUsers);
+}
 function filterByRole(role){
   currentRoleFilter = role;
   renderUsersStats(allUsers);
@@ -619,10 +657,11 @@ function filterByRole(role){
 function renderUsers(users){
       const body = document.getElementById("usersBody");
       const search = String(document.getElementById("userSearchInput")?.value || "").trim().toLowerCase();
-      if(currentRoleFilter !== "all"){
-  users = users.filter(
-    user => (user.role || "user") === currentRoleFilter
-  );
+      if(currentMedalFilter !== "all"){
+  users = users.filter(user => {
+    const medals = parseMedals(user);
+    return Number(medals[currentMedalFilter] || 0) > 0;
+  });
 }
 
 if(search){
@@ -697,6 +736,7 @@ ${user.username === ADMIN_USERNAME ? "" : `<button class="btn ghost" onclick="qu
 
         allUsers = data;
 renderUsersStats(allUsers);
+renderMedalFilters(allUsers);
 renderUsers(allUsers);
       }catch(error){
         console.error(error);
