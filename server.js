@@ -99,7 +99,93 @@ function isStaff(user){
 function isDeleteStaff(user){
   return ["admin", "developer", "moderator"].includes(user.role);
 }
+function parseTournamentJson(value){
+  if(!value) return {};
+  if(typeof value === "object") return value;
 
+  try{
+    return JSON.parse(value || "{}");
+  }catch(e){
+    return {};
+  }
+}
+
+function normalizeTournamentNick(value){
+  return String(value || "").trim().toLowerCase();
+}
+
+function tournamentCoOrganizers(tournament){
+  const data = parseTournamentJson(tournament.swiss_data);
+  return Array.isArray(data.coOrganizers) ? data.coOrganizers : [];
+}
+
+function isTournamentCoOrganizer(req,tournament){
+  const userId = Number(req.user.id);
+  const username = normalizeTournamentNick(req.user.username);
+
+  return tournamentCoOrganizers(tournament).some(org=>{
+    if(Number(org.id) === userId) return true;
+    return normalizeTournamentNick(org.username) === username;
+  });
+}
+
+async function enrichTournamentSwissData(rawSwissData){
+  const swissData = parseTournamentJson(rawSwissData);
+  const rawCoOrganizers = Array.isArray(swissData.coOrganizers)
+    ? swissData.coOrganizers
+    : [];
+
+  const names = [...new Set(
+    rawCoOrganizers
+      .map(item => typeof item === "object" ? item.username : item)
+      .map(name => String(name || "").trim())
+      .filter(Boolean)
+  )];
+
+  if(!names.length){
+    swissData.coOrganizers = [];
+    return swissData;
+  }
+
+  const result = await pool.query(`
+    SELECT id, username, role, is_partner, medals
+    FROM users
+    WHERE LOWER(username) = ANY($1)
+  `, [
+    names.map(name => name.toLowerCase())
+  ]);
+
+  const found = new Map(
+    result.rows.map(user => [
+      user.username.toLowerCase(),
+      user
+    ])
+  );
+
+  swissData.coOrganizers = names.map(name=>{
+    const user = found.get(name.toLowerCase());
+
+    if(user){
+      return {
+        id:user.id,
+        username:user.username,
+        role:user.role || "user",
+        is_partner:!!user.is_partner,
+        medals:user.medals || {}
+      };
+    }
+
+    return {
+      id:null,
+      username:name,
+      role:"user",
+      is_partner:false,
+      medals:{}
+    };
+  });
+
+  return swissData;
+}
 async function canManageTournament(req, tournamentId){
   const tournamentResult = await pool.query(
     "SELECT * FROM tournaments WHERE id = $1",
@@ -112,11 +198,15 @@ async function canManageTournament(req, tournamentId){
 
   const tournament = tournamentResult.rows[0];
 
-  if(isStaff(req.user) || Number(tournament.organizer_id) === Number(req.user.id)){
-    return { ok: true, tournament };
-  }
+  if(
+  isStaff(req.user) ||
+  Number(tournament.organizer_id) === Number(req.user.id) ||
+  isTournamentCoOrganizer(req,tournament)
+){
+  return { ok: true, tournament };
+}
 
-    return { ok: false, status: 403, error: "Недостаточно прав" };
+return { ok: false, status: 403, error: "Недостаточно прав" };
 }
 
 async function canDeleteTournament(req, tournamentId){
@@ -131,11 +221,15 @@ async function canDeleteTournament(req, tournamentId){
 
   const tournament = tournamentResult.rows[0];
 
-  if(isDeleteStaff(req.user) || Number(tournament.organizer_id) === Number(req.user.id)){
-    return { ok: true, tournament };
-  }
+  if(
+  isDeleteStaff(req.user) ||
+  Number(tournament.organizer_id) === Number(req.user.id) ||
+  isTournamentCoOrganizer(req,tournament)
+){
+  return { ok: true, tournament };
+}
 
-  return { ok: false, status: 403, error: "Недостаточно прав" };
+return { ok: false, status: 403, error: "Недостаточно прав" };
 }
 
 async function canEditTournamentPlay(req, tournamentId){
@@ -1832,28 +1926,35 @@ app.patch("/api/tournaments/:id", verifyToken, async (req, res) => {
     }
 
     const {
-      title,
-      description,
-      format,
-      max_players,
-      bracket,
-      prize_1,
-      prize_2,
-      prize_3,
-      prize_4,
-      start_date,
-end_date,
-telegram_link,
-deckMode,
-      matchFormat,
-      finalFormat,
-      decksBeforeFinal,
-      bansBeforeFinal,
-      decksFinal,
-      bansFinal,
-      isPrivate,
-      privatePassword
-    } = req.body;
+  title,
+  description,
+  format,
+  max_players,
+  bracket,
+  prize_1,
+  prize_2,
+  prize_3,
+  prize_4,
+  start_date,
+  end_date,
+  telegram_link,
+  swiss_data,
+  deckMode,
+  matchFormat,
+  finalFormat,
+  decksBeforeFinal,
+  bansBeforeFinal,
+  decksFinal,
+  bansFinal,
+  isPrivate,
+  privatePassword
+} = req.body;
+
+const oldSwissData = parseTournamentJson(access.tournament.swiss_data);
+const nextSwissData = await enrichTournamentSwissData({
+  ...oldSwissData,
+  ...(parseTournamentJson(swiss_data || {}))
+});
 
     const result = await pool.query(`
       UPDATE tournaments
@@ -1877,9 +1978,10 @@ deckMode = $12,
         decksFinal = $17,
         bansFinal = $18,
         is_private = $19,
-        private_password = $20,
-bracket = $21
-WHERE id = $22
+private_password = $20,
+bracket = $21,
+swiss_data = $22
+WHERE id = $23
       RETURNING *
     `, [
       title || "",
@@ -1903,6 +2005,7 @@ deckMode || "none",
       !!isPrivate,
       isPrivate ? (privatePassword || "") : "",
 Number(bracket) || Number(max_players) || 16,
+JSON.stringify(nextSwissData),
 req.params.id
     ]);
 
@@ -2151,7 +2254,7 @@ private_password
       start_date || null,
       telegram_link || "",
       Number(bracket) || Number(max_players) || 16,
-      JSON.stringify(swiss_data || {}),
+      JSON.stringify(await enrichTournamentSwissData(swiss_data || {})),
       deckMode || "none",
 matchFormat || "bo1",
 finalFormat || "bo3",
@@ -2412,7 +2515,9 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
     const tournament = tournamentResult.rows[0];
 
     const isStaffUser = isStaff(req.user);
-    const isOrganizer = Number(tournament.organizer_id) === Number(req.user.id);
+    const isOrganizer =
+  Number(tournament.organizer_id) === Number(req.user.id) ||
+  isTournamentCoOrganizer(req,tournament);
 
     const isMatchPlayer =
       String(req.user.username || "") === String(room?.playerA || "") ||

@@ -3046,7 +3046,11 @@ html body .bracket-cell.alive{
 
       <div class="form-grid">
         <label class="full"><span class="label">Название турнира</span><input class="field" id="requestTitle" placeholder="Например: Кубок Тьмы"></label>
-        <label><span class="label">Организатор / ник</span><input class="field" id="requestOrganizer" placeholder="Например: Player#6519"></label>
+        <label>
+  <span class="label">Дополнительные организаторы</span>
+  <button type="button" class="btn ghost" onclick="addCoOrganizerPrompt()" style="width:100%">＋ Добавить организатора</button>
+  <div id="coOrganizersBox" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>
+</label>
         <label><span class="label">Дата начала</span><input class="field" id="requestStartDate" type="datetime-local"></label>
         <label><span class="label">Дата окончания</span><input class="field" id="requestEndDate" type="datetime-local"></label>
         <label><span class="label">Формат</span><select class="select" id="requestFormat"><option value="bo1">BO1</option><option value="bo3">BO3</option><option value="bo5">BO5</option><option value="bo7">BO7</option><option value="swiss">Швейцарка</option><option value="single">Олимпийка</option></select></label>
@@ -3390,7 +3394,25 @@ function getMoneyPrizeValue(text){
   } catch (e) {
     parsedSwissData = {};
   }
+rememberUserRole(
+  t.organizer_name,
+  t.organizer_role || "user",
+  !!t.organizer_is_partner,
+  t.organizer_medals || {}
+);
 
+if(Array.isArray(parsedSwissData.coOrganizers)){
+  parsedSwissData.coOrganizers.forEach(org=>{
+    if(org?.username){
+      rememberUserRole(
+        org.username,
+        org.role || "user",
+        !!org.is_partner,
+        org.medals || {}
+      );
+    }
+  });
+}
   const tid = String(t.id);
 
   tournamentManualCells[tid] = parsedSwissData.manualCells || {};
@@ -3423,9 +3445,11 @@ function getMoneyPrizeValue(text){
 privatePassword: t.private_password || "",
 
     organizer: t.organizer_name || "Организатор",
-    organizer_role: t.organizer_role || "user",
-    organizer_is_partner: !!t.organizer_is_partner,
-    organizer_medals: t.organizer_medals || {},
+organizerId: t.organizer_id,
+organizer_role: t.organizer_role || "user",
+organizer_is_partner: !!t.organizer_is_partner,
+organizer_medals: t.organizer_medals || {},
+coOrganizers: Array.isArray(parsedSwissData.coOrganizers) ? parsedSwissData.coOrganizers : [],
 
         prize: t.prize_1 || "Без приза",
     prizeValue: getMoneyPrizeValue(t.prize_1 || ""),
@@ -3710,7 +3734,77 @@ function roleNickHtml(nick){
     userStarHtmlByNick(nick) +
     `<span class="role-colored-nick" style="color:${escapeHtml(getNickColor(nick))}">${escapeHtml(nick)}</span>`;
 }
+let extraTournamentOrganizers = [];
 
+function renderCoOrganizersEditor(){
+  const box = $("coOrganizersBox");
+  if(!box) return;
+
+  box.innerHTML = extraTournamentOrganizers.length
+    ? extraTournamentOrganizers.map((nick,index)=>`
+      <span style="display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;background:rgba(214,168,79,.11);border:1px solid rgba(214,168,79,.22);font-weight:900">
+        ${roleNickHtml(nick)}
+        <button type="button" onclick="removeCoOrganizer(${index})" style="border:0;background:rgba(255,107,107,.16);color:#ffd3d3;border-radius:50%;width:24px;height:24px;cursor:pointer;font-weight:950">×</button>
+      </span>
+    `).join("")
+    : '<span class="small">Пока дополнительных организаторов нет.</span>';
+}
+
+function addCoOrganizerPrompt(){
+  const nick = prompt("Введите ник организатора, например WilDick#2160");
+
+  if(!nick) return;
+
+  const clean = nick.trim();
+  if(!clean) return;
+
+  const current = getLoggedUser();
+  const currentNick = normalizeNick(current?.username || getCurrentUserNick()).toLowerCase();
+
+  if(normalizeNick(clean).toLowerCase() === currentNick){
+    showAlert("Ты уже являешься главным организатором.");
+    return;
+  }
+
+  const exists = extraTournamentOrganizers.some(
+    item => normalizeNick(item).toLowerCase() === normalizeNick(clean).toLowerCase()
+  );
+
+  if(exists){
+    showAlert("Этот организатор уже добавлен.");
+    return;
+  }
+
+  extraTournamentOrganizers.push(clean);
+  renderCoOrganizersEditor();
+}
+
+function removeCoOrganizer(index){
+  extraTournamentOrganizers.splice(index,1);
+  renderCoOrganizersEditor();
+}
+
+function getTournamentOrganizers(t){
+  const main = t?.organizer ? [t.organizer] : [];
+  const extra = Array.isArray(t?.coOrganizers)
+    ? t.coOrganizers.map(o => typeof o === "object" ? o.username : o).filter(Boolean)
+    : [];
+
+  return [...new Set([...main, ...extra])];
+}
+
+function organizersHtml(t){
+  return getTournamentOrganizers(t).map(nick => roleNickHtml(nick)).join("<br>");
+}
+
+function isTournamentCoOrganizer(t,nick){
+  const target = normalizeNick(nick || "").toLowerCase();
+  if(!target) return false;
+
+  return getTournamentOrganizers(t).some(
+    item => normalizeNick(item).toLowerCase() === target
+  );
+}
     async function warmTournamentRoleCache(){
       rememberCurrentUserRole();
 
@@ -3786,13 +3880,12 @@ function roleNickHtml(nick){
       if(["admin","developer","moderator","creator"].includes(getUserRole())) return true;
 
       const rights = t.editRights || "organizer";
-      const organizer = String(t.organizer || "").toLowerCase();
-      const isOrganizer = nick && organizer === nick.toLowerCase();
-      const isParticipant = getPlayers(id).some(p => String(p).toLowerCase() === String(nick).toLowerCase());
+const isOrganizer = nick && isTournamentCoOrganizer(t,nick);
+const isParticipant = getPlayers(id).some(p => String(p).toLowerCase() === String(nick).toLowerCase());
 
-      if(rights === "admin") return false;
-      if(rights === "organizer") return isOrganizer;
-      if(rights === "participants") return isOrganizer || isParticipant;
+if(rights === "admin") return false;
+if(rights === "organizer") return isOrganizer;
+if(rights === "participants") return isOrganizer || isParticipant;
 
       return false;
     }
@@ -4748,7 +4841,8 @@ function injectSwordsEverywhere(){
 
     async function submitTournamentRequest(){
       const title = $('requestTitle').value.trim();
-      const organizer = $('requestOrganizer').value.trim();
+const organizer = getLoggedUser()?.username || getCurrentUserNick();
+const coOrganizers = extraTournamentOrganizers.slice();
       const startDate = $('requestStartDate').value;
       const endDate = $('requestEndDate').value;
       const format = $('requestFormat').value;
@@ -4775,7 +4869,6 @@ function injectSwordsEverywhere(){
       const description = $('requestDescription').value.trim();
 
       if(!title){ showAlert('Напиши название турнира'); return; }
-      if(!organizer){ showAlert('Напиши организатора или ник'); return; }
       if(!startDate){ showAlert('Укажи дату начала'); return; }
       if(!endDate){ showAlert('Укажи дату окончания'); return; }
       if(!places || places < 2){ showAlert('Укажи количество мест минимум 2'); return; }
@@ -4816,7 +4909,8 @@ function injectSwordsEverywhere(){
         free:places,
         deckRules:rules || 'Правила не указаны',
         description,
-        createdAt:new Date().toISOString()
+coOrganizers,
+createdAt:new Date().toISOString()
       };
 
       try{
@@ -4846,7 +4940,8 @@ swiss_data: {
   endDate: request.endDate || "",
   deckMode: request.deckMode || "none",
   matchFormat: request.matchFormat || "bo1",
-  finalFormat: request.finalFormat || "bo3"
+  finalFormat: request.finalFormat || "bo3",
+  coOrganizers: request.coOrganizers || []
 },
 
 deckMode: request.deckMode || "none",
@@ -4893,7 +4988,9 @@ if(typeof updateStats === "function"){
     }
 
     function clearTournamentRequestForm(){
-      ['requestTitle','requestOrganizer','requestStartDate','requestEndDate','requestPlaces','requestPrize1','requestPrize2','requestPrize3','requestPrize4','requestPrize5','requestPrize6','requestPrize7','requestPrize8','requestRules','requestDescription','requestPassword'].forEach(id=>{if($(id))$(id).value='';});
+      ['requestTitle','requestStartDate','requestEndDate','requestPlaces','requestPrize1','requestPrize2','requestPrize3','requestPrize4','requestPrize5','requestPrize6','requestPrize7','requestPrize8','requestRules','requestDescription','requestPassword'].forEach(id=>{if($(id))$(id).value='';});
+extraTournamentOrganizers = [];
+renderCoOrganizersEditor();
       $('requestFormat').value='bo1';
       if($('requestBracketSize')) $('requestBracketSize').value='16';
       if($('requestSwissRounds')) $('requestSwissRounds').value='3';
@@ -6952,7 +7049,7 @@ const players = getPlayers(id);
         `<div class="info-row"><span>Название</span><span>${escapeHtml(t.title)}</span></div>
          <div class="info-row"><span>Дата начала</span><span>${formatDate(t.date)}</span></div>
          <div class="info-row"><span>Дата окончания</span><span>${t.endDate?formatDate(t.endDate):'—'}</span></div>
-         <div class="info-row"><span>Организатор</span><span>${roleNickHtml(t.organizer)}</span></div>
+         <div class="info-row"><span>Организаторы</span><span>${organizersHtml(t)}</span></div>
          <div class="info-row"><span>Права</span><span>${t.editRights === 'participants' ? 'Участники турнира могут редактировать' : 'Только организатор'}</span></div>
          <div class="info-row"><span>Формат</span><span>${escapeHtml(t.mode)}</span></div>
          <div class="info-row"><span>Колоды</span><span>${deckModeLabel(t.deckMode)}</span></div>
@@ -7097,7 +7194,10 @@ function openEditTournament(id){
   window.editingTournamentId = id;
 
   if($("requestTitle")) $("requestTitle").value = t.title || "";
-  if($("requestOrganizer")) $("requestOrganizer").value = t.organizer || "";
+  extraTournamentOrganizers = Array.isArray(t.coOrganizers)
+  ? t.coOrganizers.map(o => typeof o === "object" ? o.username : o).filter(Boolean)
+  : [];
+renderCoOrganizersEditor();
   if($("requestStartDate")) $("requestStartDate").value = toDateTimeLocal(t.date);
 if($("requestEndDate")) $("requestEndDate").value = toDateTimeLocal(t.endDate);
   if($("requestFormat")) $("requestFormat").value = t.format || "bo1";
@@ -7155,7 +7255,7 @@ function canRandomizeTournamentClient(t){
   }
 
   const nick = user.username || getCurrentUserNick();
-  return !!nick && String(t.organizer || "").toLowerCase() === String(nick).toLowerCase();
+return !!nick && isTournamentCoOrganizer(t,nick);
 }
 function canDeleteTournamentClient(t){
   const user = getLoggedUser();
@@ -7170,7 +7270,7 @@ function canDeleteTournamentClient(t){
   }
 
   const nick = user.username || getCurrentUserNick();
-  return !!nick && String(t.organizer || "").toLowerCase() === String(nick).toLowerCase();
+return !!nick && isTournamentCoOrganizer(t,nick);
 }
     function openDeleteTournamentModal(id){
       const t=tournaments.find(item=>String(item.id)===String(id));
@@ -7260,7 +7360,7 @@ function canDeleteTournamentClient(t){
           + '<h3>'+escapeHtml(t.title)+'</h3><p class="desc">'+escapeHtml(t.description)+'</p>'
           + '<div class="info-grid">'
           + '<div class="info-row"><span>Дата</span><span>'+formatDate(t.date)+'</span></div>'
-          + '<div class="info-row"><span>Организатор</span><span>'+roleNickHtml(t.organizer)+'</span></div>'
+          + '<div class="info-row"><span>Организаторы</span><span>'+organizersHtml(t)+'</span></div>'
           + '<div class="info-row prize-info-row"><span>Призы</span><span>'+escapeHtml(prizeText(t)).replace(/\s*\|\s*/g, '<br>')+'</span></div>'
           + '<div class="info-row"><span>Формат</span><span>'+escapeHtml(t.mode)+'</span></div>'
           + '<div class="info-row"><span>Колоды</span><span>'+escapeHtml(deckModeLabel(t.deckMode))+'</span></div>'
