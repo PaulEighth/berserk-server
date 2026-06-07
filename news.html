@@ -400,6 +400,73 @@
       root.style.display = 'none';
     };
   };
+    window.nicePrompt = function(message, placeholder, onOk){
+    const root = ensureNiceDialog();
+
+    document.getElementById('niceNativeTitle').textContent = 'Вставить ссылку';
+    document.getElementById('niceNativeText').innerHTML = `
+      <span>${String(message || '')}</span>
+      <input id="niceNativeInput" style="
+        width:100%;
+        margin-top:18px;
+        padding:14px 15px;
+        border-radius:16px;
+        border:1px solid rgba(232,194,112,.24);
+        background:rgba(255,255,255,.06);
+        color:#f4efe6;
+        outline:none;
+        font-size:15px;
+        text-align:center;
+        font-weight:900;
+      " placeholder="${String(placeholder || '')}">
+    `;
+
+    document.getElementById('niceNativeActions').innerHTML = `
+      <button type="button" id="niceNativePromptOk" style="
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        padding:12px 28px;
+        border-radius:999px;
+        border:1px solid transparent;
+        background:linear-gradient(135deg,#d6a84f,#f0d28b);
+        color:#171008;
+        font-weight:900;
+        font-size:14px;
+        cursor:pointer;
+      ">OK</button>
+
+      <button type="button" id="niceNativePromptCancel" style="
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        padding:12px 24px;
+        border-radius:999px;
+        border:1px solid rgba(255,255,255,.13);
+        background:rgba(255,255,255,.06);
+        color:#f4efe6;
+        font-weight:900;
+        font-size:14px;
+        cursor:pointer;
+      ">Отмена</button>
+    `;
+
+    root.style.display = 'flex';
+
+    setTimeout(() => {
+      document.getElementById('niceNativeInput')?.focus();
+    }, 50);
+
+    document.getElementById('niceNativePromptOk').onclick = () => {
+      const value = document.getElementById('niceNativeInput')?.value || '';
+      root.style.display = 'none';
+      if(typeof onOk === 'function') onOk(value);
+    };
+
+    document.getElementById('niceNativePromptCancel').onclick = () => {
+      root.style.display = 'none';
+    };
+  };
 })();
 </script>
 
@@ -796,16 +863,25 @@ function formatNewsText(type){
   if(type === "u") replacement = `<u>${selected}</u>`;
 
   if(type === "a"){
-    const url = prompt("Вставь ссылку, начиная с https://");
-    if(!url) return;
+  nicePrompt("Вставь ссылку, начиная с https://", "https://", (url)=>{
+    const cleanUrl = String(url || "").trim();
 
-    if(!/^https?:\/\//i.test(url)){
+    if(!cleanUrl) return;
+
+    if(!/^https?:\/\//i.test(cleanUrl)){
       alert("Ссылка должна начинаться с http:// или https://");
       return;
     }
 
-    replacement = `<a href="${url}" target="_blank" rel="noopener">${selected}</a>`;
-  }
+    replacement = `<a href="${cleanUrl}" target="_blank" rel="noopener">${selected}</a>`;
+
+    textarea.value = before + replacement + after;
+    textarea.focus();
+    textarea.setSelectionRange(before.length, before.length + replacement.length);
+  });
+
+  return;
+}
 
   textarea.value = before + replacement + after;
   textarea.focus();
