@@ -3743,33 +3743,138 @@ function roleNickHtml(nick){
 }
 let extraTournamentOrganizers = [];
 
+function coOrganizerEditorHtml(item){
+  if(typeof item === "object" && item?.username){
+    rememberUserRole(
+      item.username,
+      item.role || "user",
+      !!item.is_partner,
+      item.medals || {}
+    );
+
+    return roleNickHtml(item.username);
+  }
+
+  return `<span style="color:#fff">${escapeHtml(String(item || ""))}</span>`;
+}
+
 function renderCoOrganizersEditor(){
   const box = $("coOrganizersBox");
   if(!box) return;
 
   box.innerHTML = extraTournamentOrganizers.length
-    ? extraTournamentOrganizers.map((nick,index)=>`
+    ? extraTournamentOrganizers.map((item,index)=>`
       <span style="display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;background:rgba(214,168,79,.11);border:1px solid rgba(214,168,79,.22);font-weight:900">
-        ${roleNickHtml(nick)}
+        ${coOrganizerEditorHtml(item)}
         <button type="button" onclick="removeCoOrganizer(${index})" style="border:0;background:rgba(255,107,107,.16);color:#ffd3d3;border-radius:50%;width:24px;height:24px;cursor:pointer;font-weight:950">×</button>
       </span>
     `).join("")
     : '<span class="small">Пока дополнительных организаторов нет.</span>';
 }
 
-function addCoOrganizerPrompt(){
+async function addCoOrganizerPrompt(){
   const modal = $("coOrganizerModal");
-  const input = $("coOrganizerInput");
+  const list = $("coOrganizerUsersList");
 
-  if(input) input.value = "";
   if(modal) modal.classList.add("show");
 
-  setTimeout(()=>input?.focus(), 50);
+  if(list){
+    list.innerHTML = '<div class="small">Загрузка аккаунтов...</div>';
+  }
+
+  try{
+    const response = await fetch("https://berserk-server.com/api/users/public-list");
+    const data = await response.json();
+
+    if(!data.ok || !Array.isArray(data.users)){
+      if(list) list.innerHTML = '<div class="small">Не удалось загрузить аккаунты.</div>';
+      return;
+    }
+
+    if(list){
+      list.innerHTML = data.users.map(user => {
+        rememberUserRole(
+          user.username,
+          user.role || "user",
+          !!user.is_partner,
+          user.medals || {}
+        );
+
+        return `
+          <button type="button" class="btn ghost" onclick='addRegisteredCoOrganizer(${JSON.stringify(user).replace(/'/g,"&#39;")})' style="width:100%;justify-content:flex-start">
+            ${roleNickHtml(user.username)}
+          </button>
+        `;
+      }).join("");
+    }
+
+  }catch(error){
+    if(list) list.innerHTML = '<div class="small">Ошибка загрузки аккаунтов.</div>';
+  }
 }
 
 function closeCoOrganizerModal(){
   const modal = $("coOrganizerModal");
   if(modal) modal.classList.remove("show");
+}
+
+function addRegisteredCoOrganizer(user){
+  if(!user?.username) return;
+
+  const current = getLoggedUser();
+  const currentNick = normalizeNick(current?.username || getCurrentUserNick()).toLowerCase();
+
+  if(normalizeNick(user.username).toLowerCase() === currentNick){
+    showAlert("Ты уже являешься главным организатором.");
+    return;
+  }
+
+  const exists = extraTournamentOrganizers.some(item => {
+    const itemNick = typeof item === "object" ? item.username : item;
+    return normalizeNick(itemNick).toLowerCase() === normalizeNick(user.username).toLowerCase();
+  });
+
+  if(exists){
+    showAlert("Этот организатор уже добавлен.");
+    return;
+  }
+
+  rememberUserRole(
+    user.username,
+    user.role || "user",
+    !!user.is_partner,
+    user.medals || {}
+  );
+
+  extraTournamentOrganizers.push(user);
+  renderCoOrganizersEditor();
+  closeCoOrganizerModal();
+}
+
+function addCustomCoOrganizer(){
+  const input = $("coOrganizerInput");
+  const clean = String(input?.value || "").trim();
+
+  if(!clean){
+    showAlert("Введите название организатора.");
+    return;
+  }
+
+  const exists = extraTournamentOrganizers.some(item => {
+    const itemNick = typeof item === "object" ? item.username : item;
+    return normalizeNick(itemNick).toLowerCase() === normalizeNick(clean).toLowerCase();
+  });
+
+  if(exists){
+    showAlert("Этот организатор уже добавлен.");
+    return;
+  }
+
+  extraTournamentOrganizers.push(clean);
+  renderCoOrganizersEditor();
+
+  if(input) input.value = "";
+  closeCoOrganizerModal();
 }
 
 async function confirmAddCoOrganizer(){
@@ -7297,7 +7402,7 @@ function openEditTournament(id){
 
   if($("requestTitle")) $("requestTitle").value = t.title || "";
   extraTournamentOrganizers = Array.isArray(t.coOrganizers)
-  ? t.coOrganizers.map(o => typeof o === "object" ? o.username : o).filter(Boolean)
+  ? t.coOrganizers.filter(Boolean)
   : [];
 renderCoOrganizersEditor();
   if($("requestStartDate")) $("requestStartDate").value = toDateTimeLocal(t.date);

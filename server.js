@@ -697,6 +697,27 @@ app.get("/api/users/by-nick/:username", async (req, res) => {
     });
   }
 });
+app.get("/api/users/public-list", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, username, role, is_partner, medals
+      FROM users
+      WHERE role != 'banned'
+      ORDER BY username ASC
+    `);
+
+    res.json({
+      ok:true,
+      users:result.rows
+    });
+
+  } catch(error) {
+    res.status(500).json({
+      ok:false,
+      error:error.message
+    });
+  }
+});
 // =========================
 // СТАРТ СЕРВЕРА
 // =========================
