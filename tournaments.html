@@ -3745,6 +3745,10 @@ let extraTournamentOrganizers = [];
 
 function coOrganizerEditorHtml(item){
   if(typeof item === "object" && item?.username){
+    if(item.id === null || item.id === undefined){
+      return `<span style="color:#fff">${escapeHtml(item.username)}</span>`;
+    }
+
     rememberUserRole(
       item.username,
       item.role || "user",
@@ -3877,72 +3881,7 @@ function addCustomCoOrganizer(){
   closeCoOrganizerModal();
 }
 
-async function confirmAddCoOrganizer(){
-  const input = $("coOrganizerInput");
-  const clean = String(input?.value || "").trim();
 
-  if(!clean){
-    showAlert("Введите ник организатора.");
-    return;
-  }
-
-  const current = getLoggedUser();
-  const currentNick = normalizeNick(current?.username || getCurrentUserNick()).toLowerCase();
-
-  if(normalizeNick(clean).toLowerCase() === currentNick){
-    showAlert("Ты уже являешься главным организатором.");
-    return;
-  }
-
-  const exists = extraTournamentOrganizers.some(item => {
-    const itemNick = typeof item === "object" ? item.username : item;
-    return normalizeNick(itemNick).toLowerCase() === normalizeNick(clean).toLowerCase();
-  });
-
-  if(exists){
-    showAlert("Этот организатор уже добавлен.");
-    return;
-  }
-
-  try{
-    const response = await fetch(
-      `https://berserk-server.com/api/users/by-nick/${encodeURIComponent(clean)}`
-    );
-
-    const data = await response.json();
-
-    if(data.ok && data.user){
-      rememberUserRole(
-        data.user.username,
-        data.user.role || "user",
-        !!data.user.is_partner,
-        data.user.medals || {}
-      );
-
-      extraTournamentOrganizers.push(data.user);
-    }else{
-      extraTournamentOrganizers.push({
-        id:null,
-        username:clean,
-        role:"user",
-        is_partner:false,
-        medals:{}
-      });
-    }
-
-  }catch(error){
-    extraTournamentOrganizers.push({
-      id:null,
-      username:clean,
-      role:"user",
-      is_partner:false,
-      medals:{}
-    });
-  }
-
-  renderCoOrganizersEditor();
-  closeCoOrganizerModal();
-}
 
 function removeCoOrganizer(index){
   extraTournamentOrganizers.splice(index,1);
@@ -3989,6 +3928,10 @@ function getTournamentOrganizers(t){
 
 function organizerUserHtml(org){
   if(!org?.username) return "";
+
+  if(org.id === null || org.id === undefined){
+    return `<span style="color:#fff">${escapeHtml(org.username)}</span>`;
+  }
 
   rememberUserRole(
     org.username,
@@ -8241,19 +8184,24 @@ function closeAlert(){
   </div>
 </div>
 <div class="custom-alert" id="coOrganizerModal">
-  <div class="custom-alert-box">
-    <h3>Добавить организатора</h3>
-    <p>Введите ник организатора, например Eighth#2020</p>
+  <div class="custom-alert-box" style="width:min(620px,94vw);text-align:left">
+    <h3 style="text-align:center">Добавить организатора</h3>
 
+    <p style="text-align:center">Выбери аккаунт сайта или добавь обычное название.</p>
+
+    <div class="label">Аккаунты сайта</div>
+    <div id="coOrganizerUsersList" style="display:grid;gap:8px;max-height:280px;overflow:auto;margin-bottom:18px"></div>
+
+    <div class="label">Обычный организатор / компания</div>
     <input
       class="field"
       id="coOrganizerInput"
-      placeholder="Eighth#2020"
-      style="margin-bottom:18px;text-align:center;font-weight:900"
+      placeholder="Например: 123 или BGO Community"
+      style="margin-bottom:14px;text-align:center;font-weight:900"
     >
 
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <button class="btn gold" onclick="confirmAddCoOrganizer()">Добавить</button>
+      <button class="btn gold" onclick="addCustomCoOrganizer()">Добавить обычный текст</button>
       <button class="btn ghost" onclick="closeCoOrganizerModal()">Отмена</button>
     </div>
   </div>
