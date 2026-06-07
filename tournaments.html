@@ -3745,9 +3745,9 @@ let extraTournamentOrganizers = [];
 
 function coOrganizerEditorHtml(item){
   if(typeof item === "object" && item?.username){
-    if(item.id === null || item.id === undefined){
-      return `<span style="color:#fff">${escapeHtml(item.username)}</span>`;
-    }
+    if(item.id === null){
+  return `<span style="color:#fff">${escapeHtml(item.username)}</span>`;
+}
 
     rememberUserRole(
       item.username,
@@ -3900,11 +3900,12 @@ function getTournamentOrganizers(t){
     ? t.coOrganizers.map(o => {
         if(typeof o === "object"){
           return {
-            username:o.username,
-            role:o.role || "user",
-            is_partner:!!o.is_partner,
-            medals:o.medals || {}
-          };
+  id:o.id,
+  username:o.username,
+  role:o.role || "user",
+  is_partner:!!o.is_partner,
+  medals:o.medals || {}
+};
         }
 
         return {
@@ -3929,9 +3930,9 @@ function getTournamentOrganizers(t){
 function organizerUserHtml(org){
   if(!org?.username) return "";
 
-  if(org.id === null || org.id === undefined){
-    return `<span style="color:#fff">${escapeHtml(org.username)}</span>`;
-  }
+  if(org.id === null){
+  return `<span style="color:#fff">${escapeHtml(org.username)}</span>`;
+}
 
   rememberUserRole(
     org.username,
