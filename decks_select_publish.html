@@ -1992,7 +1992,7 @@ async function deleteDeckHistoryItem(deckId,index){
   try{
 
     const response = await fetch(
-      `${API_BASE}/decks/${deckId}/history/${index}`,
+      `https://berserk-server.com/api/decks/${deckId}/history/${index}`,
       {
         method:'DELETE',
         headers:authHeaders()
