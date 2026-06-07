@@ -571,7 +571,16 @@
         <button class="btn red" id="clearDeck">Очистить</button>
       </div>
       <button class="btn gold" id="createDeck" style="width:100%;margin:0 0 14px">Создать</button>
-      <button class="btn gold" id="saveEditedDeck" style="width:100%;margin:0 0 14px;display:none">
+      <button class="btn gold" id="saveEditedDeck" style="
+  width:100%;
+  min-height:68px;
+  margin:0 0 14px;
+  display:none;
+  white-space:normal;
+  text-align:center;
+  line-height:1.2;
+  padding:14px 18px;
+">
   Сохранить изменения
 </button>
       <div class="progress"><span id="progressBar"></span></div>
@@ -1431,7 +1440,9 @@ const createBtn = $('createDeck');
 
 if(editingDeckData){
   saveEditedBtn.style.display = 'inline-flex';
-  saveEditedBtn.textContent = editingDeckData.mode === 'published' ? 'Сохранить изменения опубликованной колоды' : 'Сохранить изменения';
+  saveEditedBtn.innerHTML = editingDeckData.mode === 'published'
+  ? 'Сохранить изменения<br>опубликованной колоды'
+  : 'Сохранить изменения';
   createBtn.textContent = 'Создать колоду';
 } else {
   saveEditedBtn.style.display = 'none';
