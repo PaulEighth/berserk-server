@@ -979,8 +979,39 @@ app.delete("/api/news/:id", verifyToken, requireRoles("admin", "developer", "mod
 
 });
 // Редактировать новость
-app.patch("/api/news/:id", verifyToken, requireRoles("admin", "developer", "moderator"), async (req, res) => {
+app.patch("/api/news/:id", verifyToken, async (req, res) => {
   try {
+        const newsResult = await pool.query(
+      "SELECT * FROM news WHERE id = $1",
+      [req.params.id]
+    );
+
+    if(newsResult.rows.length === 0){
+      return res.status(404).json({
+        ok:false,
+        error:"Новость не найдена"
+      });
+    }
+
+    const news = newsResult.rows[0];
+
+    const isAuthorById =
+      news.author_id &&
+      req.user.id &&
+      Number(news.author_id) === Number(req.user.id);
+
+    const isAuthorByName =
+      String(news.author_name || "").toLowerCase() ===
+      String(req.user.username || "").toLowerCase();
+
+    const isStaff = ["admin", "developer", "moderator"].includes(req.user.role);
+
+    if(!isStaff && !isAuthorById && !isAuthorByName){
+      return res.status(403).json({
+        ok:false,
+        error:"Редактировать новость может только автор, admin, developer или moderator"
+      });
+    }
     const {
       title,
       text,

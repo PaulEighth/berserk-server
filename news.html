@@ -644,9 +644,29 @@
       return ["admin", "developer", "moderator", "creator"].includes(getUserRole());
     }
 
-    function canEditNews(){
-      return ["admin", "developer", "moderator"].includes(getUserRole());
-    }
+    function canEditNews(news){
+  const user = getLoggedUser();
+  if(!user) return false;
+
+  const role = user.role || "user";
+
+  if(["admin", "developer", "moderator"].includes(role)){
+    return true;
+  }
+
+  if(!news) return false;
+
+  const sameId =
+    news.author_id &&
+    user.id &&
+    Number(news.author_id) === Number(user.id);
+
+  const sameName =
+    String(news.author || "").toLowerCase() ===
+    String(user.username || "").toLowerCase();
+
+  return sameId || sameName;
+}
 
     function canDeleteNews(){
       return ["admin", "developer", "moderator"].includes(getUserRole());
@@ -1121,7 +1141,8 @@ async function loadNewsFromServer(){
       title: n.title,
       text: n.text,
 
-      author: n.author_name,
+      author_id: n.author_id,
+author: n.author_name,
       author_role: n.author_role || "user",
       author_is_partner: !!n.author_is_partner,
       author_medals: n.author_medals || {},
@@ -1198,7 +1219,7 @@ async function loadNewsFromServer(){
       document.getElementById('modalGallery').innerHTML = renderMediaGallery(currentOpenMediaList) || '<p class="slot-note">Дополнительных изображений нет.</p>';
       let modalActions = '';
 
-      if(!previewingRequest && canEditNews()){
+      if(!previewingRequest && canEditNews(n)){
         modalActions += '<button class="btn gold" onclick="editPublishedNews()">Редактировать</button>';
       }
 
