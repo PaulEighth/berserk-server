@@ -558,7 +558,18 @@
 
         <label class="full">
           <span class="label">Текст новости</span>
-          <textarea class="textarea" id="newsTextInput" placeholder="Опиши новость полностью..."></textarea>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 8px">
+  <button type="button" class="btn ghost" onclick="formatNewsText('b')" style="padding:8px 12px">Ж</button>
+  <button type="button" class="btn ghost" onclick="formatNewsText('i')" style="padding:8px 12px"><i>К</i></button>
+  <button type="button" class="btn ghost" onclick="formatNewsText('u')" style="padding:8px 12px"><u>Ч</u></button>
+  <button type="button" class="btn ghost" onclick="formatNewsText('a')" style="padding:8px 12px">🔗 Ссылка</button>
+</div>
+
+<textarea class="textarea" id="newsTextInput" placeholder="Опиши новость полностью..."></textarea>
+
+<div class="slot-note">
+  Можно выделить текст и нажать Ж, К, Ч или 🔗. Поддерживаются только жирный, курсив, подчёркивание и ссылки.
+</div>
         </label>
 
         <label class="full">
@@ -737,6 +748,69 @@ function isLoggedIn(){
     }
     function saveRequests(){ localStorage.setItem(REQUESTS_KEY, JSON.stringify(NEWS_REQUESTS)); }
     function escapeHtml(str){ return String(str ?? '').replace(/[&<>'"]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[s])); }
+    function newsTextToSafeHtml(text){
+  let safe = escapeHtml(text || "");
+
+  safe = safe
+    .replace(/&lt;b&gt;([\s\S]*?)&lt;\/b&gt;/gi, "<b>$1</b>")
+    .replace(/&lt;i&gt;([\s\S]*?)&lt;\/i&gt;/gi, "<i>$1</i>")
+    .replace(/&lt;u&gt;([\s\S]*?)&lt;\/u&gt;/gi, "<u>$1</u>")
+    .replace(
+      /&lt;a href=&quot;(https?:\/\/[^&"]+)&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;([\s\S]*?)&lt;\/a&gt;/gi,
+      '<a href="$1" target="_blank" rel="noopener" style="color:var(--gold2);font-weight:900;text-decoration:underline">$2</a>'
+    );
+
+  return safe
+    .split("\n")
+    .filter(Boolean)
+    .map(p => `<p>${p}</p>`)
+    .join("");
+}
+
+function newsTextToPlain(text){
+  return String(text || "")
+    .replace(/<a[^>]*>([\s\S]*?)<\/a>/gi, "$1")
+    .replace(/<\/?(b|i|u)>/gi, "")
+    .replace(/<[^>]*>/g, "");
+}
+
+function formatNewsText(type){
+  const textarea = document.getElementById("newsTextInput");
+  if(!textarea) return;
+
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const selected = textarea.value.slice(start, end);
+  const before = textarea.value.slice(0, start);
+  const after = textarea.value.slice(end);
+
+  if(!selected){
+    alert("Сначала выдели текст, который хочешь оформить.");
+    return;
+  }
+
+  let replacement = selected;
+
+  if(type === "b") replacement = `<b>${selected}</b>`;
+  if(type === "i") replacement = `<i>${selected}</i>`;
+  if(type === "u") replacement = `<u>${selected}</u>`;
+
+  if(type === "a"){
+    const url = prompt("Вставь ссылку, начиная с https://");
+    if(!url) return;
+
+    if(!/^https?:\/\//i.test(url)){
+      alert("Ссылка должна начинаться с http:// или https://");
+      return;
+    }
+
+    replacement = `<a href="${url}" target="_blank" rel="noopener">${selected}</a>`;
+  }
+
+  textarea.value = before + replacement + after;
+  textarea.focus();
+  textarea.setSelectionRange(before.length, before.length + replacement.length);
+}
     function showAlert(title, text){
       document.getElementById('customAlertTitle').textContent = title || 'Готово';
       document.getElementById('customAlertText').textContent = text || '';
@@ -1182,7 +1256,7 @@ author: n.author_name,
           <img class="news-thumb" src="${n.cover || placeholder(n.title)}" alt="${escapeHtml(n.title)}" onerror="imgError(this,'${escapeHtml(n.title)}','📰')">
           <span class="news-date">${escapeHtml(n.date || '')}</span>
           <h3>${escapeHtml(n.title)}</h3>
-          <p>${escapeHtml((n.text || '').slice(0,130))}${(n.text || '').length > 130 ? '...' : ''}</p>
+          <p>${escapeHtml(newsTextToPlain(n.text || '').slice(0,130))}${newsTextToPlain(n.text || '').length > 130 ? '...' : ''}</p>
           <div class="tag-row"><span class="tag">${newsAuthorHtml(n)}</span></div>
           <div class="news-card-actions">
   <button type="button" class="btn gold" onclick="event.stopPropagation(); openNews(${i});">Открыть</button>
@@ -1560,7 +1634,7 @@ function renderRequests(){
 
       <p><strong>Автор:</strong> ${newsAuthorHtml(n)}</p>
 
-      <p>${escapeHtml((n.text || '').slice(0,220))}${(n.text || '').length > 220 ? '...' : ''}</p>
+      <p>${escapeHtml(newsTextToPlain(n.text || '').slice(0,220))}${newsTextToPlain(n.text || '').length > 220 ? '...' : ''}</p>
 
       <div class="request-actions">
         <button class="btn gold" onclick="previewRequest(${i})">Открыть</button>
