@@ -668,9 +668,9 @@
   return sameId || sameName;
 }
 
-    function canDeleteNews(){
-      return ["admin", "developer", "moderator"].includes(getUserRole());
-    }
+    function canDeleteNews(news){
+  return canEditNews(news);
+}
 
     function canSuggestNews(){
       return isLoggedIn() && !isBanned();
@@ -1223,9 +1223,9 @@ author: n.author_name,
         modalActions += '<button class="btn gold" onclick="editPublishedNews()">Редактировать</button>';
       }
 
-      if(!previewingRequest && canDeleteNews()){
-        modalActions += '<button class="btn danger" onclick="deletePublishedNews()">Удалить новость</button>';
-      }
+      if(!previewingRequest && canDeleteNews(n)){
+  modalActions += '<button class="btn danger" onclick="deletePublishedNews()">Удалить новость</button>';
+}
 
       document.getElementById('modalAdminActions').innerHTML = modalActions;
 loadNewsComments();
@@ -1683,14 +1683,14 @@ function renderRequests(){
     document.getElementById('confirmNo')?.addEventListener('click',closeConfirm);
 
     async function actuallyDeleteNews(){
-  if(!canDeleteNews()){
-    showAuthRequiredModal("Недостаточно прав. Удалять новости могут admin, developer и moderator.");
-    return;
-  }
-
   if(currentOpenNewsIndex === null || previewingRequest) return;
 
   const news = NEWS[currentOpenNewsIndex];
+
+  if(!canDeleteNews(news)){
+    showAuthRequiredModal("Недостаточно прав. Удалить новость может автор, admin, developer или moderator.");
+    return;
+  }
 
   try{
     const response = await fetch(`https://berserk-server.com/api/news/${news.id}`, {
@@ -1728,11 +1728,18 @@ function editPublishedNews(){
     }
 
 function deletePublishedNews(){
-      if(!canDeleteNews()){
-        showAuthRequiredModal("Недостаточно прав. Удалять новости могут admin, developer и moderator.");
+      if(currentOpenNewsIndex === null || previewingRequest) return;
+
+      const news = NEWS[currentOpenNewsIndex];
+
+      if(!canDeleteNews(news)){
+        showAuthRequiredModal("Недостаточно прав. Удалить новость может автор, admin, developer или moderator.");
         return;
       }
- confirmMode = 'news'; openConfirm('Удалить новость?', 'Новость будет удалена из ленты.'); }
+
+      confirmMode = 'news';
+      openConfirm('Удалить новость?', 'Новость будет удалена из ленты.');
+    }
 
     document.getElementById('openCreateNews').addEventListener('click',()=>openForm('create'));
     document.getElementById('openSuggestNews').addEventListener('click',()=>openForm('suggest'));

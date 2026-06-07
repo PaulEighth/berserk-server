@@ -947,36 +947,53 @@ app.delete("/api/news/:newsId/comments/:commentId", verifyToken, requireRoles("a
 
 });  
 // Удалить новость
-app.delete("/api/news/:id", verifyToken, requireRoles("admin", "developer", "moderator"), async (req, res) => {
-
+app.delete("/api/news/:id", verifyToken, async (req, res) => {
   try {
+    const newsResult = await pool.query(
+      "SELECT * FROM news WHERE id = $1",
+      [req.params.id]
+    );
 
-    const result = await pool.query(`
-      DELETE FROM news
-      WHERE id = $1
-      RETURNING *
-    `, [req.params.id]);
-
-    if (result.rows.length === 0) {
+    if(newsResult.rows.length === 0){
       return res.status(404).json({
-        ok: false,
-        error: "Новость не найдена"
+        ok:false,
+        error:"Новость не найдена"
       });
     }
 
-    res.json({
-      ok: true
-    });
+    const news = newsResult.rows[0];
+
+    const isAuthorById =
+      news.author_id &&
+      req.user.id &&
+      Number(news.author_id) === Number(req.user.id);
+
+    const isAuthorByName =
+      String(news.author_name || "").toLowerCase() ===
+      String(req.user.username || "").toLowerCase();
+
+    const isStaff = ["admin", "developer", "moderator"].includes(req.user.role);
+
+    if(!isStaff && !isAuthorById && !isAuthorByName){
+      return res.status(403).json({
+        ok:false,
+        error:"Удалить новость может только автор, admin, developer или moderator"
+      });
+    }
+
+    await pool.query(`
+      DELETE FROM news
+      WHERE id = $1
+    `, [req.params.id]);
+
+    res.json({ ok:true });
 
   } catch (error) {
-
     res.status(500).json({
-      ok: false,
-      error: error.message
+      ok:false,
+      error:error.message
     });
-
   }
-
 });
 // Редактировать новость
 app.patch("/api/news/:id", verifyToken, async (req, res) => {
