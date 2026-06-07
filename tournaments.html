@@ -54,6 +54,13 @@
   opacity:1;
   pointer-events:auto;
 }
+#customAlert{
+  z-index:120000;
+}
+
+#coOrganizerModal{
+  z-index:110000;
+}
 .custom-alert-box{
   width:420px;
   max-width:90%;
@@ -3782,9 +3789,10 @@ async function confirmAddCoOrganizer(){
     return;
   }
 
-  const exists = extraTournamentOrganizers.some(
-    item => normalizeNick(item).toLowerCase() === normalizeNick(clean).toLowerCase()
-  );
+  const exists = extraTournamentOrganizers.some(item => {
+    const itemNick = typeof item === "object" ? item.username : item;
+    return normalizeNick(itemNick).toLowerCase() === normalizeNick(clean).toLowerCase();
+  });
 
   if(exists){
     showAlert("Этот организатор уже добавлен.");
@@ -3798,26 +3806,37 @@ async function confirmAddCoOrganizer(){
 
     const data = await response.json();
 
-    if(!data.ok || !data.user){
-      showAlert(data.error || "Пользователь не найден.");
-      return;
+    if(data.ok && data.user){
+      rememberUserRole(
+        data.user.username,
+        data.user.role || "user",
+        !!data.user.is_partner,
+        data.user.medals || {}
+      );
+
+      extraTournamentOrganizers.push(data.user);
+    }else{
+      extraTournamentOrganizers.push({
+        id:null,
+        username:clean,
+        role:"user",
+        is_partner:false,
+        medals:{}
+      });
     }
 
-    rememberUserRole(
-      data.user.username,
-      data.user.role || "user",
-      !!data.user.is_partner,
-      data.user.medals || {}
-    );
-
-    extraTournamentOrganizers.push(data.user.username);
-    renderCoOrganizersEditor();
-    closeCoOrganizerModal();
-
   }catch(error){
-    console.error(error);
-    showAlert("Не удалось проверить организатора.");
+    extraTournamentOrganizers.push({
+      id:null,
+      username:clean,
+      role:"user",
+      is_partner:false,
+      medals:{}
+    });
   }
+
+  renderCoOrganizersEditor();
+  closeCoOrganizerModal();
 }
 
 function removeCoOrganizer(index){
@@ -3826,16 +3845,58 @@ function removeCoOrganizer(index){
 }
 
 function getTournamentOrganizers(t){
-  const main = t?.organizer ? [t.organizer] : [];
+  const main = t?.organizer ? [{
+    username:t.organizer,
+    role:t.organizer_role || "user",
+    is_partner:!!t.organizer_is_partner,
+    medals:t.organizer_medals || {}
+  }] : [];
+
   const extra = Array.isArray(t?.coOrganizers)
-    ? t.coOrganizers.map(o => typeof o === "object" ? o.username : o).filter(Boolean)
+    ? t.coOrganizers.map(o => {
+        if(typeof o === "object"){
+          return {
+            username:o.username,
+            role:o.role || "user",
+            is_partner:!!o.is_partner,
+            medals:o.medals || {}
+          };
+        }
+
+        return {
+          username:o,
+          role:"user",
+          is_partner:false,
+          medals:{}
+        };
+      }).filter(o => o.username)
     : [];
 
-  return [...new Set([...main, ...extra])];
+  const seen = new Set();
+
+  return [...main, ...extra].filter(org => {
+    const key = normalizeNick(org.username).toLowerCase();
+    if(!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function organizerUserHtml(org){
+  if(!org?.username) return "";
+
+  rememberUserRole(
+    org.username,
+    org.role || "user",
+    !!org.is_partner,
+    org.medals || {}
+  );
+
+  return roleNickHtml(org.username);
 }
 
 function organizersHtml(t){
-  return getTournamentOrganizers(t).map(nick => roleNickHtml(nick)).join("<br>");
+  return getTournamentOrganizers(t).map(org => organizerUserHtml(org)).join("<br>");
 }
 
 function isTournamentCoOrganizer(t,nick){
@@ -3843,7 +3904,7 @@ function isTournamentCoOrganizer(t,nick){
   if(!target) return false;
 
   return getTournamentOrganizers(t).some(
-    item => normalizeNick(item).toLowerCase() === target
+    org => normalizeNick(org.username).toLowerCase() === target
   );
 }
     async function warmTournamentRoleCache(){
@@ -8154,7 +8215,7 @@ position:fixed;
 inset:0;
 background:rgba(0,0,0,.72);
 backdrop-filter:blur(10px);
-z-index:99999;
+z-index:110000;
 justify-content:center;
 align-items:center;
 ">
