@@ -392,7 +392,7 @@
         <table>
           <thead>
             <tr>
-              <th>ID</th>
+              <th>№</th>
               <th>Ник</th>
               <th>Email</th>
               <th>Роль</th>
@@ -692,9 +692,9 @@ if(search){
         return;
       }
 
-      body.innerHTML = users.map(user => `
+      body.innerHTML = users.map((user,index) => `
         <tr>
-          <td>${user.id}</td>
+          <td>${index + 1}</td>
           <td style="color:${roleColors[user.role] || "#ffffff"}">${medalsHtml(user)}${userStarHtml(user)}${user.username}</td>
           <td class="muted">${user.email || "—"}</td>
           <td>
