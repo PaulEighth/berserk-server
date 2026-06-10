@@ -6521,38 +6521,74 @@ function renderPlayerContactLine(tournamentId, nick){
       $("deckViewModal")?.setAttribute("aria-hidden","true");
     }
 
-    function renderMatchPlayerDecks(t, room, playerNick, side){
-      const deckCount = getMatchDeckCount(t, room.round);
-      const banLimit = getMatchBanLimit(t, room.round);
-      const decks = getSubmittedDecksArray(t.id, playerNick);
+    function matchBanSideForCurrentUser(room){
+  const nick = normalizeMatchNick(getCurrentUserNick());
 
-      const bannedKey = side === "a" ? "bannedA" : "bannedB";
-      room[bannedKey] = Array.isArray(room[bannedKey]) ? room[bannedKey] : [];
-      const banned = room[bannedKey];
+  if(!nick) return "";
 
-      let html = "";
+  if(nick === normalizeMatchNick(room.playerA)) return "a";
+  if(nick === normalizeMatchNick(room.playerB)) return "b";
 
-      for(let i=0;i<deckCount;i++){
-        const deck = decks[i] || null;
-        const img = deck ? deckHeroImage(deck) : "";
-        const title = deck ? (deck.title || ("Колода " + (i+1))) : ("Колода " + (i+1));
-        const isBanned = banned.includes(i);
+  return "staff";
+}
 
-        html += `
-          <div class="match-deck-unit">
-            <button type="button" class="match-hero-btn ${isBanned ? "banned" : ""}" ${deck ? `onclick="openDeckView('${escapeHtml(t.id)}','${escapeHtml(playerNick)}',${i})"` : ""} title="${escapeHtml(title)}">
-              ${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" onerror="this.style.visibility='hidden'">` : `<span>${i+1}</span>`}
-            </button>
-            <button type="button" class="match-ban-btn ${isBanned ? "active" : ""}" onclick="toggleMatchDeckBan('${side}',${i})">✕</button>
-          </div>
-        `;
-      }
+function bothPlayersFinishedBans(room, banLimit){
+  const bannedA = Array.isArray(room.bannedA) ? room.bannedA : [];
+  const bannedB = Array.isArray(room.bannedB) ? room.bannedB : [];
 
-      return `
-        <div class="match-decks-line">${html}</div>
-        <div class="match-ban-limit">Банов: ${banned.length}/${banLimit}</div>
-      `;
-    }
+  if(Number(banLimit) <= 0) return true;
+
+  return bannedA.length >= banLimit && bannedB.length >= banLimit;
+}
+
+function shouldShowBanForSide(room, side, banLimit){
+  const currentSide = matchBanSideForCurrentUser(room);
+
+  if(currentSide === "staff") return true;
+
+  if(bothPlayersFinishedBans(room, banLimit)) return true;
+
+  if(currentSide === "a" && side === "b") return true;
+  if(currentSide === "b" && side === "a") return true;
+
+  return false;
+}
+
+function renderMatchPlayerDecks(t, room, playerNick, side){
+  const deckCount = getMatchDeckCount(t, room.round);
+  const banLimit = getMatchBanLimit(t, room.round);
+  const decks = getSubmittedDecksArray(t.id, playerNick);
+
+  const bannedKey = side === "a" ? "bannedA" : "bannedB";
+  room[bannedKey] = Array.isArray(room[bannedKey]) ? room[bannedKey] : [];
+
+  const realBanned = room[bannedKey];
+  const showBans = shouldShowBanForSide(room, side, banLimit);
+  const visibleBanned = showBans ? realBanned : [];
+
+  let html = "";
+
+  for(let i=0;i<deckCount;i++){
+    const deck = decks[i] || null;
+    const img = deck ? deckHeroImage(deck) : "";
+    const title = deck ? (deck.title || ("Колода " + (i+1))) : ("Колода " + (i+1));
+    const isBanned = visibleBanned.includes(i);
+
+    html += `
+      <div class="match-deck-unit">
+        <button type="button" class="match-hero-btn ${isBanned ? "banned" : ""}" ${deck ? `onclick="openDeckView('${escapeHtml(t.id)}','${escapeHtml(playerNick)}',${i})"` : ""} title="${escapeHtml(title)}">
+          ${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" onerror="this.style.visibility='hidden'">` : `<span>${i+1}</span>`}
+        </button>
+        <button type="button" class="match-ban-btn ${isBanned ? "active" : ""}" onclick="toggleMatchDeckBan('${side}',${i})">✕</button>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="match-decks-line">${html}</div>
+    <div class="match-ban-limit">Банов: ${visibleBanned.length}/${banLimit}</div>
+  `;
+}
 
     function toggleMatchDeckBan(side, deckIndex){
       const room = getCurrentMatchRoom();
