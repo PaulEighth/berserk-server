@@ -4031,7 +4031,8 @@ function isTournamentCoOrganizer(t,nick){
           if(user?.username) cache[normalizeNick(user.username).toLowerCase()] = user.role || "user";
         });
         saveRoleCache(cache);
-        if(typeof applyFilters === "function") (async function initTournamentsPage(){
+        if(typeof applyFilters === "function") 
+        (async function initTournamentsPage(){
   await loadTournamentsFromServer();
 
   tournaments = tournaments
@@ -4043,6 +4044,7 @@ function isTournamentCoOrganizer(t,nick){
   }
 
   applyFilters();
+  openTournamentFromUrl();
 
   if(typeof updateStats === "function"){
     updateStats();
@@ -4525,6 +4527,8 @@ if(typeof updateStats === "function"){
     window.confirmJoin = confirmJoin;
     window.openTrackModal = openTrackModal;
     window.openMatchRoom = openMatchRoom;
+    window.copyTournamentLink = copyTournamentLink;
+window.openTournamentFromUrl = openTournamentFromUrl;
     window.closeMatchRoom = closeMatchRoom;
 
     window.openSimpleMatchRoom = openSimpleMatchRoom;
@@ -7578,7 +7582,47 @@ return !!nick && isTournamentCoOrganizer(t,nick);
   await deleteTournament(pendingDeleteTournamentId);
 }
 
+function getTournamentDirectLink(id){
+  const url = new URL(window.location.href);
 
+  url.search = "";
+  url.hash = "";
+
+  url.searchParams.set("t", String(id));
+
+  return url.toString();
+}
+
+async function copyTournamentLink(id){
+  const link = getTournamentDirectLink(id);
+
+  try{
+    await navigator.clipboard.writeText(link);
+    showAlert("Ссылка скопирована");
+  }catch(e){
+    prompt("Скопируйте ссылку:", link);
+  }
+}
+
+function openTournamentFromUrl(){
+  const params = new URLSearchParams(window.location.search);
+
+  const tournamentId =
+    params.get("t") ||
+    params.get("id");
+
+  if(!tournamentId) return;
+
+  const t = tournaments.find(
+    x => String(x.id) === String(tournamentId)
+  );
+
+  if(!t) return;
+
+  setTimeout(() => {
+    openTrackModal(t.id);
+  }, 500);
+}
     function applyFilters(){
       const q = $('search').value.trim().toLowerCase();
       const status = $('status').value, format = $('format').value, sort = $('sort').value;
@@ -7621,6 +7665,8 @@ return !!nick && isTournamentCoOrganizer(t,nick);
 + '<button type="button" class="btn ghost track-tournament-btn" data-track-id="'+escapeHtml(String(t.id))+'" onclick="forceOpenTrackModal(\''+escapeHtml(String(t.id))+'\')">Отслеживать</button>'
 
 + '<button type="button" class="btn ghost" data-tournament-chat-id="'+escapeHtml(String(t.id))+'">💬 Чат турнира</button>'
+
++ '<button type="button" class="btn ghost" onclick="copyTournamentLink('+t.id+')">🔗 Ссылка</button>'
 
 + (canManageTournament(t.id) ? '<button type="button" class="btn ghost" onclick="openEditTournament('+t.id+')">Редактировать</button>' : '')
 + '<a class="btn ghost" href="deck-builder_checked.html">Собрать колоду</a>'
