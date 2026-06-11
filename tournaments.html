@@ -4167,6 +4167,7 @@ if(rights === "participants") return isOrganizer || isParticipant;
     });
   }
 
+
   if(localStorage.getItem("token")){
     try{
       const response = await fetch("https://berserk-server.com/api/player-decks", {
