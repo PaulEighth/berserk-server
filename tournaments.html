@@ -3246,8 +3246,8 @@ html body .bracket-cell.alive{
         <label><span class="label">Колод в финале</span><select class="select" id="requestDecksFinal"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
         <label><span class="label">Банов в финале</span><select class="select" id="requestBansFinal"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
         <label><span class="label">Мест</span><input class="field" id="requestPlaces" type="number" min="2" max="1000" placeholder="16"></label>
-        <label><span class="label">Сетка</span><select class="select" id="requestBracketSize"><option value="8">8 игроков</option><option value="16" selected>16 игроков</option><option value="32">32 игрока</option><option value="64">64 игрока</option><option value="128">128 игроков</option></select></label>
-        <label id="requestSwissRoundsLabel" style="display:none"><span class="label">Количество раундов</span><select class="select" id="requestSwissRounds"><option value="1">1 раунд</option><option value="2">2 раунда</option><option value="3" selected>3 раунда</option><option value="4">4 раунда</option><option value="5">5 раундов</option><option value="6">6 раундов</option><option value="7">7 раундов</option><option value="8">8 раундов</option><option value="9">9 раундов</option><option value="10">10 раундов</option></select></label>
+        <label id="requestBracketSizeLabel"><span class="label">Сетка</span><select class="select" id="requestBracketSize"><option value="8">8 игроков</option><option value="16" selected>16 игроков</option><option value="32">32 игрока</option><option value="64">64 игрока</option><option value="128">128 игроков</option></select></label>
+<label id="requestSwissRoundsLabel" style="display:none"><span class="label">Раунды</span><select class="select" id="requestSwissRounds"><option value="1">1 раунд</option><option value="2">2 раунда</option><option value="3" selected>3 раунда</option><option value="4">4 раунда</option><option value="5">5 раундов</option><option value="6">6 раундов</option><option value="7">7 раундов</option><option value="8">8 раундов</option><option value="9">9 раундов</option><option value="10">10 раундов</option></select></label>
         <label><span class="label">Права</span><select class="select" id="requestEditRights"><option value="organizer" selected>Редактирует только организатор</option><option value="participants">Редактируют участники турнира</option></select></label>
         <label>
           <span class="label">Доступ</span>
@@ -5222,7 +5222,7 @@ function injectSwordsEverywhere(){
       if(!formatSelect || !bracketSelect) return;
 
       const isSwiss = formatSelect.value === 'swiss';
-      const bracketLabel = bracketSelect.closest('label');
+      const bracketLabel = $('requestBracketSizeLabel');
       const roundsLabel = $('requestSwissRoundsLabel');
       if(bracketLabel) bracketLabel.style.display = isSwiss ? 'none' : '';
       if(roundsLabel) roundsLabel.style.display = isSwiss ? '' : 'none';
