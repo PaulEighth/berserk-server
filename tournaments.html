@@ -7858,7 +7858,7 @@ function getTournamentDirectLink(id){
   url.search = "";
   url.hash = "";
 
-  url.searchParams.set("t", String(id));
+  url.searchParams.set("track", String(id));
 
   return url.toString();
 }
@@ -7878,6 +7878,7 @@ function openTournamentFromUrl(){
   const params = new URLSearchParams(window.location.search);
 
   const tournamentId =
+    params.get("track") ||
     params.get("t") ||
     params.get("id");
 
