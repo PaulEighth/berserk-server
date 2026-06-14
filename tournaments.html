@@ -3237,7 +3237,7 @@ html body .bracket-cell.alive{
 </label>
         <label><span class="label">Дата начала</span><input class="field" id="requestStartDate" type="datetime-local"></label>
         <label><span class="label">Дата окончания</span><input class="field" id="requestEndDate" type="datetime-local"></label>
-        <label><span class="label">Формат</span><select class="select" id="requestFormat"><option value="bo1">BO1</option><option value="bo3">BO3</option><option value="bo5">BO5</option><option value="bo7">BO7</option><option value="swiss">Швейцарка</option><option value="single">Олимпийка</option></select></label>
+        <label><span class="label">Формат</span><select class="select" id="requestFormat" onchange="toggleTournamentBracketChoice()"><option value="bo1">BO1</option><option value="bo3">BO3</option><option value="bo5">BO5</option><option value="bo7">BO7</option><option value="swiss">Швейцарка</option><option value="single">Олимпийка</option></select></label>
         <label><span class="label">Колоды</span><select class="select" id="requestDeckMode"><option value="none" selected>Без колод</option><option value="required">Колоды обязательны</option></select></label>
         <label><span class="label">Формат до финала</span><select class="select" id="requestMatchFormat"><option value="bo1" selected>BO1</option><option value="bo3">BO3</option><option value="bo5">BO5</option><option value="bo7">BO7</option></select></label>
         <label><span class="label">Формат финала</span><select class="select" id="requestFinalFormat"><option value="bo1">BO1</option><option value="bo3" selected>BO3</option><option value="bo5">BO5</option><option value="bo7">BO7</option></select></label>
@@ -5215,7 +5215,7 @@ function injectSwordsEverywhere(){
     }
     window.togglePrivateTournamentRequest = togglePrivateTournamentRequest;
 
-    function toggleTournamentBracketChoice(){
+    window.toggleTournamentBracketChoice = function toggleTournamentBracketChoice(){
       const formatSelect = $('requestFormat');
       const bracketSelect = $('requestBracketSize');
       const placesInput = $('requestPlaces');
@@ -7669,6 +7669,7 @@ renderCoOrganizersEditor();
 if($("requestEndDate")) $("requestEndDate").value = toDateTimeLocal(t.endDate);
   if($("requestFormat")) $("requestFormat").value = t.format || "bo1";
   if($("requestSwissRounds")) $("requestSwissRounds").value = String(t.swissRounds || 3);
+  if(typeof toggleTournamentBracketChoice === "function") toggleTournamentBracketChoice();
   if($("requestDeckMode")) $("requestDeckMode").value = t.deckMode || "none";
   if($("requestMatchFormat")) $("requestMatchFormat").value = t.matchFormat || "bo1";
   if($("requestFinalFormat")) $("requestFinalFormat").value = t.finalFormat || "bo3";
