@@ -3164,6 +3164,61 @@ html body .bracket-cell.alive{
   }
 
 }
+/* ===== MOBILE FIX: tournament bracket ===== */
+@media(max-width:900px){
+  .track-modal{
+    align-items:flex-start !important;
+    padding:8px !important;
+  }
+
+  .track-box{
+    width:100vw !important;
+    max-width:100vw !important;
+    padding:12px !important;
+    border-radius:18px !important;
+    overflow-x:hidden !important;
+  }
+
+  .bracket-wrap,
+  .bracket-group{
+    width:100% !important;
+    max-width:100% !important;
+    overflow-x:auto !important;
+    padding:10px !important;
+  }
+
+  .clean-bracket,
+  .clean-bracket.bracket-8{
+    min-width:0 !important;
+    width:max-content !important;
+    transform:scale(.62);
+    transform-origin:top left;
+    margin-bottom:-180px;
+  }
+
+  .bracket-group-title{
+    font-size:20px !important;
+    text-align:center !important;
+  }
+
+  .tournament-final-group{
+    max-width:100% !important;
+    overflow-x:auto !important;
+  }
+
+  .tournament-final-center{
+    justify-content:flex-start !important;
+    overflow-x:auto !important;
+  }
+}
+
+@media(max-width:430px){
+  .clean-bracket,
+  .clean-bracket.bracket-8{
+    transform:scale(.54);
+    margin-bottom:-220px;
+  }
+}
 </style>
 </head>
 <body>
