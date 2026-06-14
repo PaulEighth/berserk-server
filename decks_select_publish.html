@@ -624,6 +624,34 @@
 
     <section class="panel">
       <div class="section-title"><h2>Зал славы колод</h2><span class="small">топ-5 по оценкам игроков</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+  <label>
+    <span class="label">Фракция</span>
+    <select class="field" id="hallFactionFilter">
+      <option value="">Все фракции</option>
+      <option value="neutral">Нейтральные</option>
+      <option value="mountains">Горы</option>
+      <option value="forest">Лес</option>
+      <option value="swamp">Болота</option>
+      <option value="dark">Тьма</option>
+      <option value="steppes">Степи</option>
+    </select>
+  </label>
+
+  <label>
+    <span class="label">Герой</span>
+    <select class="field" id="hallHeroFilter">
+      <option value="">Все герои</option>
+    </select>
+  </label>
+
+  <label>
+    <span class="label">Игрок</span>
+    <select class="field" id="hallAuthorFilter">
+      <option value="">Все игроки</option>
+    </select>
+  </label>
+</div>
       <div class="top-grid" id="topDecks"></div>
     </section>
   </main>
@@ -908,6 +936,62 @@ function formatDeckDate(value){
     function cardById(id){return cards.find(c=>String(c.id)===String(id))}
     function normalizeDeckCard(item){if(typeof item==='number'||typeof item==='string')return cardById(item)||{id:item,name:'Карта '+item,type:'Не указано',image:''};if(item&&item.id)return cardById(item.id)||normalizeCard(item,0);return null}
     function deckCardsFromIds(deck){return (deck.cards||[]).map(normalizeDeckCard).filter(Boolean)}
+    function getDeckHeroName(deck){
+  const hero = getHero(deckCardsFromIds(deck));
+  return hero ? String(hero.name || "") : "";
+}
+
+function getDeckFaction(deck){
+  const hero = getHero(deckCardsFromIds(deck));
+  return hero?.elements?.[0] || "";
+}
+
+function updateHallFilters(){
+  const heroSelect = $("hallHeroFilter");
+  const authorSelect = $("hallAuthorFilter");
+  if(!heroSelect || !authorSelect) return;
+
+  const currentHero = heroSelect.value;
+  const currentAuthor = authorSelect.value;
+
+  const heroes = [...new Set(
+    publishedDecks
+      .map(getDeckHeroName)
+      .filter(Boolean)
+      .sort((a,b)=>a.localeCompare(b,"ru"))
+  )];
+
+  const authors = [...new Set(
+    publishedDecks
+      .map(d => d.author || "Не указан")
+      .filter(Boolean)
+      .sort((a,b)=>a.localeCompare(b,"ru"))
+  )];
+
+  heroSelect.innerHTML =
+    `<option value="">Все герои</option>` +
+    heroes.map(h=>`<option value="${escapeHtml(h)}">${escapeHtml(h)}</option>`).join("");
+
+  authorSelect.innerHTML =
+    `<option value="">Все игроки</option>` +
+    authors.map(a=>`<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join("");
+
+  if(heroes.includes(currentHero)) heroSelect.value = currentHero;
+  if(authors.includes(currentAuthor)) authorSelect.value = currentAuthor;
+}
+
+function getFilteredHallDecks(){
+  const faction = $("hallFactionFilter")?.value || "";
+  const hero = $("hallHeroFilter")?.value || "";
+  const author = $("hallAuthorFilter")?.value || "";
+
+  return publishedDecks.filter(deck=>{
+    if(faction && getDeckFaction(deck) !== faction) return false;
+    if(hero && getDeckHeroName(deck) !== hero) return false;
+    if(author && String(deck.author || "Не указан") !== author) return false;
+    return true;
+  });
+}
     function groupDeckCards(deckCards){
       const hero = deckCards.find(c => String(c.type||'').toLowerCase().includes('герой'));
       const grouped = [];
@@ -2022,10 +2106,28 @@ found.description = description;
       },50);
     }
 
-    function renderAll(){renderMyDecks();renderTopDecks();updateStats()}
+    function renderAll(){
+  renderMyDecks();
+  renderTopDecks();
+  updateStats();
+
+  ["hallFactionFilter","hallHeroFilter","hallAuthorFilter"].forEach(id=>{
+    const el = $(id);
+    if(el && !el.dataset.bound){
+      el.dataset.bound = "1";
+      el.addEventListener("change", renderTopDecks);
+    }
+  });
+}
     function renderMyDecks(){
   const list=getAvailableDecks();;$('myDecks').innerHTML=list.length?list.map(d=>renderLocalDeckCard(d)).join(''):'<div class="empty">Пока нет созданных колод. Собери колоду во вкладке «База карт» и нажми «Создать», после этого она появится здесь.</div>'}
-    function renderTopDecks(){const top=[...publishedDecks].sort((a,b)=>deckScore(b)-deckScore(a));$('topDecks').innerHTML=top.length?top.map((d,i)=>renderDeckCard(d,i+1)).join(''):'<div class="empty">Топ появится после публикации колод.</div>'}
+    function renderTopDecks(){
+  updateHallFilters();
+  const top = getFilteredHallDecks().sort((a,b)=>deckScore(b)-deckScore(a)).slice(0,5);
+  $('topDecks').innerHTML = top.length
+    ? top.map((d,i)=>renderDeckCard(d,i+1)).join('')
+    : '<div class="empty">По выбранным фильтрам колод нет.</div>';
+}
     function updateStats(){
       const local=getAvailableDecks();
       const sortedByLikes=[...publishedDecks].sort((a,b)=>deckScore(b)-deckScore(a));
