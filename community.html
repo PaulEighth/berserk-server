@@ -284,11 +284,6 @@
   right:12px !important;
   bottom:calc(14px + env(safe-area-inset-bottom)) !important;
   z-index:300000 !important;
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  width:auto !important;
-  max-width:calc(100vw - 24px) !important;
   padding:11px 14px !important;
   border-radius:999px !important;
   border:1px solid rgba(232,194,112,.25) !important;
@@ -977,56 +972,29 @@ initCommunityVotes();
   <source src="BGO.mp3" type="audio/mpeg">
 </audio>
 
-<button id="musicToggle" type="button">🔇 Звук: ВЫКЛ</button>
-
-<style>
-#musicToggle{
-  position:fixed !important;
-  right:12px !important;
-  bottom:calc(14px + env(safe-area-inset-bottom)) !important;
-  z-index:300000 !important;
-  padding:11px 14px !important;
-  border-radius:999px !important;
-  border:1px solid rgba(232,194,112,.25) !important;
-  background:rgba(7,9,15,.92) !important;
-  color:#f0d28b !important;
-  font-weight:900 !important;
-  cursor:pointer !important;
-}
-</style>
+<button id="musicToggle" type="button">🔇 Музыка</button>
 
 <script>
-(function(){
-  const music = document.getElementById("bgMusic");
-  const btn = document.getElementById("musicToggle");
-  if(!music || !btn) return;
+const music = document.getElementById('bgMusic');
+const musicToggle = document.getElementById('musicToggle');
 
-  music.volume = 1;
-  music.muted = true;
+let musicOn = false;
 
-  const savedTime = Number(localStorage.getItem("musicTime") || 0);
-  if(savedTime) music.currentTime = savedTime;
-
-  btn.onclick = async function(){
-    try{
-      if(music.paused){
-        await music.play();
-        music.muted = false;
-      }else{
-        music.muted = !music.muted;
-      }
-
-      btn.textContent = music.muted ? "🔇 Звук: ВЫКЛ" : "🔊 Звук: ВКЛ";
-    }catch(e){
-      console.error("Музыка заблокирована браузером:", e);
+musicToggle.addEventListener('click', async () => {
+  try {
+    if (!musicOn) {
+      music.muted = false;
+      await music.play();
+      musicOn = true;
+      musicToggle.textContent = '🔊 Музыка';
+    } else {
+      music.pause();
+      musicOn = false;
+      musicToggle.textContent = '🔇 Музыка';
     }
-  };
-
-  setInterval(function(){
-    if(!music.paused){
-      localStorage.setItem("musicTime", music.currentTime);
-    }
-  }, 1000);
-})();
+  } catch (e) {
+    console.log('Музыка не запустилась:', e);
+  }
+});
 </script></body>
 </html>
