@@ -728,5 +728,42 @@ async function confirmDeleteMessage(){
     </div>
   </div>
 </div>
+<audio id="bgMusic" loop>
+  <source src="BGO.mp3" type="audio/mpeg">
+</audio>
+
+<button id="musicToggle">
+  🔇 Звук: ВЫКЛ
+</button>
+
+<script>
+const music = document.getElementById("bgMusic");
+const btn = document.getElementById("musicToggle");
+
+let savedTime = localStorage.getItem("musicTime");
+
+music.volume = 1;
+music.muted = true;
+btn.textContent = "🔇 Звук: ВЫКЛ";
+
+if(savedTime){
+  music.currentTime = savedTime;
+}
+
+btn.addEventListener("click", () => {
+  if(music.paused){
+    music.play();
+    music.muted = false;
+    btn.textContent = "🔊 Звук: ВКЛ";
+  }else{
+    music.muted = !music.muted;
+    btn.textContent = music.muted ? "🔇 Звук: ВЫКЛ" : "🔊 Звук: ВКЛ";
+  }
+});
+
+setInterval(() => {
+  localStorage.setItem("musicTime", music.currentTime);
+}, 1000);
+</script>
 </body>
 </html>
