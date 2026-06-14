@@ -651,6 +651,29 @@
     padding:10px 12px !important;
   }
 }
+@media(max-width:680px){
+
+  .panel.ad-banner{
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    overflow:visible !important;
+  }
+
+  .panel.ad-banner a{
+    display:block !important;
+  }
+
+  .panel.ad-banner img{
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+    object-fit:contain !important;
+    display:block !important;
+  }
+
+}
   </style>
 </head>
 <body>
@@ -712,7 +735,7 @@
     </p>
 
     <!-- Баннер 640x100 -->
-<div class="panel" style="
+<div class="panel ad-banner" style="
     padding:0;
     width:640px;
     height:200px;

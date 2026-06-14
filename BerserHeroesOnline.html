@@ -131,22 +131,7 @@
   color:var(--gold2);
   text-shadow:0 0 12px rgba(240,210,139,.4);
 }
-@media(max-width:680px){
 
-  .ad-banner{
-    width:100% !important;
-    height:auto !important;
-    overflow:visible !important;
-  }
-
-  .ad-banner img{
-    width:100% !important;
-    height:auto !important;
-    object-fit:contain !important;
-    display:block !important;
-  }
-
-}
 </style></head><body><nav class="nav">
   <a class="brand" href="BerserHeroesOnline.html">
     <span class="brand-mark">
@@ -226,7 +211,7 @@
 <section class="section" style="padding-top:0;padding-bottom:24px;">
   <div class="wrap">
     <!-- Баннер 1200x200 -->
-<div class="panel" style="
+<div class="panel ad-banner" style="
     padding:0;
     width:1200px;
     height:200px;
@@ -388,7 +373,7 @@
       </div>
 
       <!-- Баннер 770x370 -->
-<div class="panel" style="
+<div class="panel ad-banner" style="
     padding:0;
     width:770px;
     height:370px;
@@ -692,6 +677,29 @@
     font-size:13px !important;
     padding:10px 12px !important;
   }
+}
+@media(max-width:680px){
+
+  .panel.ad-banner{
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    overflow:visible !important;
+  }
+
+  .panel.ad-banner a{
+    display:block !important;
+  }
+
+  .panel.ad-banner img{
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+    object-fit:contain !important;
+    display:block !important;
+  }
+
 }
 </style>
 
