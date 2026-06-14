@@ -98,8 +98,8 @@
 }
 
 .hero h1{
-  max-width:none !important;
-  width:max-content !important;
+  max-width:100% !important;
+  width:auto !important;
   overflow:visible !important;
   word-break:normal !important;
   overflow-wrap:normal !important;
@@ -700,6 +700,91 @@
     display:block !important;
   }
 
+}
+@media(max-width:680px){
+
+  html,
+  body{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden !important;
+  }
+
+  .wrap{
+    width:calc(100% - 24px) !important;
+    max-width:100% !important;
+  }
+
+  .nav{
+    width:calc(100% - 28px) !important;
+    max-width:100% !important;
+    flex-wrap:wrap !important;
+    border-radius:24px !important;
+  }
+
+  .nav-links{
+    display:flex !important;
+    width:100% !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    flex-wrap:nowrap !important;
+    justify-content:flex-start !important;
+    gap:8px !important;
+    padding:8px 0 !important;
+    scrollbar-width:none;
+  }
+
+  .nav-links::-webkit-scrollbar{
+    display:none;
+  }
+
+  .nav-links a{
+    flex:0 0 auto !important;
+    white-space:nowrap !important;
+  }
+
+  .hero-grid,
+  .contacts,
+  .grid,
+  .three,
+  .four,
+  .actions-grid,
+  .gallery{
+    grid-template-columns:1fr !important;
+  }
+
+  .hero h1{
+    width:auto !important;
+    max-width:100% !important;
+  }
+
+  img,
+  video,
+  iframe{
+    max-width:100% !important;
+  }
+
+  .ad-banner{
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+    overflow:hidden !important;
+  }
+
+  .ad-banner img{
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+  }
+
+  .video-block{
+    display:none !important;
+  }
+
+  .video-block + div{
+    width:100% !important;
+    margin-left:0 !important;
+  }
 }
 </style>
 
