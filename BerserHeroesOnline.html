@@ -656,6 +656,11 @@
   right:12px !important;
   bottom:calc(14px + env(safe-area-inset-bottom)) !important;
   z-index:300000 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:auto !important;
+  max-width:calc(100vw - 24px) !important;
   padding:11px 14px !important;
   border-radius:999px !important;
   border:1px solid rgba(232,194,112,.25) !important;
@@ -913,7 +918,8 @@ window.addEventListener("load", function() {
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
 });
-</script><audio id="bgMusic" loop>
+</script>
+<audio id="bgMusic" loop>
   <source src="BGO.mp3" type="audio/mpeg">
 </audio>
 
