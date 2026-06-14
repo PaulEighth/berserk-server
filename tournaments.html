@@ -7160,9 +7160,8 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
     function saveSwissRounds(){ localStorage.setItem(SWISS_ROUNDS_KEY, JSON.stringify(swissRoundsData)); }
     function saveSwissManualStats(){ localStorage.setItem(SWISS_MANUAL_STATS_KEY, JSON.stringify(swissManualStats)); }
     function swissPlayersForTournament(t,id){
-      const players = getPlayers(id).slice(0, Number(t.places) || 1000);
-      return players.length ? players : Array.from({length:Math.min(Number(t.places)||0, 32)},(_,i)=>`Игрок ${i+1}`);
-    }
+  return getPlayers(id).slice(0, Number(t.places) || 1000);
+}
     function emptySwissStats(players){
       const stats={};
       players.forEach(n=>stats[n]={player:n,wins:0,draws:0,losses:0,points:0,diff:0});
