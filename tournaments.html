@@ -9319,7 +9319,9 @@ function redrawBracketLinesSoon(){
 window.addEventListener("load", redrawBracketLinesSoon);
 window.addEventListener("resize", redrawBracketLinesSoon);
 document.addEventListener("click", () => {
-  setTimeout(redrawBracketLinesSoon, 150);
+  setTimeout(drawBracketLines, 100);
+  setTimeout(drawBracketLines, 400);
+  setTimeout(drawBracketLines, 900);
 });
 </script>
 </body>
