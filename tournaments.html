@@ -9309,19 +9309,17 @@ function drawBracketLines(){
   });
 }
 
+let bracketLinesTimer = null;
+
 function redrawBracketLinesSoon(){
-  setTimeout(drawBracketLines, 50);
-  setTimeout(drawBracketLines, 250);
-  setTimeout(drawBracketLines, 700);
+  clearTimeout(bracketLinesTimer);
+  bracketLinesTimer = setTimeout(drawBracketLines, 120);
 }
 
 window.addEventListener("load", redrawBracketLinesSoon);
 window.addEventListener("resize", redrawBracketLinesSoon);
-document.addEventListener("click", redrawBracketLinesSoon);
-
-new MutationObserver(redrawBracketLinesSoon).observe(document.body,{
-  childList:true,
-  subtree:true
+document.addEventListener("click", () => {
+  setTimeout(redrawBracketLinesSoon, 150);
 });
 </script>
 </body>
