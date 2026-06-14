@@ -951,25 +951,23 @@ const btn = document.getElementById("musicToggle");
 
 let savedTime = localStorage.getItem("musicTime");
 
-// громкость
 music.volume = 1;
-
-// музыка изначально выключена
 music.muted = true;
 btn.textContent = "🔇 Звук: ВЫКЛ";
 
-// если есть время — продолжаем с него
-if (savedTime) {
-  music.currentTime = savedTime;
-}
+music.addEventListener("loadedmetadata", () => {
+  if (savedTime) {
+    music.currentTime = parseFloat(savedTime) || 0;
+  }
+});
 
 // кнопка включает / выключает музыку
 btn.addEventListener("click", () => {
   if (music.paused) {
-    music.play();
-    music.muted = false;
-    btn.textContent = "🔊 Звук: ВКЛ";
-  } else {
+  music.muted = false;
+  music.play();
+  btn.textContent = "🔊 Звук: ВКЛ";
+} else {
     music.muted = !music.muted;
     btn.textContent = music.muted
       ? "🔇 Звук: ВЫКЛ"
