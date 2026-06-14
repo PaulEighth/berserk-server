@@ -84,8 +84,27 @@
   }
 
   .nav-links{
-    display:none !important;
-  }
+  display:flex !important;
+  width:100% !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  flex-wrap:nowrap !important;
+  justify-content:flex-start !important;
+  gap:8px !important;
+  padding:8px 0 !important;
+
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+
+.nav-links::-webkit-scrollbar{
+  display:none;
+}
+
+.nav-links a{
+  flex:0 0 auto !important;
+  white-space:nowrap !important;
+}
 
   .btn{
     width:100% !important;
@@ -123,8 +142,27 @@
   }
 
   .nav-links{
-    display:none !important;
-  }
+  display:flex !important;
+  width:100% !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  flex-wrap:nowrap !important;
+  justify-content:flex-start !important;
+  gap:8px !important;
+  padding:8px 0 !important;
+
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+
+.nav-links::-webkit-scrollbar{
+  display:none;
+}
+
+.nav-links a{
+  flex:0 0 auto !important;
+  white-space:nowrap !important;
+}
 
   .hero{
     padding:36px 0 32px !important;
