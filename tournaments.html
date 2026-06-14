@@ -9241,19 +9241,19 @@ function drawBracketLines(){
     svg.classList.add("bracket-lines-svg");
     svg.style.cssText = `
       position:absolute;
-      inset:0;
+      left:0;
+      top:0;
       width:100%;
       height:100%;
       pointer-events:none;
       overflow:visible;
-      z-index:1;
+      z-index:2;
     `;
     bracket.prepend(svg);
 
     function pairs(cls){
       const col = bracket.querySelector("." + cls);
-      if(!col) return [];
-      return [...col.querySelectorAll(".bracket-pair")];
+      return col ? [...col.querySelectorAll(".bracket-pair")] : [];
     }
 
     function box(el){
@@ -9262,14 +9262,11 @@ function drawBracketLines(){
       return {
         left:b.left-a.left,
         right:b.right-a.left,
-        top:b.top-a.top,
-        bottom:b.bottom-a.top,
-        cx:b.left-a.left+b.width/2,
         cy:b.top-a.top+b.height/2
       };
     }
 
-    function path(d){
+    function line(d){
       const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
       p.setAttribute("d", d);
       p.setAttribute("fill", "none");
@@ -9280,46 +9277,52 @@ function drawBracketLines(){
       svg.appendChild(p);
     }
 
-    function connectLeft(fromArr, toArr){
-      fromArr.forEach((from, i) => {
-        const to = toArr[Math.floor(i / 2)];
+    function connectLeft(aArr,bArr){
+      aArr.forEach((from,i)=>{
+        const to = bArr[Math.floor(i/2)];
         if(!to) return;
-
         const a = box(from);
         const b = box(to);
-        const midX = (a.right + b.left) / 2;
-
-        path(`M ${a.right} ${a.cy} H ${midX} V ${b.cy} H ${b.left}`);
+        const mx = (a.right + b.left) / 2;
+        line(`M ${a.right} ${a.cy} H ${mx} V ${b.cy} H ${b.left}`);
       });
     }
 
-    function connectRight(fromArr, toArr){
-      fromArr.forEach((from, i) => {
-        const to = toArr[Math.floor(i / 2)];
+    function connectRight(aArr,bArr){
+      aArr.forEach((from,i)=>{
+        const to = bArr[Math.floor(i/2)];
         if(!to) return;
-
         const a = box(from);
         const b = box(to);
-        const midX = (a.left + b.right) / 2;
-
-        path(`M ${a.left} ${a.cy} H ${midX} V ${b.cy} H ${b.right}`);
+        const mx = (a.left + b.right) / 2;
+        line(`M ${a.left} ${a.cy} H ${mx} V ${b.cy} H ${b.right}`);
       });
     }
 
     connectLeft(pairs("left-r1"), pairs("left-r2"));
     connectLeft(pairs("left-r2"), pairs("left-r3"));
-    connectLeft(pairs("left-r3").length ? pairs("left-r3") : pairs("left-r2"), pairs("center-final"));
+    connectLeft(pairs("left-r3"), pairs("center-final"));
 
     connectRight(pairs("right-r1"), pairs("right-r2"));
     connectRight(pairs("right-r2"), pairs("right-r3"));
-    connectRight(pairs("right-r3").length ? pairs("right-r3") : pairs("right-r2"), pairs("center-final"));
+    connectRight(pairs("right-r3"), pairs("center-final"));
   });
 }
 
-window.addEventListener("load", drawBracketLines);
-window.addEventListener("resize", drawBracketLines);
-setTimeout(drawBracketLines, 300);
-setTimeout(drawBracketLines, 1000);
+function redrawBracketLinesSoon(){
+  setTimeout(drawBracketLines, 50);
+  setTimeout(drawBracketLines, 250);
+  setTimeout(drawBracketLines, 700);
+}
+
+window.addEventListener("load", redrawBracketLinesSoon);
+window.addEventListener("resize", redrawBracketLinesSoon);
+document.addEventListener("click", redrawBracketLinesSoon);
+
+new MutationObserver(redrawBracketLinesSoon).observe(document.body,{
+  childList:true,
+  subtree:true
+});
 </script>
 </body>
 </html>
