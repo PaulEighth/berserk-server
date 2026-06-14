@@ -990,7 +990,12 @@
 .swiss-pairings{display:grid;gap:10px}
 .swiss-pair{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;padding:12px;border-radius:16px;border:1px solid rgba(232,194,112,.14);background:rgba(255,255,255,.045)}
 .swiss-player{text-align:center;font-weight:950;color:#f4efe6}
-.swiss-vs{color:var(--muted);font-weight:950}
+.swiss-vs{
+  position:relative !important;
+  z-index:100000 !important;
+  color:var(--gold2) !important;
+  transform:translateY(-18px) !important;
+}
 .swiss-result{grid-column:1/-1;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .swiss-result .btn{padding:9px 12px;font-size:12px}
 .swiss-result-label{grid-column:1/-1;text-align:center;color:var(--gold2);font-weight:950}
@@ -3044,26 +3049,12 @@ html body .bracket-cell.alive{
 }
 
 /* Швейцарка: меч тоже по центру пары */
-.swiss-pair{
-  position:relative !important;
-}
 
-.swiss-pair .match-swords-btn{
-  position:absolute !important;
-  left:50% !important;
-  top:50% !important;
-  transform:translate(-50%, -50%) !important;
-  width:34px !important;
-  height:34px !important;
-  border-radius:50% !important;
-  border:1px solid rgba(240,210,139,.82) !important;
-  background:rgba(6,8,14,.97) !important;
-  color:#f0d28b !important;
-  display:grid !important;
-  place-items:center !important;
-  z-index:99999 !important;
-  cursor:pointer !important;
-  pointer-events:auto !important;
+.swiss-vs{
+  position:relative !important;
+  z-index:100000 !important;
+  color:var(--gold2) !important;
+  transform:translateY(-18px) !important;
 }
 /* PC FIX: лобби ⚔ всегда между двумя игроками */
 @media(min-width:861px){
@@ -3115,7 +3106,27 @@ html body .bracket-cell.alive{
     z-index:99999 !important;
   }
 }
+.swiss-pair{
+  position:relative !important;
+}
 
+.swiss-pair .match-swords-btn{
+  position:absolute !important;
+  left:50% !important;
+  top:56% !important;
+  transform:translate(-50%, -50%) !important;
+  width:34px !important;
+  height:34px !important;
+  border-radius:50% !important;
+  border:1px solid rgba(240,210,139,.82) !important;
+  background:rgba(6,8,14,.97) !important;
+  color:#f0d28b !important;
+  display:grid !important;
+  place-items:center !important;
+  z-index:99999 !important;
+  cursor:pointer !important;
+  pointer-events:auto !important;
+}
 </style>
 </head>
 <body>
