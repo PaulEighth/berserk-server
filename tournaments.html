@@ -3782,6 +3782,15 @@ if(playerDecks.length){
     return p;
   });
 }
+function getPlayerContact(id, playerName){
+  const p = (registrations[String(id)] || []).find(x => {
+    if(typeof x !== "object") return false;
+    const nick = x.username || x.name || "";
+    return String(nick).toLowerCase() === String(playerName).toLowerCase();
+  });
+
+  return p?.contactInfo || "";
+}
     function getExtraTaken(id){ return getPlayers(id).length; }
     function escapeHtml(str){ return String(str ?? '').replace(/[&<>'"]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[s])); }
     function formatDate(str){ const d = new Date(str.replace(' ','T')); return d.toLocaleString('ru-RU',{day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}); }
@@ -7358,9 +7367,9 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
     data-a="${escapeHtml(p.a || '')}"
     data-b="${escapeHtml(p.b || '')}"
     title="Открыть матч">⚔</button>
-  <div class="swiss-player">${escapeHtml(p.a)}${scoreAInput}</div>
+  <div class="swiss-player">${escapeHtml(p.a)}${getPlayerContact(id,p.a) ? `<div class="small-note">${escapeHtml(getPlayerContact(id,p.a))}</div>` : ""}${scoreAInput}</div>
   <div class="swiss-vs">vs</div>
-  <div class="swiss-player">${escapeHtml(p.b)}${scoreBInput}</div>
+  <div class="swiss-player">${escapeHtml(p.b)}${getPlayerContact(id,p.b) ? `<div class="small-note">${escapeHtml(getPlayerContact(id,p.b))}</div>` : ""}${scoreBInput}</div>
   <div class="swiss-result-label">${resultText}</div>
 </div>`;
       }).join('')}</div></div>`;
