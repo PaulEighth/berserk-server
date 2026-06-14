@@ -3252,6 +3252,56 @@ html body .bracket-cell.alive{
   cursor:pointer !important;
   pointer-events:auto !important;
 }
+/* PC FIX: лобби ⚔ всегда между двумя игроками */
+@media(min-width:861px){
+
+  .bracket-pair,
+  .match-pair-auto,
+  .final-match-pair,
+  .third-match-pair{
+    position:relative !important;
+    overflow:visible !important;
+  }
+
+  .bracket-pair .match-swords-btn,
+  .match-pair-auto .match-swords-btn,
+  .final-match-pair .match-swords-btn,
+  .third-match-pair .match-swords-btn{
+    position:absolute !important;
+    left:50% !important;
+    right:auto !important;
+    top:50% !important;
+    transform:translate(-50%, -50%) !important;
+    z-index:99999 !important;
+  }
+
+  .bracket-pair.match-side-left .match-swords-btn,
+  .bracket-pair.match-side-right .match-swords-btn,
+  .bracket-pair.match-side-a .match-swords-btn,
+  .bracket-pair.match-side-b .match-swords-btn,
+  .bracket-pair.match-side-A .match-swords-btn,
+  .bracket-pair.match-side-B .match-swords-btn,
+  .match-pair-auto.match-side-left .match-swords-btn,
+  .match-pair-auto.match-side-right .match-swords-btn{
+    left:50% !important;
+    right:auto !important;
+    top:50% !important;
+    transform:translate(-50%, -50%) !important;
+  }
+
+  .swiss-pair{
+    position:relative !important;
+  }
+
+  .swiss-pair .match-swords-btn{
+    position:absolute !important;
+    left:50% !important;
+    right:auto !important;
+    top:50% !important;
+    transform:translate(-50%, -50%) !important;
+    z-index:99999 !important;
+  }
+}
 </style>
 </head>
 <body>
