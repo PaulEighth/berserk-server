@@ -9377,5 +9377,44 @@ document.addEventListener("click", function(e){
   window.openTournamentChat(btn.dataset.tournamentChatId);
 }, true);
 </script>
+<script>
+function forceAllLobbySwordsToCenter(){
+  if(!window.matchMedia("(min-width:861px)").matches) return;
+
+  document.querySelectorAll(`
+    .bracket-pair > .match-swords-btn,
+    .match-pair-auto > .match-swords-btn,
+    .final-match-pair > .match-swords-btn,
+    .third-match-pair > .match-swords-btn,
+    .swiss-pair > .match-swords-btn
+  `).forEach(btn => {
+    btn.style.setProperty("left", "50%", "important");
+    btn.style.setProperty("right", "auto", "important");
+    btn.style.setProperty("top", "50%", "important");
+    btn.style.setProperty("bottom", "auto", "important");
+    btn.style.setProperty("transform", "translate(-50%, -50%)", "important");
+    btn.style.setProperty("margin", "0", "important");
+    btn.style.setProperty("z-index", "999999", "important");
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  forceAllLobbySwordsToCenter();
+  setTimeout(forceAllLobbySwordsToCenter, 100);
+  setTimeout(forceAllLobbySwordsToCenter, 500);
+  setTimeout(forceAllLobbySwordsToCenter, 1000);
+});
+
+const lobbySwordObserver = new MutationObserver(() => {
+  forceAllLobbySwordsToCenter();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  lobbySwordObserver.observe(document.body, {
+    childList:true,
+    subtree:true
+  });
+});
+</script>
 </body>
 </html>
