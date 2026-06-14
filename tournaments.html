@@ -5502,10 +5502,17 @@ renderCoOrganizersEditor();
   modal.setAttribute('aria-hidden','false');
 
   try{
-    renderTrackModal(id);
-  }catch(e){
-    console.error("Ошибка открытия отслеживания:", e);
+  renderTrackModal(id);
+
+  if(typeof drawBracketLines === "function"){
+    setTimeout(drawBracketLines, 100);
+    setTimeout(drawBracketLines, 400);
+    setTimeout(drawBracketLines, 900);
   }
+
+}catch(e){
+  console.error("Ошибка открытия отслеживания:", e);
+}
 
     if(tournamentRefreshTimer){
     clearInterval(tournamentRefreshTimer);
