@@ -3302,6 +3302,106 @@ html body .bracket-cell.alive{
     z-index:99999 !important;
   }
 }
+/* ===== DECOR: линии сетки 1/8 -> 1/4, первый тест ===== */
+@media(min-width:901px){
+
+  .clean-bracket{
+    position:relative !important;
+  }
+
+  .bracket-col{
+    position:relative !important;
+    overflow:visible !important;
+  }
+
+  .bracket-pair{
+    position:relative !important;
+    overflow:visible !important;
+  }
+
+  /* левая сторона: выход линии вправо от матчей 1/8 */
+  .left-r1 .bracket-pair:nth-of-type(2n-1)::after{
+    content:"" !important;
+    display:block !important;
+    position:absolute !important;
+    right:-34px !important;
+    top:50% !important;
+    width:34px !important;
+    height:2px !important;
+    background:rgba(240,210,139,.58) !important;
+    box-shadow:0 0 10px rgba(214,168,79,.18) !important;
+    z-index:1 !important;
+  }
+
+  .left-r1 .bracket-pair:nth-of-type(2n)::after{
+    content:"" !important;
+    display:block !important;
+    position:absolute !important;
+    right:-34px !important;
+    top:50% !important;
+    width:34px !important;
+    height:2px !important;
+    background:rgba(240,210,139,.58) !important;
+    box-shadow:0 0 10px rgba(214,168,79,.18) !important;
+    z-index:1 !important;
+  }
+
+  /* правая сторона: выход линии влево от матчей 1/8 */
+  .right-r1 .bracket-pair:nth-of-type(2n-1)::after{
+    content:"" !important;
+    display:block !important;
+    position:absolute !important;
+    left:-34px !important;
+    top:50% !important;
+    width:34px !important;
+    height:2px !important;
+    background:rgba(240,210,139,.58) !important;
+    box-shadow:0 0 10px rgba(214,168,79,.18) !important;
+    z-index:1 !important;
+  }
+
+  .right-r1 .bracket-pair:nth-of-type(2n)::after{
+    content:"" !important;
+    display:block !important;
+    position:absolute !important;
+    left:-34px !important;
+    top:50% !important;
+    width:34px !important;
+    height:2px !important;
+    background:rgba(240,210,139,.58) !important;
+    box-shadow:0 0 10px rgba(214,168,79,.18) !important;
+    z-index:1 !important;
+  }
+  /* вертикальные скобки между двумя матчами 1/8 */
+  .left-r1 .bracket-pair:nth-of-type(2n-1)::before{
+    content:"" !important;
+    display:block !important;
+    position:absolute !important;
+    right:-34px !important;
+    top:50% !important;
+    width:2px !important;
+    height:84px !important;
+    background:rgba(240,210,139,.58) !important;
+    z-index:1 !important;
+  }
+
+  .right-r1 .bracket-pair:nth-of-type(2n-1)::before{
+    content:"" !important;
+    display:block !important;
+    position:absolute !important;
+    left:-34px !important;
+    top:50% !important;
+    width:2px !important;
+    height:84px !important;
+    background:rgba(240,210,139,.58) !important;
+    z-index:1 !important;
+  }
+
+  /* мечи должны быть выше линий */
+  .match-swords-btn{
+    z-index:999999 !important;
+  }
+}
 </style>
 </head>
 <body>
