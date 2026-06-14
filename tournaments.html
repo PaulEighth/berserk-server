@@ -3247,7 +3247,7 @@ html body .bracket-cell.alive{
         <label><span class="label">Банов в финале</span><select class="select" id="requestBansFinal"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
         <label><span class="label">Мест</span><input class="field" id="requestPlaces" type="number" min="2" max="1000" placeholder="16"></label>
         <label><span class="label">Сетка</span><select class="select" id="requestBracketSize"><option value="8">8 игроков</option><option value="16" selected>16 игроков</option><option value="32">32 игрока</option><option value="64">64 игрока</option><option value="128">128 игроков</option></select></label>
-        <label id="requestSwissRoundsLabel" style="display:none"><span class="label">Количество раундов</span><select class="select" id="requestSwissRounds"><option value="1">1 раунд</option><option value="2">2 раунда</option><option value="3" selected>3 раунда</option><option value="4">4 раунда</option><option value="5">5 раундов</option></select></label>
+        <label id="requestSwissRoundsLabel" style="display:none"><span class="label">Количество раундов</span><select class="select" id="requestSwissRounds"><option value="1">1 раунд</option><option value="2">2 раунда</option><option value="3" selected>3 раунда</option><option value="4">4 раунда</option><option value="5">5 раундов</option><option value="6">6 раундов</option><option value="7">7 раундов</option><option value="8">8 раундов</option><option value="9">9 раундов</option><option value="10">10 раундов</option></select></label>
         <label><span class="label">Права</span><select class="select" id="requestEditRights"><option value="organizer" selected>Редактирует только организатор</option><option value="participants">Редактируют участники турнира</option></select></label>
         <label>
           <span class="label">Доступ</span>
@@ -3723,6 +3723,7 @@ bansFinal: Number(t.bansfinal || t.bansFinal || 0),
     bracketSize: Number(t.bracket_size || t.bracketSize || t.bracket || t.grid || t.max_players) || 8,
 grid: Number(t.bracket_size || t.bracketSize || t.bracket || t.grid || t.max_players) || 8,
 bracket: Number(t.bracket_size || t.bracketSize || t.bracket || t.grid || t.max_players) || 8,
+swissRounds: Number(parsedSwissData.swissRounds || t.swissRounds || 3),
 bracketData: Array.isArray(t.bracket) ? t.bracket : [],
 
     swissData: parsedSwissData
@@ -5420,7 +5421,7 @@ renderCoOrganizersEditor();
             <div class="info-row"><span>Формат</span><span>${escapeHtml(formatMap[r.format] || r.format)}</span></div>
             <div class="info-row"><span>Мест</span><span>${r.places}</span></div>
             <div class="info-row"><span>Доступ</span><span>${r.isPrivate ? 'Закрытый' : 'Открытый'}</span></div>
-            <div class="info-row"><span>${r.format === 'swiss' ? 'Раундов' : 'Сетка'}</span><span>${r.format === 'swiss' ? (r.swissRounds || 3) + ' из 5' : (r.bracketSize||16) + ' игроков'}</span></div>
+            <div class="info-row"><span>${r.format === 'swiss' ? 'Раундов' : 'Сетка'}</span><span>${r.format === 'swiss' ? (r.swissRounds || 3) + ' из 10' : (r.bracketSize||16) + ' игроков'}</span></div>
             <div class="info-row"><span>Права</span><span>${r.editRights === 'participants' ? 'Участники турнира могут редактировать' : 'Только организатор'}</span></div>
             <div class="info-row"><span>Призы</span><span>${escapeHtml((r.prizes||[r.prize]).map((p,i)=>`${i+1}: ${p||"-"}`).join(" | "))}</span></div>
             <div class="info-row"><span>Правила</span><span>${escapeHtml(r.deckRules)}</span></div>
@@ -7216,7 +7217,7 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
     function ensureSwissData(t,id){
   const key=String(id);
   const players=swissPlayersForTournament(t,id);
-  const maxRounds=Math.min(5, Math.max(1, Number(t.swissRounds || 3)));
+  const maxRounds=Math.min(10, Math.max(1, Number(t.swissRounds || 3)));
 
   if(!swissRoundsData[key]) swissRoundsData[key]={current:0,rounds:[]};
 
@@ -7283,7 +7284,7 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
       if(!t) return;
       const players=swissPlayersForTournament(t,id);
       const data=ensureSwissData(t,id);
-      const maxRounds=Math.min(5, Math.max(1, Number(t.swissRounds || 3)));
+      const maxRounds=Math.min(10, Math.max(1, Number(t.swissRounds || 3)));
 
       // Если мы уже смотрим созданный прошлый раунд — просто листаем историю вперёд.
       if(data.current < data.rounds.length-1){ data.current++; saveSwissRounds(); renderTrackModal(id); return; }
@@ -7316,7 +7317,7 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
       const t=tournaments.find(item=>String(item.id)===String(id));
       if(!t) return;
       const data=ensureSwissData(t,id);
-      const maxRounds=Math.min(5,Math.max(1,Number(t.swissRounds || 3)));
+      const maxRounds=Math.min(10,Math.max(1,Number(t.swissRounds || 3)));
       const idx=Number(data.current)||0;
       const visibleRounds = idx >= maxRounds ? data.rounds.slice(0,maxRounds) : data.rounds.slice(0,idx+1);
       const players=swissPlayersForTournament(t,id);
@@ -7368,7 +7369,7 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
     function renderSwissMode(t,id,players){
       const data=ensureSwissData(t,id);
       const idx=Number(data.current)||0;
-      const maxRounds=Math.min(5,Math.max(1,Number(t.swissRounds || 3)));
+      const maxRounds=Math.min(10,Math.max(1,Number(t.swissRounds || 3)));
       const isPlayoffStage = idx >= maxRounds;
       const visibleRounds = isPlayoffStage ? data.rounds.slice(0,maxRounds) : data.rounds.slice(0,idx+1);
       const size = Number(t.bracketSize || t.bracket || t.grid || t.maxPlayers || t.places || 8);
@@ -7379,7 +7380,7 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
           <div class="swiss-controls"><button class="btn ghost" onclick="previousSwissRound(${id})">← Назад</button><div class="swiss-round-title">Раунд ${maxRounds+1}: сетка после швейцарки</div><button class="btn gold" onclick="nextSwissRound(${id})">Следующий раунд →</button></div>
           ${renderSwissStandingsTable(id,players,visibleRounds)}
           <div class="track-note">Швейцарка завершена: таблица зафиксировала места автоматически по очкам и разнице. Ниже начинается сетка по итоговому рейтингу.</div>
-          <div class="swiss-bracket-after"><div class="bracket-size-row" style="display:flex"><span>Сетка после швейцарки: ${bracketSize} игроков. Размер зафиксирован и не меняется после создания турнира.</span></div>${renderFullBracket(id, standingsPlayers, bracketSize)}</div>
+          <div class="swiss-bracket-after"><div class="bracket-size-row" style="display:flex"><span>Сетка после швейцарки: топ 8 игроков.</span></div>${renderFullBracket(id, standingsPlayers.slice(0,8), 8)}</div>
         </div>`;
       }
 
@@ -7522,7 +7523,7 @@ const players = getPlayers(id);
          <div class="info-row"><span>До финала</span><span>${matchFormatLabel(t.matchFormat)} · колод: ${t.decksBeforeFinal || 1} · банов: ${t.bansBeforeFinal || 1}</span></div>
          <div class="info-row"><span>Финал</span><span>${matchFormatLabel(t.finalFormat)} · колод: ${t.decksFinal || 1} · банов: ${t.bansFinal || 1}</span></div>
          <div class="info-row"><span>Количество мест</span><span>${t.places}</span></div>
-         <div class="info-row"><span>${t.format === 'swiss' ? 'Раундов' : 'Размер сетки'}</span><span>${t.format === 'swiss' ? (t.swissRounds || 3) + ' из 5' : bracketSize + ' игроков'}</span></div>
+         <div class="info-row"><span>${t.format === 'swiss' ? 'Раундов' : 'Размер сетки'}</span><span>${t.format === 'swiss' ? (t.swissRounds || 3) + ' из 10' : bracketSize + ' игроков'}</span></div>
          <div class="info-row"><span>Правила колод</span><span>${escapeHtml(t.deckRules)}</span></div>
          <div class="info-row"><span>Статус</span><span>${escapeHtml((statusMap[t.status]||['Неизвестно'])[0])}</span></div>`;
 
@@ -7667,6 +7668,7 @@ renderCoOrganizersEditor();
   if($("requestStartDate")) $("requestStartDate").value = toDateTimeLocal(t.date);
 if($("requestEndDate")) $("requestEndDate").value = toDateTimeLocal(t.endDate);
   if($("requestFormat")) $("requestFormat").value = t.format || "bo1";
+  if($("requestSwissRounds")) $("requestSwissRounds").value = String(t.swissRounds || 3);
   if($("requestDeckMode")) $("requestDeckMode").value = t.deckMode || "none";
   if($("requestMatchFormat")) $("requestMatchFormat").value = t.matchFormat || "bo1";
   if($("requestFinalFormat")) $("requestFinalFormat").value = t.finalFormat || "bo3";
