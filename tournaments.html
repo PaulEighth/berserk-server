@@ -7214,17 +7214,32 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
       return pairings;
     }
     function ensureSwissData(t,id){
-      const key=String(id);
-      const players=swissPlayersForTournament(t,id);
-      const maxRounds=Math.min(5, Math.max(1, Number(t.swissRounds || 3)));
-      if(!swissRoundsData[key]) swissRoundsData[key]={current:0,rounds:[]};
-      const data=swissRoundsData[key];
-      if(!data.rounds.length) data.rounds.push({number:1,pairings:makeSwissPairings(players,[],id)});
-      // current может быть равен maxRounds: это уже стадия плей-офф после швейцарки.
-      data.current=Math.min(Math.max(Number(data.current)||0,0), Math.min(maxRounds, data.rounds.length));
-      saveSwissRounds();
-      return data;
-    }
+  const key=String(id);
+  const players=swissPlayersForTournament(t,id);
+  const maxRounds=Math.min(5, Math.max(1, Number(t.swissRounds || 3)));
+
+  if(!swissRoundsData[key]) swissRoundsData[key]={current:0,rounds:[]};
+
+  const data=swissRoundsData[key];
+
+  const currentPlayersKey = players.slice().sort().join('||');
+  const savedPlayersKey = data.playersKey || '';
+
+  if(savedPlayersKey !== currentPlayersKey){
+    data.current = 0;
+    data.rounds = [{number:1,pairings:makeSwissPairings(players,[],id)}];
+    data.playersKey = currentPlayersKey;
+  }
+
+  if(!data.rounds.length){
+    data.rounds.push({number:1,pairings:makeSwissPairings(players,[],id)});
+    data.playersKey = currentPlayersKey;
+  }
+
+  data.current=Math.min(Math.max(Number(data.current)||0,0), Math.min(maxRounds, data.rounds.length));
+  saveSwissRounds();
+  return data;
+}
     function setSwissResult(id,roundIndex,pairIndex,result){
       const data=swissRoundsData[String(id)];
       if(!data || !data.rounds[roundIndex] || !data.rounds[roundIndex].pairings[pairIndex]) return;
