@@ -669,6 +669,38 @@
   }
 
 }
+@media(max-width:680px){
+
+  html,
+  body{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden !important;
+  }
+
+  .hero-top{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:24px !important;
+    align-items:center !important;
+    margin-top:18px !important;
+  }
+
+  .panel.ad-banner{
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+    overflow:hidden !important;
+  }
+
+  .panel.ad-banner img{
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+    object-fit:contain !important;
+    display:block !important;
+  }
+}
   </style>
 </head>
 <body>
@@ -717,13 +749,7 @@
     Поддержать неофициальный, фанатский проект по Berserk Heroes Online
   </h1>
 
-  <div style="
-    display:grid;
-    grid-template-columns:1fr 650px;
-    gap:40px;
-    align-items:center;
-    margin-top:18px;
-  ">
+  <div class="hero-top">
     <p class="lead">
       Эта страница для тех, кто хочет помочь развитию сайта, турниров,
       базы карт и всего сообщества фанатского проекта по Berserk Heroes Online
@@ -732,8 +758,9 @@
     <!-- Баннер 640x100 -->
 <div class="panel ad-banner" style="
     padding:0;
-    width:640px;
-    height:200px;
+    width:100%;
+    max-width:640px;
+    height:auto;
     overflow:hidden;
 ">
     <a href="" target="_blank" rel="noopener noreferrer">
