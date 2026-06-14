@@ -1150,31 +1150,4 @@ function closeLogoutModal(){
   document.getElementById("logoutModal").style.display = "none";
 }
 </script>
-<audio id="bgMusic" loop>
-  <source src="BGO.mp3" type="audio/mpeg">
-</audio>
-
-<script>
-const music = document.getElementById('bgMusic');
-const musicToggle = document.getElementById('musicToggle');
-
-let musicOn = false;
-
-musicToggle.addEventListener('click', async () => {
-  try {
-    if (!musicOn) {
-      music.muted = false;
-      await music.play();
-      musicOn = true;
-      musicToggle.textContent = '🔊 Музыка';
-    } else {
-      music.pause();
-      musicOn = false;
-      musicToggle.textContent = '🔇 Музыка';
-    }
-  } catch (e) {
-    console.log('Музыка не запустилась:', e);
-  }
-});
-</script>
 </body></html>
