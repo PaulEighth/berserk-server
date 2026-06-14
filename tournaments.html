@@ -7937,7 +7937,7 @@ function openTournamentFromUrl(){
 
 + '<button type="button" class="btn ghost" data-tournament-chat-id="'+escapeHtml(String(t.id))+'">💬 Чат турнира</button>'
 
-+ '<button type="button" class="btn ghost" onclick="copyTournamentLink('+t.id+')">🔗 Ссылка</button>'
++ '<button type="button" class="btn ghost" onclick="copyTournamentLink(\''+escapeHtml(String(t.id))+'\')">🔗 Ссылка</button>'
 
 + (canManageTournament(t.id) ? '<button type="button" class="btn ghost" onclick="openEditTournament('+t.id+')">Редактировать</button>' : '')
 + '<a class="btn ghost" href="deck-builder_checked.html">Собрать колоду</a>'
@@ -8939,6 +8939,7 @@ function closeLogoutModal(){
   async function bootFix(){
   await loadTournamentsFromServer();
   if(typeof applyFilters === 'function') applyFilters();
+  if(typeof openTournamentFromUrl === 'function') openTournamentFromUrl();
   if(typeof updateStats === 'function') updateStats();
 }
 
