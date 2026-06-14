@@ -3219,6 +3219,39 @@ html body .bracket-cell.alive{
     margin-bottom:-220px;
   }
 }
+/* FINAL FIX: мечи всегда по центру пары, как в финале */
+.bracket-pair .match-swords-btn,
+.match-pair-auto .match-swords-btn,
+.final-match-pair .match-swords-btn,
+.third-match-pair .match-swords-btn{
+  left:50% !important;
+  right:auto !important;
+  top:50% !important;
+  transform:translate(-50%, -50%) !important;
+}
+
+/* Швейцарка: меч тоже по центру пары */
+.swiss-pair{
+  position:relative !important;
+}
+
+.swiss-pair .match-swords-btn{
+  position:absolute !important;
+  left:50% !important;
+  top:50% !important;
+  transform:translate(-50%, -50%) !important;
+  width:34px !important;
+  height:34px !important;
+  border-radius:50% !important;
+  border:1px solid rgba(240,210,139,.82) !important;
+  background:rgba(6,8,14,.97) !important;
+  color:#f0d28b !important;
+  display:grid !important;
+  place-items:center !important;
+  z-index:99999 !important;
+  cursor:pointer !important;
+  pointer-events:auto !important;
+}
 </style>
 </head>
 <body>
@@ -7416,7 +7449,23 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
         const scoreBInput=isBye
           ? `<div class="swiss-score-box"><div class="swiss-score-input" style="display:grid;place-items:center;opacity:.75;pointer-events:none">BYE</div></div>`
           : `<div class="swiss-score-box"><input class="swiss-score-input" type="number" min="0" step="1" value="${scoreB}" placeholder="0" oninput="setSwissPairScore(${id},${roundIndex},${i},'b',this.value)"></div>`;
-        return `<div class="swiss-pair"><div class="swiss-player">${escapeHtml(p.a)}${scoreAInput}</div><div class="swiss-vs">vs</div><div class="swiss-player">${escapeHtml(p.b)}${scoreBInput}</div><div class="swiss-result-label">${resultText}</div></div>`;
+        return `<div class="swiss-pair">
+  <button type="button"
+    class="match-swords-btn"
+    data-match-room="1"
+    data-id="${escapeHtml(id)}"
+    data-group="swiss"
+    data-side="round"
+    data-round="${roundIndex+1}"
+    data-match-index="${i}"
+    data-a="${escapeHtml(p.a || '')}"
+    data-b="${escapeHtml(p.b || '')}"
+    title="Открыть матч">⚔</button>
+  <div class="swiss-player">${escapeHtml(p.a)}${scoreAInput}</div>
+  <div class="swiss-vs">vs</div>
+  <div class="swiss-player">${escapeHtml(p.b)}${scoreBInput}</div>
+  <div class="swiss-result-label">${resultText}</div>
+</div>`;
       }).join('')}</div></div>`;
     }
     function renderSwissMode(t,id,players){
