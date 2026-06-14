@@ -7340,9 +7340,7 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
     }
     function renderSwissStandingsTable(id,players,rounds){
       const rows=sortedSwissTable(players,rounds,id);
-      return `<div class="swiss-table-box"><table class="swiss-table"><thead><tr><th>Место</th><th>Игрок</th><th>Победы</th><th>Ничьи</th><th>Поражения</th><th>Очки</th><th>Разница</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td style="color:${roleColors[r.role] || '#ffffff'}">
-  ${escapeHtml(r.player)}
-</td><td>${r.wins}</td><td>${r.draws}</td><td>${r.losses}</td><td>${r.points}</td><td>${r.diff>0?'+':''}${r.diff}</td></tr>`).join('')}</tbody></table></div>`;
+      return `<div class="swiss-table-box"><table class="swiss-table"><thead><tr><th>Место</th><th>Игрок</th><th>Победы</th><th>Ничьи</th><th>Поражения</th><th>Очки</th><th>Разница</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${roleNickHtml(r.player)}</td><td>${r.wins}</td><td>${r.draws}</td><td>${r.losses}</td><td>${r.points}</td><td>${r.diff>0?'+':''}${r.diff}</td></tr>`).join('')}</tbody></table></div>`;
     }
     function renderSwissPairings(id,data,roundIndex){
       const round=data.rounds[roundIndex] || {pairings:[]};
@@ -7367,9 +7365,9 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
     data-a="${escapeHtml(p.a || '')}"
     data-b="${escapeHtml(p.b || '')}"
     title="Открыть матч">⚔</button>
-  <div class="swiss-player">${escapeHtml(p.a)}${getPlayerContact(id,p.a) ? `<div class="small-note">${escapeHtml(getPlayerContact(id,p.a))}</div>` : ""}${scoreAInput}</div>
+  <div class="swiss-player">${roleNickHtml(p.a)}${getPlayerContact(id,p.a) ? `<div class="small-note">${escapeHtml(getPlayerContact(id,p.a))}</div>` : ""}${scoreAInput}</div>
   <div class="swiss-vs">vs</div>
-  <div class="swiss-player">${escapeHtml(p.b)}${getPlayerContact(id,p.b) ? `<div class="small-note">${escapeHtml(getPlayerContact(id,p.b))}</div>` : ""}${scoreBInput}</div>
+  <div class="swiss-player">${p.b === 'BYE' ? 'BYE' : roleNickHtml(p.b)}${getPlayerContact(id,p.b) ? `<div class="small-note">${escapeHtml(getPlayerContact(id,p.b))}</div>` : ""}${scoreBInput}</div>
   <div class="swiss-result-label">${resultText}</div>
 </div>`;
       }).join('')}</div></div>`;
