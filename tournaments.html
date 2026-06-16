@@ -3305,6 +3305,7 @@ html body .bracket-cell.alive{
       </div>
 
       <div class="track-delete-actions">
+  <button type="button" class="btn ghost" id="myTournamentDecksBtn" style="display:none">Мои колоды</button>
   <button type="button" class="btn ghost" id="toggleRegistrationBtn" style="display:none">Турнир открыт</button>
   <button type="button" class="btn ghost" id="changeStatusBtn" style="display:none">Изменить статус</button>
   <button type="button" class="btn danger" id="leaveTournamentBtn" style="display:none">Покинуть турнир</button>
@@ -4579,6 +4580,209 @@ return String(img).replace(/\.png$/i, ".webp");
     }
 
     async function confirmJoin(id){
+     function isTournamentLockedForDeckEdit(t){
+  return !t || !t.registrationOpen || t.status === "closed" || t.status === "finished";
+}
+
+async function openTournamentDeckManagerModal(id){
+  const t = tournaments.find(item => String(item.id) === String(id));
+  if(!t) return;
+
+  if(!isCurrentUserInTournament(id)){
+    showAlert("Ты не зарегистрирован на этот турнир.");
+    return;
+  }
+
+  if(isTournamentLockedForDeckEdit(t)){
+    showAlert("Турнир закрыт. Колоды больше нельзя менять.");
+    return;
+  }
+
+  await loadTournamentCardDatabase();
+
+  const currentUserNick = getCurrentUserNick();
+  const needsDeck = String(t.deckMode || "").toLowerCase() === "required";
+  const requiredDeckCount = Number(t.decksBeforeFinal || 1);
+  const myDecks = await getPlayerDecksForTournament();
+  const submittedDecks = getSubmittedDecksArray(id, currentUserNick);
+  const submittedIds = new Set(submittedDecks.map(d => String(d.id || "")).filter(Boolean));
+
+  const deckSelectHtml = `
+    <div class="tournament-deck-select-box">
+      <span class="label">Мои колоды турнира</span>
+      <div class="tournament-deck-count-note">${needsDeck ? "Нужно выбрать колод: " + requiredDeckCount : "В этом турнире колоды не обязательны"}</div>
+      ${myDecks.length ? `
+        <div class="tournament-deck-picker" id="tournamentDeckPicker">
+          ${myDecks.map(renderTournamentDeckChoice).join("")}
+        </div>
+        <div class="small-note">Можно поменять выбранные колоды, отредактировать выбранную или создать новую. Пока турнир открыт.</div>
+      ` : `
+        <div class="empty" style="display:block;margin-top:8px">
+          У тебя пока нет сохранённых колод. Можно создать новую.
+        </div>
+      `}
+    </div>
+  `;
+
+  const modal = document.createElement("div");
+  modal.className = "join-modal";
+  modal.innerHTML = `
+    <div class="join-box" style="width:min(900px,100%)">
+      <h2>Мои колоды турнира</h2>
+      <p><b>${escapeHtml(t.title)}</b><br>Здесь можно поменять или отредактировать колоды до закрытия турнира.</p>
+      <div class="players-box" style="margin-top:10px">
+        <div class="players-title"><span>Ваш ник</span></div>
+        <div class="players-list"><span class="player-pill" style="color:${escapeHtml(getNickColor(currentUserNick))}">${escapeHtml(currentUserNick)}</span></div>
+      </div>
+      <div class="info-grid">
+        <div class="info-row"><span>Колоды</span><span>${deckModeLabel(t.deckMode)}</span></div>
+        <div class="info-row"><span>Нужно выбрать</span><span>${requiredDeckCount}</span></div>
+        <div class="info-row"><span>Статус</span><span>${t.registrationOpen ? "Открыт" : "Закрыт"}</span></div>
+      </div>
+      ${deckSelectHtml}
+      <div class="join-actions">
+        <button class="btn gold" id="saveTournamentDecksBtn">Сохранить колоды</button>
+        <button class="btn ghost" id="editTournamentDeckBtn">Редактировать колоду</button>
+        <button class="btn ghost" id="createTournamentDeckBtn">Создать новую колоду</button>
+        <button class="btn ghost" id="closeTournamentDecksBtn">Закрыть</button>
+      </div>
+    </div>
+  `;
+
+  modal.addEventListener("click", e => { if(e.target === modal) modal.remove(); });
+  document.body.appendChild(modal);
+
+  modal.querySelectorAll(".tournament-deck-choice").forEach(card => {
+    if(submittedIds.has(String(card.dataset.tournamentDeckId))){
+      card.classList.add("selected");
+    }
+
+    card.addEventListener("click", () => {
+      const selected = getSelectedTournamentDeckIds(modal);
+
+      if(card.classList.contains("selected")){
+        card.classList.remove("selected");
+        return;
+      }
+
+      if(needsDeck && selected.length >= requiredDeckCount){
+        showAlert("Можно выбрать только " + requiredDeckCount + " колод.");
+        return;
+      }
+
+      card.classList.add("selected");
+    });
+  });
+
+  modal.querySelector("#saveTournamentDecksBtn")?.addEventListener("click", () => saveMyTournamentDecks(id, modal));
+  modal.querySelector("#editTournamentDeckBtn")?.addEventListener("click", () => editSelectedTournamentDeck(id, modal));
+  modal.querySelector("#createTournamentDeckBtn")?.addEventListener("click", () => createDeckForTournament(id));
+  modal.querySelector("#closeTournamentDecksBtn")?.addEventListener("click", () => modal.remove());
+}
+
+async function saveMyTournamentDecks(id, modal){
+  const t = tournaments.find(item => String(item.id) === String(id));
+  if(isTournamentLockedForDeckEdit(t)){
+    showAlert("Турнир закрыт. Колоды больше нельзя менять.");
+    return;
+  }
+
+  const requiredDeckCount = Number(t.decksBeforeFinal || 1);
+  const needsDeck = String(t.deckMode || "").toLowerCase() === "required";
+  const selectedDeckIds = modal ? getSelectedTournamentDeckIds(modal) : [];
+  const myDecks = await getPlayerDecksForTournament();
+
+  const selectedDecks = selectedDeckIds
+    .map(deckId => myDecks.find(d => String(d.id) === String(deckId)))
+    .filter(Boolean);
+
+  if(needsDeck && selectedDecks.length !== requiredDeckCount){
+    showAlert("Нужно выбрать ровно " + requiredDeckCount + " колод.");
+    return;
+  }
+
+  try{
+    const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${id}/my-decks`, {
+      method:"PATCH",
+      headers:authHeaders(),
+      body:JSON.stringify({decks:selectedDecks})
+    });
+
+    const data = await response.json();
+
+    if(!data.ok){
+      throw new Error(data.error || "Не удалось сохранить колоды");
+    }
+
+    await loadTournamentsFromServer();
+    modal?.remove();
+    applyFilters();
+
+    if(currentTrackTournamentId && String(currentTrackTournamentId) === String(id)){
+      renderTrackModal(id);
+    }
+
+    showAlert("Колоды турнира обновлены.");
+
+  }catch(error){
+    console.error(error);
+    showAlert(error.message || "Ошибка сохранения колод.");
+  }
+}
+
+async function editSelectedTournamentDeck(id, modal){
+  const t = tournaments.find(item => String(item.id) === String(id));
+  if(isTournamentLockedForDeckEdit(t)){
+    showAlert("Турнир закрыт. Колоды больше нельзя менять.");
+    return;
+  }
+
+  const selectedDeckIds = modal ? getSelectedTournamentDeckIds(modal) : [];
+
+  if(selectedDeckIds.length !== 1){
+    showAlert("Выбери одну колоду для редактирования.");
+    return;
+  }
+
+  const myDecks = await getPlayerDecksForTournament();
+  const deck = myDecks.find(d => String(d.id) === String(selectedDeckIds[0]));
+
+  if(!deck){
+    showAlert("Колода не найдена.");
+    return;
+  }
+
+  localStorage.setItem("bho_deck_builder_deck", JSON.stringify(deck.cards || []));
+  localStorage.setItem("bhoEditingDeckV1", JSON.stringify({
+    id: deck.raw?.id || deck.id,
+    serverId: deck.raw?.serverId || deck.raw?.id || null,
+    title: deck.title || "",
+    description: deck.raw?.description || "",
+    previewIds: deck.previewIds || [],
+    createdAt: deck.raw?.createdAt || new Date().toISOString(),
+    tournamentReturn:{
+      tournamentId:String(id),
+      tournamentDeckId:String(deck.id)
+    }
+  }));
+
+  window.location.href = "deck-builder_checked.html";
+}
+
+function createDeckForTournament(id){
+  const t = tournaments.find(item => String(item.id) === String(id));
+  if(isTournamentLockedForDeckEdit(t)){
+    showAlert("Турнир закрыт. Колоды больше нельзя менять.");
+    return;
+  }
+
+  localStorage.setItem("bhoTournamentDeckReturnV1", JSON.stringify({
+    tournamentId:String(id),
+    createdAt:new Date().toISOString()
+  }));
+
+  window.location.href = "deck-builder_checked.html";
+} 
       const nick = normalizeNick(getCurrentUserNick());
       if(!isValidNick(nick)){ showAlert('Ник аккаунта должен быть в формате Eighth#2020'); return; }
 
@@ -7582,6 +7786,11 @@ if($('toggleRegistrationBtn')){
   $('toggleRegistrationBtn').textContent = t.registrationOpen ? "Турнир открыт" : "Турнир закрыт";
   $('toggleRegistrationBtn').onclick = () => toggleTournamentRegistration(id);
 }
+if($('myTournamentDecksBtn')){
+  const canEditMyDecks = isCurrentUserInTournament(id) && !isTournamentLockedForDeckEdit(t);
+  $('myTournamentDecksBtn').style.display = canEditMyDecks ? "inline-flex" : "none";
+  $('myTournamentDecksBtn').onclick = () => openTournamentDeckManagerModal(id);
+}
 if($('leaveTournamentBtn')){
   const canLeave = isCurrentUserInTournament(id);
   $('leaveTournamentBtn').style.display = canLeave ? "inline-flex" : "none";
@@ -7921,6 +8130,7 @@ function openTournamentFromUrl(){
           + '<div class="card-actions">'
 + '<button class="btn gold" '+(disabled ? 'disabled' : '')+' onclick="openJoinModal('+t.id+')">'+(disabled ? 'Регистрация закрыта' : 'Участвовать')+'</button>'
 + '<button type="button" class="btn ghost track-tournament-btn" data-track-id="'+escapeHtml(String(t.id))+'" onclick="forceOpenTrackModal(\''+escapeHtml(String(t.id))+'\')">Отслеживать</button>'
++ (isCurrentUserInTournament(t.id) ? '<button type="button" class="btn ghost" onclick="openTournamentDeckManagerModal(\''+escapeHtml(String(t.id))+'\')">Мои колоды</button>' : '')
 
 + '<button type="button" class="btn ghost" data-tournament-chat-id="'+escapeHtml(String(t.id))+'">💬 Чат турнира</button>'
 

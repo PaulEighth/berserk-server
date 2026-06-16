@@ -2444,6 +2444,65 @@ String(contactInfo || "").trim()
     });
   }
 });
+app.patch("/api/tournaments/:id/my-decks", verifyToken, async (req, res) => {
+  try {
+    const tournamentId = req.params.id;
+    const decks = Array.isArray(req.body.decks) ? req.body.decks : [];
+
+    const tournamentResult = await pool.query(
+      "SELECT id, status, registration_open FROM tournaments WHERE id = $1",
+      [tournamentId]
+    );
+
+    if (tournamentResult.rows.length === 0) {
+      return res.status(404).json({ ok:false, error:"Турнир не найден" });
+    }
+
+    const tournament = tournamentResult.rows[0];
+
+    const registrationOpen =
+      tournament.registration_open === true ||
+      tournament.registration_open === "true" ||
+      tournament.registration_open === 1 ||
+      tournament.registration_open === "1";
+
+    if (!registrationOpen || tournament.status === "closed" || tournament.status === "finished") {
+      return res.status(403).json({
+        ok:false,
+        error:"Турнир закрыт. Колоды больше нельзя менять."
+      });
+    }
+
+    const result = await pool.query(`
+      UPDATE tournament_participants
+      SET decks = $1
+      WHERE tournament_id = $2 AND user_id = $3
+      RETURNING *
+    `, [
+      JSON.stringify(decks),
+      tournamentId,
+      req.user.id
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        ok:false,
+        error:"Ты не зарегистрирован на этот турнир"
+      });
+    }
+
+    res.json({
+      ok:true,
+      participant:result.rows[0]
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok:false,
+      error:error.message
+    });
+  }
+});
 // Покинуть турнир
 app.delete("/api/tournaments/:id/leave", verifyToken, async (req, res) => {
   try {

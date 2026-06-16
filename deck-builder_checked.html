@@ -963,6 +963,7 @@ padding:24px;
     let multiOnly = false;
     let deck = JSON.parse(localStorage.getItem('bho_deck_builder_deck') || '[]');
     let editingDeckData = JSON.parse(localStorage.getItem('bhoEditingDeckV1') || 'null');
+    const TOURNAMENT_DECK_RETURN_KEY = "bhoTournamentDeckReturnV1";
     const $ = (id) => document.getElementById(id);
 
 
@@ -1130,6 +1131,40 @@ function authHeaders(){
     "Content-Type": "application/json",
     "Authorization": `Bearer ${localStorage.getItem("token")}`
   };
+}
+async function syncTournamentDeckAfterBuilder(updatedDeck, playerDecks, tournamentReturn){
+  if(!tournamentReturn || !tournamentReturn.tournamentId) return false;
+
+  const tournamentId = String(tournamentReturn.tournamentId);
+  const selectedDecks = Array.isArray(playerDecks) ? playerDecks : [];
+
+  try{
+    const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${tournamentId}/my-decks`, {
+      method:"PATCH",
+      headers:authHeaders(),
+      body:JSON.stringify({decks:selectedDecks})
+    });
+
+    const data = await response.json();
+
+    if(!data.ok){
+      throw new Error(data.error || "Не удалось обновить колоды турнира");
+    }
+
+    localStorage.removeItem(TOURNAMENT_DECK_RETURN_KEY);
+    showCustomAlert("Колода сохранена и обновлена в турнире.");
+
+    setTimeout(() => {
+      window.location.href = "tournaments.html?tournament=" + encodeURIComponent(tournamentId);
+    }, 900);
+
+    return true;
+
+  }catch(error){
+    console.error(error);
+    showCustomAlert(error.message || "Колода сохранена, но не обновилась в турнире.");
+    return false;
+  }
 }
 function countCardsById(list){
   const result = {};
@@ -1301,12 +1336,20 @@ async function saveEditedDeck(){
   }
 
   localStorage.setItem('bhoPlayerDecksV1', JSON.stringify(playerDecks));
-  localStorage.removeItem('bhoEditingDeckV1');
-  editingDeckData = null;
 
-  saveDeck();
-  renderDeck();
+const tournamentReturn = editingDeckData?.tournamentReturn || null;
+
+localStorage.removeItem('bhoEditingDeckV1');
+editingDeckData = null;
+
+saveDeck();
+renderDeck();
+
+const syncedToTournament = await syncTournamentDeckAfterBuilder(updatedDeck, playerDecks, tournamentReturn);
+
+if(!syncedToTournament){
   showCustomAlert('Изменения колоды сохранены.');
+}
 }
     function openCreateDeckModal(){
       if(!isLoggedIn()){
@@ -1381,12 +1424,19 @@ async function saveEditedDeck(){
   }
 
   playerDecks.unshift(newDeck);
-  localStorage.setItem('bhoPlayerDecksV1', JSON.stringify(playerDecks));
-  saveDeck();
+localStorage.setItem('bhoPlayerDecksV1', JSON.stringify(playerDecks));
+saveDeck();
 
-  closeCreateDeckModal();
-  showToast('Колода создана: ' + title);
+const tournamentReturn = JSON.parse(localStorage.getItem(TOURNAMENT_DECK_RETURN_KEY) || "null");
+
+closeCreateDeckModal();
+showToast('Колода создана: ' + title);
+
+const syncedToTournament = await syncTournamentDeckAfterBuilder(newDeck, playerDecks, tournamentReturn);
+
+if(!syncedToTournament){
   showCustomAlert('Колода сохранена.');
+}
 }
 
     function showCustomAlert(text){
