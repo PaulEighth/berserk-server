@@ -1,0 +1,2 @@
+<a href="meta.html#meta">(Мета тех.работа)</a> у других
+ <a class="active" href="meta.html">(Мета тех.работа)</a> мета у себя

@@ -3239,6 +3239,7 @@ html body .bracket-cell.alive{
         <label><span class="label">Дата окончания</span><input class="field" id="requestEndDate" type="datetime-local"></label>
         <label><span class="label">Формат</span><select class="select" id="requestFormat" onchange="toggleTournamentBracketChoice()"><option value="bo1">BO1</option><option value="bo3">BO3</option><option value="bo5">BO5</option><option value="bo7">BO7</option><option value="swiss">Швейцарка</option><option value="single">Олимпийка</option></select></label>
         <label><span class="label">Колоды</span><select class="select" id="requestDeckMode"><option value="none" selected>Без колод</option><option value="required">Колоды обязательны</option></select></label>
+        <label><span class="label">Колоды видны</span><select class="select" id="requestDeckVisibility"><option value="visible" selected>Да</option><option value="hidden_until_closed">Нет</option></select></label>
         <label><span class="label">Формат до финала</span><select class="select" id="requestMatchFormat"><option value="bo1" selected>BO1</option><option value="bo3">BO3</option><option value="bo5">BO5</option><option value="bo7">BO7</option></select></label>
         <label><span class="label">Формат финала</span><select class="select" id="requestFinalFormat"><option value="bo1">BO1</option><option value="bo3" selected>BO3</option><option value="bo5">BO5</option><option value="bo7">BO7</option></select></label>
         <label><span class="label">Колод до финала</span><select class="select" id="requestDecksBeforeFinal"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
@@ -3713,8 +3714,9 @@ telegram: t.telegram_link || "",
 
     mode: formatMap[t.format] || t.format || "BO1",
     deckMode: t.deckmode || t.deckMode || "none",
-    matchFormat: t.matchformat || t.matchFormat || "bo1",
-    finalFormat: t.finalformat || t.finalFormat || "bo3",
+deckVisibility: parsedSwissData.deckVisibility || t.deckVisibility || "visible",
+matchFormat: t.matchformat || t.matchFormat || "bo1",
+finalFormat: t.finalformat || t.finalFormat || "bo3",
     decksBeforeFinal: Number(t.decksbeforefinal || t.decksBeforeFinal || 1),
 bansBeforeFinal: Number(t.bansbeforefinal || t.bansBeforeFinal || 0),
 decksFinal: Number(t.decksfinal || t.decksFinal || 1),
@@ -5249,7 +5251,8 @@ const coOrganizers = extraTournamentOrganizers.slice();
       const endDate = $('requestEndDate').value;
       const format = $('requestFormat').value;
       const deckMode = $('requestDeckMode') ? $('requestDeckMode').value : 'none';
-      const matchFormat = $('requestMatchFormat') ? $('requestMatchFormat').value : 'bo1';
+const deckVisibility = $('requestDeckVisibility') ? $('requestDeckVisibility').value : 'visible';
+const matchFormat = $('requestMatchFormat') ? $('requestMatchFormat').value : 'bo1';
       const finalFormat = $('requestFinalFormat') ? $('requestFinalFormat').value : 'bo3';
       const decksBeforeFinal = getSelectNumber('requestDecksBeforeFinal', 1);
       const bansBeforeFinal = getSelectNumber('requestBansBeforeFinal', 0);
@@ -5290,8 +5293,9 @@ const coOrganizers = extraTournamentOrganizers.slice();
         format,
         mode:formatMap[format] || format,
         deckMode,
-        deckRequired: deckMode === 'required',
-        matchFormat,
+deckVisibility,
+deckRequired: deckMode === 'required',
+matchFormat,
         finalFormat,
         decksBeforeFinal,
         bansBeforeFinal,
@@ -5341,6 +5345,7 @@ swiss_data: {
   rules: request.deckRules || "",
   endDate: request.endDate || "",
   deckMode: request.deckMode || "none",
+  deckVisibility: request.deckVisibility || "visible",
   matchFormat: request.matchFormat || "bo1",
   finalFormat: request.finalFormat || "bo3",
   coOrganizers: request.coOrganizers || []
@@ -5397,8 +5402,9 @@ renderCoOrganizersEditor();
       if($('requestBracketSize')) $('requestBracketSize').value='16';
       if($('requestSwissRounds')) $('requestSwissRounds').value='3';
       if($('requestEditRights')) $('requestEditRights').value='organizer';
-      if($('requestDeckMode')) $('requestDeckMode').value='none';
-      if($('requestIsPrivate')) $('requestIsPrivate').value='0';
+if($('requestDeckMode')) $('requestDeckMode').value='none';
+if($('requestDeckVisibility')) $('requestDeckVisibility').value='visible';
+if($('requestIsPrivate')) $('requestIsPrivate').value='0';
       if($('requestPrivateToggle')){
         $('requestPrivateToggle').textContent='Открытый турнир';
         $('requestPrivateToggle').classList.remove('gold');
@@ -6811,17 +6817,36 @@ function shouldShowBanForSide(room, side, banLimit){
 
   return false;
 }
+function canSeeMatchDecksNow(t, playerNick){
+  if(String(t?.deckVisibility || "visible") !== "hidden_until_closed"){
+    return true;
+  }
 
+  if(t.registrationOpen === false || t.status === "closed" || t.status === "finished"){
+    return true;
+  }
+
+  const role = typeof getUserRole === "function" ? getUserRole() : "user";
+  if(["admin","developer","moderator","creator"].includes(String(role))){
+    return true;
+  }
+
+  const currentNick = normalizeMatchNick(getCurrentUserNick());
+  const targetNick = normalizeMatchNick(playerNick);
+
+  return currentNick && targetNick && currentNick === targetNick;
+}
 function renderMatchPlayerDecks(t, room, playerNick, side){
   const deckCount = getMatchDeckCount(t, room.round);
   const banLimit = getMatchBanLimit(t, room.round);
-  const decks = getSubmittedDecksArray(t.id, playerNick);
+  const decksVisibleNow = canSeeMatchDecksNow(t, playerNick);
+  const decks = decksVisibleNow ? getSubmittedDecksArray(t.id, playerNick) : [];
 
   const bannedKey = side === "a" ? "bannedA" : "bannedB";
   room[bannedKey] = Array.isArray(room[bannedKey]) ? room[bannedKey] : [];
 
   const realBanned = room[bannedKey];
-  const showBans = shouldShowBanForSide(room, side, banLimit);
+  const showBans = decksVisibleNow && shouldShowBanForSide(room, side, banLimit);
   const visibleBanned = showBans ? realBanned : [];
 
   let html = "";
@@ -6829,22 +6854,22 @@ function renderMatchPlayerDecks(t, room, playerNick, side){
   for(let i=0;i<deckCount;i++){
     const deck = decks[i] || null;
     const img = deck ? deckHeroImage(deck) : "";
-    const title = deck ? (deck.title || ("Колода " + (i+1))) : ("Колода " + (i+1));
+    const title = decksVisibleNow && deck ? (deck.title || ("Колода " + (i+1))) : "Колода скрыта до закрытия турнира";
     const isBanned = visibleBanned.includes(i);
 
     html += `
       <div class="match-deck-unit">
-        <button type="button" class="match-hero-btn ${isBanned ? "banned" : ""}" ${deck ? `onclick="openDeckView('${escapeHtml(t.id)}','${escapeHtml(playerNick)}',${i})"` : ""} title="${escapeHtml(title)}">
-          ${img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" onerror="this.style.visibility='hidden'">` : `<span>${i+1}</span>`}
+        <button type="button" class="match-hero-btn ${isBanned ? "banned" : ""}" ${decksVisibleNow && deck ? `onclick="openDeckView('${escapeHtml(t.id)}','${escapeHtml(playerNick)}',${i})"` : ""} title="${escapeHtml(title)}">
+          ${decksVisibleNow && img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" onerror="this.style.visibility='hidden'">` : `<span>${decksVisibleNow ? (i+1) : "?"}</span>`}
         </button>
-        <button type="button" class="match-ban-btn ${isBanned ? "active" : ""}" onclick="toggleMatchDeckBan('${side}',${i})">✕</button>
+        <button type="button" class="match-ban-btn ${isBanned ? "active" : ""}" ${decksVisibleNow ? `onclick="toggleMatchDeckBan('${side}',${i})"` : "disabled"}>✕</button>
       </div>
     `;
   }
 
   return `
     <div class="match-decks-line">${html}</div>
-    <div class="match-ban-limit">Банов: ${visibleBanned.length}/${banLimit}</div>
+    <div class="match-ban-limit">${decksVisibleNow ? `Банов: ${visibleBanned.length}/${banLimit}` : "Колоды соперника откроются после закрытия турнира"}</div>
   `;
 }
 
@@ -6854,6 +6879,12 @@ function renderMatchPlayerDecks(t, room, playerNick, side){
 
   const t = tournaments.find(item => String(item.id) === String(room.id));
   if(!t) return;
+
+  const playerNick = side === "a" ? room.playerA : room.playerB;
+  if(!canSeeMatchDecksNow(t, playerNick)){
+    showAlert("Колоды соперника откроются после закрытия турнира.");
+    return;
+  }
 
   if(!canEditMatchRoom(t, room.playerA, room.playerB)){
     showAlert("У вас нет прав менять этот матч.");
@@ -7526,6 +7557,7 @@ const players = getPlayers(id);
          <div class="info-row"><span>Права</span><span>${t.editRights === 'participants' ? 'Участники турнира могут редактировать' : 'Только организатор'}</span></div>
          <div class="info-row"><span>Формат</span><span>${escapeHtml(t.mode)}</span></div>
          <div class="info-row"><span>Колоды</span><span>${deckModeLabel(t.deckMode)}</span></div>
+<div class="info-row"><span>Колоды видны</span><span>${t.deckVisibility === 'hidden_until_closed' ? 'После закрытия турнира' : 'Да'}</span></div>
          <div class="info-row"><span>До финала</span><span>${matchFormatLabel(t.matchFormat)} · колод: ${t.decksBeforeFinal || 1} · банов: ${t.bansBeforeFinal || 1}</span></div>
          <div class="info-row"><span>Финал</span><span>${matchFormatLabel(t.finalFormat)} · колод: ${t.decksFinal || 1} · банов: ${t.bansFinal || 1}</span></div>
          <div class="info-row"><span>Количество мест</span><span>${t.places}</span></div>
