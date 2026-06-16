@@ -4579,8 +4579,7 @@ return String(img).replace(/\.png$/i, ".webp");
       modal.querySelector('#joinTournamentCancelBtn')?.addEventListener('click', () => modal.remove());
     }
 
-    async function confirmJoin(id){
-     function isTournamentLockedForDeckEdit(t){
+    function isTournamentLockedForDeckEdit(t){
   return !t || !t.registrationOpen || t.status === "closed" || t.status === "finished";
 }
 
@@ -4782,6 +4781,10 @@ function createDeckForTournament(id){
   }));
 
   window.location.href = "deck-builder_checked.html";
+}
+
+async function confirmJoin(id){
+      const nick = normalizeNick(getCurrentUserNick());
 } 
       const nick = normalizeNick(getCurrentUserNick());
       if(!isValidNick(nick)){ showAlert('Ник аккаунта должен быть в формате Eighth#2020'); return; }
