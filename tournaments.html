@@ -4785,8 +4785,6 @@ function createDeckForTournament(id){
 
 async function confirmJoin(id){
       const nick = normalizeNick(getCurrentUserNick());
-} 
-      const nick = normalizeNick(getCurrentUserNick());
       if(!isValidNick(nick)){ showAlert('Ник аккаунта должен быть в формате Eighth#2020'); return; }
 
       const t = tournaments.find(item => String(item.id) === String(id));
@@ -4919,6 +4917,8 @@ if(typeof updateStats === "function"){
   updateStats();
 }
       document.querySelector('.join-modal')?.remove();
+    }
+
       window.openJoinModal = openJoinModal;
     window.loadTournamentCardDatabase = loadTournamentCardDatabase;
     window.confirmJoin = confirmJoin;
@@ -5390,7 +5390,7 @@ function injectSwordsEverywhere(){
     window.forcePlayoffSwordCenter = forcePlayoffSwordCenter;
 
     applyFilters();
-    }
+    
 
     function renderPlayers(id){
   const players = getPlayers(id);
