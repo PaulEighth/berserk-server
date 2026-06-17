@@ -49,7 +49,7 @@ try {
 }
 
     const result = await pool.query(
-      "SELECT id, username, email, role, is_partner, medals FROM users WHERE id = $1",
+      "SELECT id, username, email, role, status, is_partner, medals FROM users WHERE id = $1",
       [decoded.id]
     );
 
@@ -284,6 +284,10 @@ async function ensurePartnerColumn() {
   ALTER TABLE users
   ADD COLUMN IF NOT EXISTS medals JSONB DEFAULT '{}'
 `);
+await pool.query(`
+  ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'none'
+`);
   await pool.query(`
   ALTER TABLE tournaments
   ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'open'
@@ -504,7 +508,7 @@ const existingUser = await pool.query(
   `
   INSERT INTO users (username, email, password)
   VALUES ($1, $2, $3)
-  RETURNING id, username, email, role, is_partner, medals, created_at
+  RETURNING id, username, email, role, status, is_partner, medals, created_at
   `,
   [username, email, hashedPassword]
 );
@@ -640,6 +644,7 @@ const isPasswordCorrect = await bcrypt.compare(
   username: user.username,
   email: user.email,
   role: user.role,
+  status: user.status || "none",
   is_partner: !!user.is_partner,
   medals: user.medals || {}
 }
@@ -725,7 +730,7 @@ app.get("/api/users/public-list", async (req, res) => {
 app.get("/admin/users", requireAdmin, async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT id, username, email, role, is_partner, medals, created_at FROM users ORDER BY id"
+      "SELECT id, username, email, role, status, is_partner, medals, created_at FROM users ORDER BY id"
     );
 
     res.json(result.rows);
@@ -759,8 +764,8 @@ if (targetUser.rows[0].username === ADMIN_USERNAME) {
   "admin",
   "developer",
   "moderator",
-  "vip",
   "creator",
+  "muted",
   "banned"
 ];
 
@@ -804,6 +809,39 @@ await pool.query(
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Ошибка смены роли" });
+  }
+});
+app.patch("/admin/users/:id/status", requireAdmin, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const { id } = req.params;
+
+    const allowedStatuses = [
+      "none",
+      "vip",
+      "premium",
+      "elite",
+      "royal",
+      "legend"
+    ];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ error: "Такого статуса не существует" });
+    }
+
+    const result = await pool.query(
+      "UPDATE users SET status = $1 WHERE id = $2 RETURNING id, username, email, role, status, is_partner, medals",
+      [status, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Пользователь не найден" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Ошибка смены статуса" });
   }
 });
 app.patch("/admin/users/:id/partner", requireAdmin, async (req, res) => {

@@ -577,14 +577,16 @@
               <th>Ник</th>
               <th>Email</th>
               <th>Роль</th>
-              <th>Новая роль</th>
-              <th>Медали</th>
+<th>Новая роль</th>
+<th>Статус</th>
+<th>Новый статус</th>
+<th>Медали</th>
               <th>Действия</th>
             </tr>
           </thead>
           <tbody id="usersBody">
             <tr>
-              <td colspan="6" class="muted">Загрузка...</td>
+              <td colspan="9" class="muted">Загрузка...</td>
             </tr>
           </tbody>
         </table>
@@ -629,14 +631,26 @@
   moderator: "#57d46a",
   creator: "#ff9d42",
 
-  vip: "#A2DAFF",
-premium: "#5FBFFF",
-elite: "#0099FF",
-royal: "#005995",
-legend: "#002A45",
-
   muted: "#9CA3AF",
   banned: "#111111"
+};
+
+const statusColors = {
+  none: "#ffffff",
+  vip: "#A2DAFF",
+  premium: "#5FBFFF",
+  elite: "#0099FF",
+  royal: "#005995",
+  legend: "#002A45"
+};
+
+const statusIcons = {
+  none: "",
+  vip: "🔹",
+  premium: "💠",
+  elite: "🔷",
+  royal: "💎",
+  legend: "👑"
 };
 const medalList = ["🏆","🥇","🥈","🥉","🎖️","🏅"];
 
@@ -654,20 +668,21 @@ let currentRoleFilter = "all";
 let currentMedalFilter = "all";
     const roles = [
   "user",
-
   "admin",
   "developer",
   "moderator",
   "creator",
+  "muted",
+  "banned"
+];
 
+const statuses = [
+  "none",
   "vip",
   "premium",
   "elite",
   "royal",
-  "legend",
-
-  "muted",
-  "banned"
+  "legend"
 ];
 
     const currentUser = JSON.parse(localStorage.getItem("user"));
@@ -701,6 +716,14 @@ function userStarHtml(user){
 
   return "";
 }
+function userStatusHtml(user){
+  const status = user?.status || "none";
+  const icon = statusIcons[status] || "";
+
+  if(!icon) return "";
+
+  return `<span style="color:${statusColors[status] || "#ffffff"};filter:drop-shadow(0 0 6px ${statusColors[status] || "#ffffff"})">${icon}</span> `;
+}
     if (currentUser?.role === "banned") {
 
   localStorage.removeItem("token");
@@ -726,7 +749,7 @@ function userStarHtml(user){
         showInfo("Недостаточно прав", "Эта страница доступна только администратору Eighth#2020.");
         document.getElementById("usersBody").innerHTML = `
           <tr>
-            <td colspan="6" class="muted">Недостаточно прав.</td>
+            <td colspan="9" class="muted">Недостаточно прав.</td>
           </tr>
         `;
         return false;
@@ -734,7 +757,17 @@ function userStarHtml(user){
 
       return true;
     }
-
+function renderStatusSelect(user){
+  return `
+    <select class="select" id="status-${user.id}">
+      ${statuses.map(status => `
+        <option value="${status}" ${(user.status || "none") === status ? "selected" : ""}>
+          ${statusIcons[status] ? statusIcons[status] + " " : ""}${status}
+        </option>
+      `).join("")}
+    </select>
+  `;
+}
     function renderRoleSelect(user){
       return `
         <select
@@ -800,23 +833,19 @@ function renderUsersStats(users){
   const box = document.getElementById("usersStats");
   if(!box) return;
 
-  const counts = {};
+    const roleCounts = {};
+  const statusCounts = {};
 
   users.forEach(user => {
     const role = user.role || "user";
-    counts[role] = (counts[role] || 0) + 1;
+    const status = user.status || "none";
+
+    roleCounts[role] = (roleCounts[role] || 0) + 1;
+    statusCounts[status] = (statusCounts[status] || 0) + 1;
   });
 
-  const roleFilterGroups = [
-  {
-    title: "Роли",
-    roles: ["admin","developer","moderator","creator"]
-  },
-  {
-    title: "Статусы",
-    roles: ["legend","royal","elite","premium","vip","user","muted","banned"]
-  }
-];
+  const roleList = ["admin","developer","moderator","creator"];
+  const statusList = ["legend","royal","elite","premium","vip","user","muted","banned"];
 
   box.innerHTML = `
     <span class="stat-pill"
@@ -825,19 +854,34 @@ function renderUsersStats(users){
       Всего аккаунтов: <b>${users.length}</b>
     </span>
 
-    ${roleFilterGroups.map(group => `
-  <div style="width:100%;margin:6px 0 2px;color:var(--gold2);font-weight:950;text-transform:uppercase;letter-spacing:.08em;font-size:12px">
-    ${group.title}
-  </div>
+    <div style="width:100%;margin:6px 0 2px;color:var(--gold2);font-weight:950;text-transform:uppercase;letter-spacing:.08em;font-size:12px">
+      Роли
+    </div>
 
-  ${group.roles.map(role => `
-    <span class="stat-pill"
-          style="cursor:pointer;color:${roleColors[role] || "#ffffff"};${currentRoleFilter === role ? "border-color:rgba(240,210,139,.65);background:rgba(214,168,79,.18);" : ""}"
-          onclick="filterByRole('${role}')">
-      ${role}: <b>${counts[role] || 0}</b>
-    </span>
-  `).join("")}
-`).join("")}
+    ${roleList.map(role => `
+      <span class="stat-pill"
+            style="cursor:pointer;color:${roleColors[role] || "#ffffff"};${currentRoleFilter === role ? "border-color:rgba(240,210,139,.65);background:rgba(214,168,79,.18);" : ""}"
+            onclick="filterByRole('${role}')">
+        ${role}: <b>${roleCounts[role] || 0}</b>
+      </span>
+    `).join("")}
+
+    <div style="width:100%;margin:6px 0 2px;color:var(--gold2);font-weight:950;text-transform:uppercase;letter-spacing:.08em;font-size:12px">
+      Статусы
+    </div>
+
+    ${statusList.map(status => {
+      const color = statusColors[status] || roleColors[status] || "#ffffff";
+      const icon = statusIcons[status] ? statusIcons[status] + " " : "";
+
+      return `
+        <span class="stat-pill"
+              style="cursor:pointer;color:${color};${currentRoleFilter === status ? "border-color:rgba(240,210,139,.65);background:rgba(214,168,79,.18);" : ""}"
+              onclick="filterByRole('${status}')">
+          ${icon}${status}: <b>${status === "user" ? roleCounts.user || 0 : statusCounts[status] || roleCounts[status] || 0}</b>
+        </span>
+      `;
+    }).join("")}
   `;
 }
 function renderMedalFilters(users){
@@ -878,9 +922,16 @@ function renderUsers(users){
 const search = String(document.getElementById("userSearchInput")?.value || "").trim().toLowerCase();
 
 if(currentRoleFilter !== "all"){
-  users = users.filter(
-    user => (user.role || "user") === currentRoleFilter
-  );
+  users = users.filter(user => {
+    const role = user.role || "user";
+    const status = user.status || "none";
+
+    if(["legend","royal","elite","premium","vip"].includes(currentRoleFilter)){
+      return status === currentRoleFilter;
+    }
+
+    return role === currentRoleFilter;
+  });
 }
 
 if(currentMedalFilter !== "all"){
@@ -908,7 +959,7 @@ if(search){
       body.innerHTML = users.map((user,index) => `
         <tr>
           <td>${index + 1}</td>
-          <td style="color:${roleColors[user.role] || "#ffffff"}">${medalsHtml(user)}${userStarHtml(user)}${user.username}</td>
+          <td style="color:${roleColors[user.role] || "#ffffff"}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)}${user.username}</td>
           <td class="muted">${user.email || "—"}</td>
           <td>
             <span class="role-pill" style="color:${roleColors[user.role] || "#ffffff"}">
@@ -921,12 +972,21 @@ if(search){
     : renderRoleSelect(user)
   }
 </td>
+<td>
+  <span class="role-pill" style="color:${statusColors[user.status || "none"] || "#ffffff"}">
+    ${statusIcons[user.status || "none"] ? statusIcons[user.status || "none"] + " " : ""}${user.status || "none"}
+  </span>
+</td>
+<td>
+  ${renderStatusSelect(user)}
+</td>
 <td>${renderMedalEditor(user)}</td>
 <td>
   <div class="actions">
     ${user.username === ADMIN_USERNAME
       ? ""
-      : `<button class="btn gold" onclick="changeRole(${user.id})">Сохранить</button>`
+      : `<button class="btn gold" onclick="changeRole(${user.id})">Сохранить роль</button>
+   <button class="btn ghost" onclick="changeStatus(${user.id})">Сохранить статус</button>`
     }
 
 ${user.username === ADMIN_USERNAME ? "" : `
@@ -1004,6 +1064,35 @@ if(protectedUser?.username === ADMIN_USERNAME){
         showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
       }
     }
+    async function changeStatus(userId){
+  if(!checkAdmin()) return;
+
+  const status = document.getElementById(`status-${userId}`).value;
+
+  try{
+    const response = await fetch(`${API_URL}/admin/users/${userId}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-username": currentUser.username
+      },
+      body: JSON.stringify({ status })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      showInfo("Ошибка", data.error || "Не удалось изменить статус.");
+      return;
+    }
+
+    showInfo("Готово", `Статус игрока ${data.username} изменён на ${data.status}.`);
+    loadUsers();
+  }catch(error){
+    console.error(error);
+    showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
+  }
+}
 async function togglePartner(userId, isPartner){
   if(!checkAdmin()) return;
 
@@ -1142,7 +1231,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if(currentUser && authBtn){
         const freshUser = JSON.parse(localStorage.getItem("user") || "null");
-authBtn.innerHTML = medalsHtml(freshUser || currentUser) + userStarHtml(freshUser || currentUser) + (freshUser?.username || currentUser.username);
+authBtn.innerHTML = userStarHtml(freshUser || currentUser) + userStatusHtml(freshUser || currentUser) + medalsHtml(freshUser || currentUser) + (freshUser?.username || currentUser.username);
         authBtn.classList.remove("gold");
         authBtn.classList.add("ghost");
         authBtn.style.background = "rgba(255,255,255,.06)";
