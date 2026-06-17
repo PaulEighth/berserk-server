@@ -1123,6 +1123,7 @@ function deckScore(deck){
       author_is_partner: !!deck.author_is_partner,
       author_id: deck.author_id,
 author_medals: deck.author_medals || {},
+author_status: deck.author_status || "none",
 
       likes: deck.likes || 0,
       dislikes: deck.dislikes || 0,
@@ -1430,6 +1431,14 @@ function deckAuthorStarHtml(deck){
 
   return "";
 }
+function deckAuthorStatusHtml(deck){
+  const status = deck.author_status || deck.authorStatus || "none";
+  const icon = statusIcons[status] || "";
+
+  if(!icon) return "";
+
+  return `<span style="color:${statusColors[status] || "#ffffff"};filter:drop-shadow(0 0 6px ${statusColors[status] || "#ffffff"})">${icon}</span> `;
+}
 function canEditPublishedDeck(deck){
   const user = getLoggedUser();
   if(!user || !deck) return false;
@@ -1552,7 +1561,7 @@ const copyCodeBtn = `<button class="vote" onclick="event.stopPropagation(); copy
   return `<article class="deck-card" onclick="openDeckView('${deck.id}','published')" style="cursor:pointer">
     <h3>${rank?rank+'. ':''}${escapeHtml(deck.title)}</h3>
     <div class="meta">
-  Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorMedalsHtml(deck)}${deckAuthorStarHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b>
+  Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorStarHtml(deck)}${deckAuthorStatusHtml(deck)}${deckAuthorMedalsHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b>
   · карт: ${deckCardCount(deck)}
   · опубликовано: ${formatDeckDate(deck.created_at)}
 </div>
@@ -2156,7 +2165,7 @@ found.description = description;
      <br>
      <span style="font-size:14px">
        Автор: <b style="color:${escapeHtml(getDeckAuthorColor(best))}">
-         ${deckAuthorMedalsHtml(best)}${deckAuthorStarHtml(best)}${escapeHtml(best.author || "Не указан")}
+         ${deckAuthorStarHtml(best)}${deckAuthorStatusHtml(best)}${deckAuthorMedalsHtml(best)}${escapeHtml(best.author || "Не указан")}
        </b>
      </span>`
   : '—';
@@ -2297,7 +2306,7 @@ showSuccess(publishedDeck);
     showToast(error.message || "Ошибка публикации колоды");
   }
 }
-    function showSuccess(deck){const deckCards=deckCardsFromIds(deck);const hero=getHero(deckCards);const first=getPreviewGroups(deckCards,deck.previewIds||deck.preview_ids||[]).map(item=>item.card);$('successTitle').textContent=deck.title;$('successMeta').innerHTML=`Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorMedalsHtml(deck)}${deckAuthorStarHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b> · карт: ${deckCardCount(deck)}`;$('successHero').src=hero?.image||'';$('successHero').alt=hero?.name||'Герой колоды';$('successFour').innerHTML=first.map(c=>`<img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.name)}" title="${escapeHtml(c.name)}" onerror="this.style.visibility='hidden'">`).join('');$('successModal').classList.add('show')}
+    function showSuccess(deck){const deckCards=deckCardsFromIds(deck);const hero=getHero(deckCards);const first=getPreviewGroups(deckCards,deck.previewIds||deck.preview_ids||[]).map(item=>item.card);$('successTitle').textContent=deck.title;$('successMeta').innerHTML=`Автор: <b style="color:${escapeHtml(getDeckAuthorColor(deck))}">${deckAuthorStarHtml(deck)}${deckAuthorStatusHtml(deck)}${deckAuthorMedalsHtml(deck)}${escapeHtml(deck.author||'Не указан')}</b> · карт: ${deckCardCount(deck)}`;$('successHero').src=hero?.image||'';$('successHero').alt=hero?.name||'Герой колоды';$('successFour').innerHTML=first.map(c=>`<img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.name)}" title="${escapeHtml(c.name)}" onerror="this.style.visibility='hidden'">`).join('');$('successModal').classList.add('show')}
     function closeSuccess(){$('successModal').classList.remove('show')}
     $('openAddDeck').addEventListener('click',openModal);$('closeDeckModal').addEventListener('click',closeModal);$('deckModal').addEventListener('click',e=>{if(e.target===$('deckModal'))closeModal()});$('confirmPublish').addEventListener('click',publishSelected);$('closeSuccessModal').addEventListener('click',closeSuccess);$('successOk').addEventListener('click',closeSuccess);$('successModal').addEventListener('click',e=>{if(e.target===$('successModal'))closeSuccess()});$('viewDeckModal').addEventListener('click',e=>{if(e.target===$('viewDeckModal'))closeDeckView()});$('customConfirm').addEventListener('click',e=>{if(e.target===$('customConfirm')){$('customConfirm').classList.remove('show');$('customConfirm').setAttribute('aria-hidden','true')}});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDeckView()});
     (async function initDecksPage(){
@@ -2537,9 +2546,28 @@ const roleColors = {
   admin: "#6f3cff",
   developer: "#0f7b43",
   moderator: "#57d46a",
-  vip: "#59c8ff",
   creator: "#ff9d42",
-  banned: "#ff4d4d"
+  vip: "#A2DAFF",
+  muted: "#9CA3AF",
+  banned: "#111111"
+};
+
+const statusColors = {
+  none: "#ffffff",
+  vip: "#A2DAFF",
+  premium: "#5FBFFF",
+  elite: "#0099FF",
+  royal: "#005995",
+  legend: "#002A45"
+};
+
+const statusIcons = {
+  none: "",
+  vip: "🔹",
+  premium: "💠",
+  elite: "🔷",
+  royal: "💎",
+  legend: "👑"
 };
 function parseMedals(user){
   if(!user?.medals) return {};
@@ -2578,6 +2606,39 @@ function userStarHtml(user){
 
   return "";
 }
+function userStatusHtml(user){
+  const status = user?.status || "none";
+  const icon = statusIcons[status] || "";
+
+  if(!icon) return "";
+
+  return `<span style="color:${statusColors[status] || "#ffffff"};filter:drop-shadow(0 0 6px ${statusColors[status] || "#ffffff"})">${icon}</span> `;
+}
+
+async function refreshCurrentUser(){
+  const token = localStorage.getItem("token");
+  if(!token) return null;
+
+  try{
+    const response = await fetch("/api/me", {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    });
+
+    const data = await response.json();
+
+    if(!response.ok || !data.ok){
+      return null;
+    }
+
+    localStorage.setItem("user", JSON.stringify(data.user));
+    return data.user;
+  }catch(error){
+    console.error(error);
+    return null;
+  }
+}
 function findAuthButton(){
   const buttons = document.querySelectorAll("a.btn");
   for (const btn of buttons) {
@@ -2594,28 +2655,36 @@ function findAuthButton(){
 const authBtn = findAuthButton();
 
 if(currentUser && authBtn){
+  const renderAuthButton = (user) => {
+    authBtn.innerHTML =
+      userStarHtml(user) +
+      userStatusHtml(user) +
+      medalsHtml(user) +
+      user.username;
 
-  const freshUser = JSON.parse(localStorage.getItem("user") || "null");
+    authBtn.classList.remove("gold");
+    authBtn.classList.add("ghost");
 
-authBtn.innerHTML =
-  medalsHtml(freshUser || currentUser) +
-  userStarHtml(freshUser || currentUser) +
-  (freshUser?.username || currentUser.username);
+    authBtn.style.background = "rgba(255,255,255,.06)";
+    authBtn.style.border = "1px solid rgba(232,194,112,.35)";
+    authBtn.style.boxShadow = "none";
+    authBtn.style.color = roleColors[user.role] || "#ffffff";
 
-  authBtn.classList.remove("gold");
-  authBtn.classList.add("ghost");
+    authBtn.href = "#";
 
-  authBtn.style.background = "rgba(255,255,255,.06)";
-  authBtn.style.border = "1px solid rgba(232,194,112,.35)";
-  authBtn.style.boxShadow = "none";
-  authBtn.style.color = roleColors[currentUser.role] || "#ffffff";
-
-  authBtn.href = "#";
-
-  authBtn.onclick = function(e){
-    e.preventDefault();
-    document.getElementById("logoutModal").style.display = "flex";
+    authBtn.onclick = function(e){
+      e.preventDefault();
+      document.getElementById("logoutModal").style.display = "flex";
+    };
   };
+
+  renderAuthButton(currentUser);
+
+  refreshCurrentUser().then(freshUser => {
+    if(!freshUser) return;
+    localStorage.setItem("user", JSON.stringify(freshUser));
+    renderAuthButton(freshUser);
+  });
 }
 
 function confirmLogout(){

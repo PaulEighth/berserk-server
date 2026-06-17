@@ -575,9 +575,28 @@ const roleColors = {
   admin: "#6f3cff",
   developer: "#0f7b43",
   moderator: "#57d46a",
-  vip: "#59c8ff",
   creator: "#ff9d42",
-  banned: "#ff4d4d"
+  vip: "#A2DAFF",
+  muted: "#9CA3AF",
+  banned: "#111111"
+};
+
+const statusColors = {
+  none: "#ffffff",
+  vip: "#A2DAFF",
+  premium: "#5FBFFF",
+  elite: "#0099FF",
+  royal: "#005995",
+  legend: "#002A45"
+};
+
+const statusIcons = {
+  none: "",
+  vip: "🔹",
+  premium: "💠",
+  elite: "🔷",
+  royal: "💎",
+  legend: "👑"
 };
 function userStarHtml(user){
   if(!user) return "";
@@ -591,6 +610,39 @@ function userStarHtml(user){
   }
 
   return "";
+}
+function userStatusHtml(user){
+  const status = user?.status || "none";
+  const icon = statusIcons[status] || "";
+
+  if(!icon) return "";
+
+  return `<span style="color:${statusColors[status] || "#ffffff"};filter:drop-shadow(0 0 6px ${statusColors[status] || "#ffffff"})">${icon}</span> `;
+}
+
+async function refreshCurrentUser(){
+  const token = localStorage.getItem("token");
+  if(!token) return null;
+
+  try{
+    const response = await fetch("/api/me", {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    });
+
+    const data = await response.json();
+
+    if(!response.ok || !data.ok){
+      return null;
+    }
+
+    localStorage.setItem("user", JSON.stringify(data.user));
+    return data.user;
+  }catch(error){
+    console.error(error);
+    return null;
+  }
 }
 function findAuthButton(){
   const buttons = document.querySelectorAll("a.btn");
@@ -614,28 +666,36 @@ function findAuthButton(){
 const authBtn = findAuthButton();
 
 if(currentUser && authBtn){
+  const renderAuthButton = (user) => {
+    authBtn.innerHTML =
+      userStarHtml(user) +
+      userStatusHtml(user) +
+      medalsHtml(user) +
+      user.username;
 
-  const freshUser = JSON.parse(localStorage.getItem("user") || "null");
+    authBtn.classList.remove("gold");
+    authBtn.classList.add("ghost");
 
-authBtn.innerHTML =
-  medalsHtml(freshUser || currentUser) +
-  userStarHtml(freshUser || currentUser) +
-  (freshUser?.username || currentUser.username);
+    authBtn.style.background = "rgba(255,255,255,.06)";
+    authBtn.style.border = "1px solid rgba(232,194,112,.35)";
+    authBtn.style.boxShadow = "none";
+    authBtn.style.color = roleColors[user.role] || "#ffffff";
 
-  authBtn.classList.remove("gold");
-  authBtn.classList.add("ghost");
+    authBtn.href = "#";
 
-  authBtn.style.background = "rgba(255,255,255,.06)";
-  authBtn.style.border = "1px solid rgba(232,194,112,.35)";
-  authBtn.style.boxShadow = "none";
-  authBtn.style.color = roleColors[currentUser.role] || "#ffffff";
-
-  authBtn.href = "#";
-
-  authBtn.onclick = function(e){
-    e.preventDefault();
-    document.getElementById("logoutModal").style.display = "flex";
+    authBtn.onclick = function(e){
+      e.preventDefault();
+      document.getElementById("logoutModal").style.display = "flex";
+    };
   };
+
+  renderAuthButton(currentUser);
+
+  refreshCurrentUser().then(freshUser => {
+    if(!freshUser) return;
+    localStorage.setItem("user", JSON.stringify(freshUser));
+    renderAuthButton(freshUser);
+  });
 }
 
 function confirmLogout(){

@@ -804,11 +804,107 @@
 
   <script>
     const roleColors = {
-      user: "#ffffff", admin: "#6f3cff", developer: "#0f7b43", moderator: "#57d46a",
-      vip: "#59c8ff", creator: "#ff9d42", banned: "#ff4d4d"
-    };
+  user: "#ffffff",
+  admin: "#6f3cff",
+  developer: "#0f7b43",
+  moderator: "#57d46a",
+  creator: "#ff9d42",
+  vip: "#A2DAFF",
+  muted: "#9CA3AF",
+  banned: "#111111"
+};
 
-    const currentUser = JSON.parse(localStorage.getItem("user"));
+const statusColors = {
+  none: "#ffffff",
+  vip: "#A2DAFF",
+  premium: "#5FBFFF",
+  elite: "#0099FF",
+  royal: "#005995",
+  legend: "#002A45"
+};
+
+const statusIcons = {
+  none: "",
+  vip: "🔹",
+  premium: "💠",
+  elite: "🔷",
+  royal: "💎",
+  legend: "👑"
+};
+function parseMedals(user){
+  if(!user?.medals) return {};
+
+  if(typeof user.medals === "string"){
+    try{
+      return JSON.parse(user.medals || "{}");
+    }catch(e){
+      return {};
+    }
+  }
+
+  return user.medals || {};
+}
+
+function medalsHtml(user){
+  const medals = parseMedals(user);
+  const medalList = ["🏆","🥇","🥈","🥉","🎖️","🏅"];
+
+  return medalList.map(medal => {
+    const count = Number(medals[medal] || 0);
+    if(count <= 0) return "";
+    return count > 1 ? `${medal}x${count}` : medal;
+  }).join("");
+}
+
+function userStarHtml(user){
+  if(!user) return "";
+
+  if(user.username === "Eighth#2020"){
+    return '<span style="color:#6f3cff;filter:drop-shadow(0 0 8px #6f3cff)">⭐</span> ';
+  }
+
+  if(user.is_partner){
+    return '<span style="color:#f0d28b;filter:drop-shadow(0 0 8px #f0d28b)">⭐</span> ';
+  }
+
+  return "";
+}
+
+function userStatusHtml(user){
+  const status = user?.status || "none";
+  const icon = statusIcons[status] || "";
+
+  if(!icon) return "";
+
+  return `<span style="color:${statusColors[status] || "#ffffff"};filter:drop-shadow(0 0 6px ${statusColors[status] || "#ffffff"})">${icon}</span> `;
+}
+
+async function refreshCurrentUser(){
+  const token = localStorage.getItem("token");
+  if(!token) return null;
+
+  try{
+    const response = await fetch("/api/me", {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    });
+
+    const data = await response.json();
+
+    if(!response.ok || !data.ok){
+      return null;
+    }
+
+    localStorage.setItem("user", JSON.stringify(data.user));
+    return data.user;
+  }catch(error){
+    console.error(error);
+    return null;
+  }
+}
+
+    let currentUser = JSON.parse(localStorage.getItem("user"));
 
     if(currentUser?.role === "banned"){
       localStorage.removeItem("token");
@@ -847,31 +943,69 @@
       }).join("");
     }
 
-    function setupAuthButton(){
-      const authBtn = document.querySelector('a[href="auth.html"]');
-      if(currentUser && authBtn){
-        const freshUser = JSON.parse(localStorage.getItem("user") || "null");
-        const user = freshUser || currentUser;
+    function userStatusHtml(user){
+  const status = user?.status || "none";
+  const icon = statusIcons[status] || "";
 
-        authBtn.innerHTML = medalsHtml(user) + userStarHtml(user) + (user.username || "Профиль");
-        authBtn.classList.remove("gold");
-        authBtn.classList.add("ghost");
-        authBtn.style.background = "rgba(255,255,255,.06)";
-        authBtn.style.border = "1px solid rgba(232,194,112,.35)";
-        authBtn.style.boxShadow = "none";
-        authBtn.style.color = roleColors[user.role] || "#ffffff";
-        authBtn.href = "#";
+  if(!icon) return "";
 
-        authBtn.onclick = function(e){
-          e.preventDefault();
-          const ok = confirm("Выйти из аккаунта?");
-          if(!ok) return;
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          location.href = "auth.html";
-        };
+  return `<span style="color:${statusColors[status] || "#ffffff"};filter:drop-shadow(0 0 6px ${statusColors[status] || "#ffffff"})">${icon}</span> `;
+}
+
+async function refreshCurrentUser(){
+  const token = localStorage.getItem("token");
+  if(!token) return null;
+
+  try{
+    const response = await fetch("/api/me", {
+      headers: {
+        "Authorization": "Bearer " + token
       }
+    });
+
+    const data = await response.json();
+
+    if(!response.ok || !data.ok){
+      return null;
     }
+
+    localStorage.setItem("user", JSON.stringify(data.user));
+    return data.user;
+  }catch(error){
+    console.error(error);
+    return null;
+  }
+}
+
+function setupAuthButton(userOverride = null){
+  const authBtn = document.querySelector('a[href="auth.html"]');
+  const user = userOverride || JSON.parse(localStorage.getItem("user") || "null") || currentUser;
+
+  if(user && authBtn){
+    authBtn.innerHTML =
+      userStarHtml(user) +
+      userStatusHtml(user) +
+      medalsHtml(user) +
+      (user.username || "Профиль");
+
+    authBtn.classList.remove("gold");
+    authBtn.classList.add("ghost");
+    authBtn.style.background = "rgba(255,255,255,.06)";
+    authBtn.style.border = "1px solid rgba(232,194,112,.35)";
+    authBtn.style.boxShadow = "none";
+    authBtn.style.color = roleColors[user.role] || "#ffffff";
+    authBtn.href = "#";
+
+    authBtn.onclick = function(e){
+      e.preventDefault();
+      const ok = confirm("Выйти из аккаунта?");
+      if(!ok) return;
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      location.href = "auth.html";
+    };
+  }
+}
 
     function getPercent(likes, dislikes){
       const total = likes + dislikes;
@@ -966,6 +1100,12 @@ async function initCommunityVotes(){
 initCommunityVotes();
 
     setupAuthButton();
+
+refreshCurrentUser().then(freshUser => {
+  if(!freshUser) return;
+  currentUser = freshUser;
+  setupAuthButton(freshUser);
+});
   </script>
 
 <audio id="bgMusic" loop>

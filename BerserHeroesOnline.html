@@ -1213,13 +1213,68 @@ function findAuthButton(){
   return null;
 }
 
-const authBtn = findAuthButton();
+const statusColors = {
+  none: "#ffffff",
+  vip: "#A2DAFF",
+  premium: "#5FBFFF",
+  elite: "#0099FF",
+  royal: "#005995",
+  legend: "#002A45"
+};
 
-if(currentUser && authBtn){
+const statusIcons = {
+  none: "",
+  vip: "🔹",
+  premium: "💠",
+  elite: "🔷",
+  royal: "💎",
+  legend: "👑"
+};
+
+function userStatusHtml(user){
+  const status = user?.status || "none";
+  const icon = statusIcons[status] || "";
+
+  if(!icon) return "";
+
+  return `<span style="color:${statusColors[status] || "#ffffff"};filter:drop-shadow(0 0 6px ${statusColors[status] || "#ffffff"})">${icon}</span> `;
+}
+
+async function refreshCurrentUser(){
+  const token = localStorage.getItem("token");
+  if(!token) return null;
+
+  try{
+    const response = await fetch("/api/me", {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    });
+
+    const data = await response.json();
+
+    if(!response.ok || !data.ok){
+      return null;
+    }
+
+    localStorage.setItem("user", JSON.stringify(data.user));
+    return data.user;
+  }catch(error){
+    console.error(error);
+    return null;
+  }
+}
+
+function setupAuthButton(user){
+  const authBtn = findAuthButton();
+  if(!user || !authBtn) return;
+
   authBtn.innerHTML =
-  medalsHtml(currentUser) +
-  userStarHtml(currentUser) +
-  currentUser.username;
+    userStarHtml(user) +
+    userStatusHtml(user) +
+    medalsHtml(user) +
+    user.username;
+
   authBtn.href = "#";
   authBtn.classList.remove("gold");
   authBtn.classList.add("ghost");
@@ -1227,13 +1282,18 @@ if(currentUser && authBtn){
   authBtn.style.background = "rgba(255,255,255,.06)";
   authBtn.style.border = "1px solid rgba(232,194,112,.35)";
   authBtn.style.boxShadow = "none";
-  authBtn.style.color = roleColors[currentUser.role] || "#ffffff";
+  authBtn.style.color = roleColors[user.role] || "#ffffff";
 
   authBtn.onclick = function(e){
     e.preventDefault();
     document.getElementById("logoutModal").style.display = "flex";
   };
 }
+
+(async function(){
+  const freshUser = await refreshCurrentUser();
+  setupAuthButton(freshUser || currentUser);
+})();
 
 function confirmLogout(){
   localStorage.removeItem("token");

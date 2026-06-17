@@ -79,7 +79,20 @@ try {
     });
   }
 }
-
+app.get("/api/me", verifyToken, async (req, res) => {
+  res.json({
+    ok: true,
+    user: {
+      id: req.user.id,
+      username: req.user.username,
+      email: req.user.email,
+      role: req.user.role || "user",
+      status: req.user.status || "none",
+      is_partner: !!req.user.is_partner,
+      medals: req.user.medals || {}
+    }
+  });
+});
 function requireRoles(...roles) {
   return function(req, res, next) {
     if (!req.user || !roles.includes(req.user.role)) {
@@ -148,9 +161,9 @@ async function enrichTournamentSwissData(rawSwissData){
   }
 
   const result = await pool.query(`
-    SELECT id, username, role, is_partner, medals
-    FROM users
-    WHERE LOWER(username) = ANY($1)
+    SELECT id, username, role, status, is_partner, medals
+FROM users
+WHERE LOWER(username) = ANY($1)
   `, [
     names.map(name => name.toLowerCase())
   ]);
@@ -170,8 +183,9 @@ async function enrichTournamentSwissData(rawSwissData){
         id:user.id,
         username:user.username,
         role:user.role || "user",
-        is_partner:!!user.is_partner,
-        medals:user.medals || {}
+status:user.status || "none",
+is_partner:!!user.is_partner,
+medals:user.medals || {}
       };
     }
 
@@ -179,8 +193,9 @@ async function enrichTournamentSwissData(rawSwissData){
       id:null,
       username:name,
       role:"user",
-      is_partner:false,
-      medals:{}
+status:"none",
+is_partner:false,
+medals:{}
     };
   });
 
@@ -677,10 +692,10 @@ app.get("/api/users/by-nick/:username", async (req, res) => {
     }
 
     const result = await pool.query(`
-      SELECT id, username, role, is_partner, medals
-      FROM users
-      WHERE LOWER(username) = LOWER($1)
-      LIMIT 1
+      SELECT id, username, role, status, is_partner, medals
+FROM users
+WHERE LOWER(username) = LOWER($1)
+LIMIT 1
     `, [username]);
 
     if(result.rows.length === 0){
@@ -705,10 +720,10 @@ app.get("/api/users/by-nick/:username", async (req, res) => {
 app.get("/api/users/public-list", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, username, role, is_partner, medals
-      FROM users
-      WHERE role != 'banned'
-      ORDER BY username ASC
+      SELECT id, username, role, status, is_partner, medals
+FROM users
+WHERE role != 'banned'
+ORDER BY username ASC
     `);
 
     res.json({
@@ -920,7 +935,8 @@ app.get("/api/news", async (req, res) => {
     n.*,
     COALESCE(u.role, n.author_role, 'user') AS author_role,
     COALESCE(u.is_partner, n.author_is_partner, false) AS author_is_partner,
-    COALESCE(u.medals, '{}'::jsonb) AS author_medals
+    COALESCE(u.medals, '{}'::jsonb) AS author_medals,
+COALESCE(u.status, 'none') AS author_status
   FROM news n
   LEFT JOIN users u ON u.id = n.author_id OR LOWER(u.username) = LOWER(n.author_name)
   ORDER BY n.created_at DESC
@@ -1019,7 +1035,8 @@ app.get("/api/news/:id/comments", async (req, res) => {
     c.*,
     COALESCE(u.role, c.author_role, 'user') AS author_role,
     COALESCE(u.is_partner, c.author_is_partner, false) AS author_is_partner,
-    COALESCE(u.medals, '{}'::jsonb) AS author_medals
+    COALESCE(u.medals, '{}'::jsonb) AS author_medals,
+COALESCE(u.status, 'none') AS author_status
   FROM news_comments c
   LEFT JOIN users u ON u.id = c.user_id
   WHERE c.news_id = $1
@@ -1420,6 +1437,7 @@ app.get("/api/site-chats/:channel/messages", verifyToken, async (req,res)=>{
         COALESCE(u.role, m.role) AS role,
         COALESCE(u.is_partner, m.is_partner) AS is_partner,
         COALESCE(u.medals, '{}'::jsonb) AS medals,
+COALESCE(u.status, 'none') AS status,
         m.text,
         m.media_type,
         m.media_name,
@@ -1699,7 +1717,8 @@ app.get("/api/tournaments", async (req, res) => {
   t.*,
   COALESCE(u.medals, '{}'::jsonb) AS organizer_medals,
   COALESCE(u.role, t.organizer_role, 'user') AS organizer_role,
-  COALESCE(u.is_partner, t.organizer_is_partner, false) AS organizer_is_partner
+  COALESCE(u.is_partner, t.organizer_is_partner, false) AS organizer_is_partner,
+COALESCE(u.status, 'none') AS organizer_status
 FROM tournaments t
 LEFT JOIN users u ON u.id = t.organizer_id
 ORDER BY t.created_at DESC
@@ -1710,7 +1729,8 @@ ORDER BY t.created_at DESC
   p.*,
   COALESCE(u.medals, '{}'::jsonb) AS medals,
   COALESCE(u.role, p.role, 'user') AS role,
-  COALESCE(u.is_partner, p.is_partner, false) AS is_partner
+  COALESCE(u.is_partner, p.is_partner, false) AS is_partner,
+COALESCE(u.status, 'none') AS status
 FROM tournament_participants p
 LEFT JOIN users u ON u.id = p.user_id
 ORDER BY p.joined_at ASC
@@ -2231,7 +2251,8 @@ app.get("/api/tournaments", async (req, res) => {
   t.*,
   COALESCE(u.medals, '{}'::jsonb) AS organizer_medals,
   COALESCE(u.role, t.organizer_role, 'user') AS organizer_role,
-  COALESCE(u.is_partner, t.organizer_is_partner, false) AS organizer_is_partner
+  COALESCE(u.is_partner, t.organizer_is_partner, false) AS organizer_is_partner,
+COALESCE(u.status, 'none') AS organizer_status
 FROM tournaments t
 LEFT JOIN users u ON u.id = t.organizer_id
 ORDER BY t.created_at DESC
@@ -2242,7 +2263,8 @@ ORDER BY t.created_at DESC
   p.*,
   COALESCE(u.medals, '{}'::jsonb) AS medals,
   COALESCE(u.role, p.role, 'user') AS role,
-  COALESCE(u.is_partner, p.is_partner, false) AS is_partner
+  COALESCE(u.is_partner, p.is_partner, false) AS is_partner,
+COALESCE(u.status, 'none') AS status
 FROM tournament_participants p
 LEFT JOIN users u ON u.id = p.user_id
 ORDER BY p.joined_at ASC
@@ -3153,7 +3175,8 @@ app.get("/api/decks", async (req, res) => {
         d.*,
         COALESCE(u.role, d.author_role, 'user') AS author_role,
         COALESCE(u.is_partner, d.author_is_partner, false) AS author_is_partner,
-        COALESCE(u.medals, '{}'::jsonb) AS author_medals
+        COALESCE(u.medals, '{}'::jsonb) AS author_medals,
+COALESCE(u.status, 'none') AS author_status
       FROM decks d
       LEFT JOIN users u ON u.id = d.author_id
       ORDER BY d.created_at DESC
