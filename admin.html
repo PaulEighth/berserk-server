@@ -178,7 +178,8 @@
     }
 
     .table-wrap{
-  overflow:hidden;
+  overflow-x:hidden;
+  overflow-y:visible;
   border-radius:18px;
   border:1px solid rgba(232,194,112,.14);
 }
@@ -186,7 +187,7 @@
 table{
   width:100%;
   border-collapse:collapse;
-  table-layout:fixed;
+  table-layout:auto;
   background:rgba(255,255,255,.025);
 }
 
@@ -220,8 +221,8 @@ table{
     }
 
     select{
-  width:100%;
-  max-width:150px;
+  width:130px;
+  max-width:130px;
   padding:10px 10px;
   border-radius:14px;
   border:1px solid rgba(232,194,112,.18);
@@ -633,6 +634,8 @@ table{
   moderator: "#57d46a",
   creator: "#ff9d42",
 
+  vip: "#A2DAFF",
+
   muted: "#9CA3AF",
   banned: "#111111"
 };
@@ -813,7 +816,7 @@ function renderMedalEditor(user){
   const medals = parseMedals(user);
 
   return `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;min-width:0">
+    <div style="display:grid;grid-template-columns:repeat(3,70px);gap:6px;min-width:220px">
       ${medalList.map(medal => `
         <label style="display:flex;align-items:center;gap:8px">
           <span style="font-size:20px">${medal}</span>
