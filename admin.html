@@ -244,10 +244,12 @@ table{
     }
 
     .actions{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  min-width:500px;
+}
 
     .notice{
       margin-top:14px;
@@ -582,7 +584,7 @@ table{
               <th style="width:220px">Роль</th>
 <th style="width:220px">Статус</th>
 <th>Медали</th>
-              <th style="width:420px">Действия</th>
+              <th style="width:520px">Действия</th>
             </tr>
           </thead>
           <tbody id="usersBody">
@@ -827,7 +829,7 @@ function renderMedalEditor(user){
           >
         </label>
       `).join("")}
-      <button class="btn ghost" onclick="saveMedals(${user.id})">Сохранить медали</button>
+      <button class="btn ghost" style="min-width:190px;grid-column:1/-1" onclick="saveMedals(${user.id})">Сохранить медали</button>
     </div>
   `;
 }
