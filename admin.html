@@ -580,16 +580,14 @@ table{
               <th>Ник</th>
               <th>Email</th>
               <th>Роль</th>
-<th>Новая роль</th>
 <th>Статус</th>
-<th>Новый статус</th>
 <th>Медали</th>
               <th>Действия</th>
             </tr>
           </thead>
           <tbody id="usersBody">
             <tr>
-              <td colspan="9" class="muted">Загрузка...</td>
+              <td colspan="7" class="muted">Загрузка...</td>
             </tr>
           </tbody>
         </table>
@@ -754,7 +752,7 @@ function userStatusHtml(user){
         showInfo("Недостаточно прав", "Эта страница доступна только администратору Eighth#2020.");
         document.getElementById("usersBody").innerHTML = `
           <tr>
-            <td colspan="9" class="muted">Недостаточно прав.</td>
+            <td colspan="7" class="muted">Недостаточно прав.</td>
           </tr>
         `;
         return false;
@@ -955,7 +953,7 @@ if(search){
       if(!users.length){
         body.innerHTML = `
           <tr>
-            <td colspan="6" class="muted">Пользователей нет.</td>
+            <td colspan="7" class="muted">Пользователей нет.</td>
           </tr>
         `;
         return;
@@ -967,23 +965,26 @@ if(search){
           <td style="color:${roleColors[user.role] || "#ffffff"}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)}${user.username}</td>
           <td class="muted">${user.email || "—"}</td>
           <td>
-            <span class="role-pill" style="color:${roleColors[user.role] || "#ffffff"}">
-              ${user.role || "user"}
-            </span>
-          </td>
-          <td>
-  ${user.username === ADMIN_USERNAME
-    ? `<span class="role-pill" style="color:${roleColors.admin}">admin навсегда</span>`
-    : renderRoleSelect(user)
-  }
+  <div style="display:grid;gap:8px;min-width:140px">
+    <span class="role-pill" style="color:${roleColors[user.role] || "#ffffff"}">
+      ${user.role || "user"}
+    </span>
+
+    ${user.username === ADMIN_USERNAME
+      ? `<span class="role-pill" style="color:${roleColors.admin}">admin навсегда</span>`
+      : renderRoleSelect(user)
+    }
+  </div>
 </td>
+
 <td>
-  <span class="role-pill" style="color:${statusColors[user.status || "none"] || "#ffffff"}">
-    ${statusIcons[user.status || "none"] ? statusIcons[user.status || "none"] + " " : ""}${user.status || "none"}
-  </span>
-</td>
-<td>
-  ${renderStatusSelect(user)}
+  <div style="display:grid;gap:8px;min-width:140px">
+    <span class="role-pill" style="color:${statusColors[user.status || "none"] || "#ffffff"}">
+      ${statusIcons[user.status || "none"] ? statusIcons[user.status || "none"] + " " : ""}${user.status || "none"}
+    </span>
+
+    ${renderStatusSelect(user)}
+  </div>
 </td>
 <td>${renderMedalEditor(user)}</td>
 <td>
