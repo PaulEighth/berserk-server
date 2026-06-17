@@ -4928,8 +4928,8 @@ if(typeof updateStats === "function"){
 window.openTournamentFromUrl = openTournamentFromUrl;
     window.closeMatchRoom = closeMatchRoom;
 
-    window.openSimpleMatchRoom = openSimpleMatchRoom;
-    window.saveSimpleMatchScore = saveSimpleMatchScore;
+    window.openSimpleMatchRoom = (typeof openSimpleMatchRoom === "function") ? openSimpleMatchRoom : openMatchRoom;
+window.saveSimpleMatchScore = (typeof saveSimpleMatchScore === "function") ? saveSimpleMatchScore : function(){};
     window.closeMatchRoom = closeMatchRoom;
 
     if($('closeMatchRoom')) $('closeMatchRoom').addEventListener('click', closeMatchRoom);
