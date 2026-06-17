@@ -623,12 +623,20 @@
 
     const roleColors = {
   user: "#ffffff",
+
   admin: "#6f3cff",
   developer: "#0f7b43",
   moderator: "#57d46a",
-  vip: "#59c8ff",
   creator: "#ff9d42",
-  banned: "#ff4d4d"
+
+  vip: "#60A5FA",
+  premium: "#3B82F6",
+  elite: "#1D4ED8",
+  royal: "#2563EB",
+  legend: "#7DD3FC",
+
+  muted: "#9CA3AF",
+  banned: "#111111"
 };
 const medalList = ["🏆","🥇","🥈","🥉","🎖️","🏅"];
 
@@ -646,10 +654,19 @@ let currentRoleFilter = "all";
 let currentMedalFilter = "all";
     const roles = [
   "user",
+
+  "admin",
   "developer",
   "moderator",
-  "vip",
   "creator",
+
+  "vip",
+  "premium",
+  "elite",
+  "royal",
+  "legend",
+
+  "muted",
   "banned"
 ];
 
@@ -790,7 +807,16 @@ function renderUsersStats(users){
     counts[role] = (counts[role] || 0) + 1;
   });
 
-  const orderedRoles = ["admin","developer","moderator","creator","vip","user","banned"];
+  const roleFilterGroups = [
+  {
+    title: "Роли",
+    roles: ["admin","developer","moderator","creator"]
+  },
+  {
+    title: "Статусы",
+    roles: ["legend","royal","elite","premium","vip","user","muted","banned"]
+  }
+];
 
   box.innerHTML = `
     <span class="stat-pill"
@@ -799,13 +825,19 @@ function renderUsersStats(users){
       Всего аккаунтов: <b>${users.length}</b>
     </span>
 
-    ${orderedRoles.map(role => `
-      <span class="stat-pill"
-            style="cursor:pointer;color:${roleColors[role] || "#ffffff"};${currentRoleFilter === role ? "border-color:rgba(240,210,139,.65);background:rgba(214,168,79,.18);" : ""}"
-            onclick="filterByRole('${role}')">
-        ${role}: <b>${counts[role] || 0}</b>
-      </span>
-    `).join("")}
+    ${roleFilterGroups.map(group => `
+  <div style="width:100%;margin:6px 0 2px;color:var(--gold2);font-weight:950;text-transform:uppercase;letter-spacing:.08em;font-size:12px">
+    ${group.title}
+  </div>
+
+  ${group.roles.map(role => `
+    <span class="stat-pill"
+          style="cursor:pointer;color:${roleColors[role] || "#ffffff"};${currentRoleFilter === role ? "border-color:rgba(240,210,139,.65);background:rgba(214,168,79,.18);" : ""}"
+          onclick="filterByRole('${role}')">
+      ${role}: <b>${counts[role] || 0}</b>
+    </span>
+  `).join("")}
+`).join("")}
   `;
 }
 function renderMedalFilters(users){
