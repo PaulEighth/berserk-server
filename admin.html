@@ -178,24 +178,25 @@
     }
 
     .table-wrap{
-      overflow:auto;
-      border-radius:18px;
-      border:1px solid rgba(232,194,112,.14);
-    }
+  overflow:hidden;
+  border-radius:18px;
+  border:1px solid rgba(232,194,112,.14);
+}
 
-    table{
-      width:100%;
-      border-collapse:collapse;
-      min-width:850px;
-      background:rgba(255,255,255,.025);
-    }
+table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  background:rgba(255,255,255,.025);
+}
 
     th,td{
-      padding:14px 12px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      text-align:left;
-      vertical-align:middle;
-    }
+  padding:12px 8px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  text-align:left;
+  vertical-align:middle;
+  word-break:break-word;
+}
 
     th{
       color:var(--gold2);
@@ -219,15 +220,16 @@
     }
 
     select{
-      width:160px;
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(232,194,112,.18);
-      background:#111622;
-      color:var(--text);
-      outline:none;
-      font-weight:800;
-    }
+  width:100%;
+  max-width:150px;
+  padding:10px 10px;
+  border-radius:14px;
+  border:1px solid rgba(232,194,112,.18);
+  background:#111622;
+  color:var(--text);
+  outline:none;
+  font-weight:800;
+}
 
     .role-pill{
       display:inline-flex;
@@ -811,7 +813,7 @@ function renderMedalEditor(user){
   const medals = parseMedals(user);
 
   return `
-    <div style="display:grid;gap:6px;min-width:220px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;min-width:0">
       ${medalList.map(medal => `
         <label style="display:flex;align-items:center;gap:8px">
           <span style="font-size:20px">${medal}</span>
@@ -927,7 +929,7 @@ if(currentRoleFilter !== "all"){
     const status = user.status || "none";
 
     if(["legend","royal","elite","premium","vip"].includes(currentRoleFilter)){
-      return status === currentRoleFilter;
+      return status === currentRoleFilter || role === currentRoleFilter;
     }
 
     return role === currentRoleFilter;
