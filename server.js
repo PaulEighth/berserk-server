@@ -881,8 +881,6 @@ app.patch("/admin/users/:id/username", requireAdmin, async (req, res) => {
     res.status(500).json({ error: "Ошибка смены ника" });
   }
 });
-
-app.patch("/admin/users/:id/status", requireAdmin, async (req, res) => {
 app.patch("/admin/users/:id/status", requireAdmin, async (req, res) => {
   try {
     const { status } = req.body;
