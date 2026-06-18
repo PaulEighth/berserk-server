@@ -826,7 +826,6 @@ await pool.query(
     res.status(500).json({ error: "Ошибка смены роли" });
   }
 });
-});
 
 app.patch("/admin/users/:id/username", requireAdmin, async (req, res) => {
   try {
