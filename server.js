@@ -1843,12 +1843,12 @@ Number(bracket) || Number(max_players) || 16,
       JSON.stringify(swiss_data || {}),
 
       deckMode || "none",
-format || "bo1",
-format || "bo1",
-1,
-0,
-1,
-0,
+matchFormat || "bo1",
+finalFormat || "bo3",
+Number(decksBeforeFinal) || 1,
+Number(bansBeforeFinal) || 0,
+Number(decksFinal) || 1,
+Number(bansFinal) || 0,
 !!isPrivate,
 isPrivate ? (privatePassword || "") : ""
     ]);
