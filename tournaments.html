@@ -7029,19 +7029,7 @@ function canSeeMatchDecksNow(t, playerNick){
     return true;
   }
 
-  if(t.registrationOpen === false || t.status === "closed" || t.status === "finished"){
-    return true;
-  }
-
-  const role = typeof getUserRole === "function" ? getUserRole() : "user";
-  if(["admin","developer","moderator","creator"].includes(String(role))){
-    return true;
-  }
-
-  const currentNick = normalizeMatchNick(getCurrentUserNick());
-  const targetNick = normalizeMatchNick(playerNick);
-
-  return currentNick && targetNick && currentNick === targetNick;
+  return t.registrationOpen === false || t.status === "closed" || t.status === "finished";
 }
 function renderMatchPlayerDecks(t, room, playerNick, side){
   const deckCount = getMatchDeckCount(t, room.round);
