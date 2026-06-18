@@ -992,10 +992,11 @@ if(search){
 <td>
   <div class="actions">
     ${user.username === ADMIN_USERNAME
-      ? ""
-      : `<button class="btn gold" onclick="changeRole(${user.id})">Сохранить роль</button>
-   <button class="btn ghost" onclick="changeStatus(${user.id})">Сохранить статус</button>`
-    }
+  ? ""
+  : `<button class="btn gold" onclick="changeRole(${user.id})">Сохранить роль</button>
+ <button class="btn ghost" onclick="changeStatus(${user.id})">Сохранить статус</button>
+ <button class="btn ghost" onclick="changeUsername(${user.id})">Сменить ник</button>`
+}
 
 ${user.username === ADMIN_USERNAME ? "" : `
   <button class="btn ghost" onclick="togglePartner(${user.id}, ${user.is_partner ? "false" : "true"})">
@@ -1072,6 +1073,43 @@ if(protectedUser?.username === ADMIN_USERNAME){
         showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
       }
     }
+    async function changeUsername(userId){
+  if(!checkAdmin()) return;
+
+  const user = allUsers.find(u => Number(u.id) === Number(userId));
+  if(!user) return;
+
+  const username = prompt(
+    "Введите новый ник в формате Name#1234 или Name#12345",
+    user.username
+  );
+
+  if(!username) return;
+
+  try{
+    const response = await fetch(`${API_URL}/admin/users/${userId}/username`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-username": currentUser.username
+      },
+      body: JSON.stringify({ username })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      showInfo("Ошибка", data.error || "Не удалось изменить ник.");
+      return;
+    }
+
+    showInfo("Готово", `Ник изменён на ${data.username}.`);
+    loadUsers();
+  }catch(error){
+    console.error(error);
+    showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
+  }
+}
     async function changeStatus(userId){
   if(!checkAdmin()) return;
 

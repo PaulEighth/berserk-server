@@ -826,6 +826,63 @@ await pool.query(
     res.status(500).json({ error: "Ошибка смены роли" });
   }
 });
+});
+
+app.patch("/admin/users/:id/username", requireAdmin, async (req, res) => {
+  try {
+    const { username } = req.body;
+    const { id } = req.params;
+
+    const newUsername = String(username || "").trim();
+    const nicknamePattern = /^[A-Za-zА-Яа-яЁё0-9_]{2,24}#[0-9]{4,5}$/;
+
+    if (!nicknamePattern.test(newUsername)) {
+      return res.status(400).json({ error: "Ник должен быть в формате Name#1234" });
+    }
+
+    const targetUser = await pool.query(
+      "SELECT username FROM users WHERE id = $1",
+      [id]
+    );
+
+    if (targetUser.rows.length === 0) {
+      return res.status(404).json({ error: "Пользователь не найден" });
+    }
+
+    if (targetUser.rows[0].username === ADMIN_USERNAME) {
+      return res.status(403).json({ error: "Ник Eighth#2020 нельзя изменить" });
+    }
+
+    const tag = newUsername.split("#")[1];
+
+    const existingUser = await pool.query(`
+      SELECT id
+      FROM users
+      WHERE id != $1
+        AND (
+          LOWER(username) = LOWER($2)
+          OR split_part(username, '#', 2) = $3
+        )
+      LIMIT 1
+    `, [id, newUsername, tag]);
+
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ error: "Такой ник или номер после # уже занят" });
+    }
+
+    const result = await pool.query(
+      "UPDATE users SET username = $1 WHERE id = $2 RETURNING id, username, email, role, status, is_partner, medals",
+      [newUsername, id]
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Ошибка смены ника" });
+  }
+});
+
+app.patch("/admin/users/:id/status", requireAdmin, async (req, res) => {
 app.patch("/admin/users/:id/status", requireAdmin, async (req, res) => {
   try {
     const { status } = req.body;
