@@ -964,7 +964,7 @@ if(search){
       body.innerHTML = users.map((user,index) => `
         <tr>
           <td>${index + 1}</td>
-          <td style="color:${roleColors[user.role] || "#ffffff"}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)}${user.username}</td>
+          <td style="color:${statusColors[user.status] && user.status !== "none" ? statusColors[user.status] : (roleColors[user.role] || "#ffffff")}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)}${user.username}</td>
           <td class="muted">${user.email || "—"}</td>
           <td>
   <div style="display:grid;gap:8px;min-width:140px">
