@@ -635,7 +635,7 @@
     </section>
 
     <section class="panel">
-      <div class="section-title"><h2>Зал славы колод</h2><span class="small">топ-5 по оценкам игроков</span></div>
+      <div class="section-title"><h2>Зал славы колод</h2><span class="small">колоды отсортированы по оценкам игроков</span></div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
   <label>
     <span class="label">Фракция</span>
@@ -2144,7 +2144,8 @@ found.description = description;
   const list=getAvailableDecks();;$('myDecks').innerHTML=list.length?list.map(d=>renderLocalDeckCard(d)).join(''):'<div class="empty">Пока нет созданных колод. Собери колоду во вкладке «База карт» и нажми «Создать», после этого она появится здесь.</div>'}
     function renderTopDecks(){
   updateHallFilters();
-  const top = getFilteredHallDecks().sort((a,b)=>deckScore(b)-deckScore(a)).slice(0,5);
+  const top = getFilteredHallDecks()
+  .sort((a,b)=>deckScore(b)-deckScore(a));
   $('topDecks').innerHTML = top.length
     ? top.map((d,i)=>renderDeckCard(d,i+1)).join('')
     : '<div class="empty">По выбранным фильтрам колод нет.</div>';
