@@ -1282,7 +1282,12 @@ function setupAuthButton(user){
   authBtn.style.background = "rgba(255,255,255,.06)";
   authBtn.style.border = "1px solid rgba(232,194,112,.35)";
   authBtn.style.boxShadow = "none";
-  authBtn.style.color = roleColors[user.role] || "#ffffff";
+  const nameColor =
+  statusColors[user.status] && user.status !== "none"
+    ? statusColors[user.status]
+    : (roleColors[user.role] || "#ffffff");
+
+authBtn.style.color = nameColor;
 
   authBtn.onclick = function(e){
     e.preventDefault();

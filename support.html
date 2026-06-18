@@ -1052,8 +1052,13 @@ function updateAuthUI(){
 
   if(user){
 
-   authLink.innerHTML =
-  `<span class="${roleClass(user.role)}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)} ${user.username}</span>`;
+   const nameColor =
+  statusColors[user.status] && user.status !== "none"
+    ? statusColors[user.status]
+    : "#ffffff";
+
+authLink.innerHTML =
+  `<span style="color:${nameColor}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)} ${user.username}</span>`;
 
     authLink.classList.remove("gold");
     authLink.classList.add("ghost");
