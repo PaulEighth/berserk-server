@@ -3240,12 +3240,6 @@ html body .bracket-cell.alive{
         <label><span class="label">Формат</span><select class="select" id="requestFormat" onchange="toggleTournamentBracketChoice()"><option value="bo1">BO1</option><option value="bo3">BO3</option><option value="bo5">BO5</option><option value="bo7">BO7</option><option value="swiss">Швейцарка</option><option value="single">Олимпийка</option></select></label>
         <label><span class="label">Колоды</span><select class="select" id="requestDeckMode"><option value="none" selected>Без колод</option><option value="required">Колоды обязательны</option></select></label>
         <label><span class="label">Колоды видны</span><select class="select" id="requestDeckVisibility"><option value="visible" selected>Да</option><option value="hidden_until_closed">Нет</option></select></label>
-        <label><span class="label">Формат до финала</span><select class="select" id="requestMatchFormat"><option value="bo1" selected>BO1</option><option value="bo3">BO3</option><option value="bo5">BO5</option><option value="bo7">BO7</option></select></label>
-        <label><span class="label">Формат финала</span><select class="select" id="requestFinalFormat"><option value="bo1">BO1</option><option value="bo3" selected>BO3</option><option value="bo5">BO5</option><option value="bo7">BO7</option></select></label>
-        <label><span class="label">Колод до финала</span><select class="select" id="requestDecksBeforeFinal"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
-        <label><span class="label">Банов до финала</span><select class="select" id="requestBansBeforeFinal"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
-        <label><span class="label">Колод в финале</span><select class="select" id="requestDecksFinal"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
-        <label><span class="label">Банов в финале</span><select class="select" id="requestBansFinal"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
         <label><span class="label">Мест</span><input class="field" id="requestPlaces" type="number" min="2" max="1000" placeholder="16"></label>
         <label id="requestBracketSizeLabel"><span class="label">Сетка</span><select class="select" id="requestBracketSize"><option value="8">8 игроков</option><option value="16" selected>16 игроков</option><option value="32">32 игрока</option><option value="64">64 игрока</option><option value="128">128 игроков</option></select></label>
 <label id="requestSwissRoundsLabel" style="display:none"><span class="label">Раунды</span><select class="select" id="requestSwissRounds"><option value="1">1 раунд</option><option value="2">2 раунда</option><option value="3" selected>3 раунда</option><option value="4">4 раунда</option><option value="5">5 раундов</option><option value="6">6 раундов</option><option value="7">7 раундов</option><option value="8">8 раундов</option><option value="9">9 раундов</option><option value="10">10 раундов</option></select></label>
@@ -5459,12 +5453,6 @@ const coOrganizers = extraTournamentOrganizers.slice();
       const format = $('requestFormat').value;
       const deckMode = $('requestDeckMode') ? $('requestDeckMode').value : 'none';
 const deckVisibility = $('requestDeckVisibility') ? $('requestDeckVisibility').value : 'visible';
-const matchFormat = $('requestMatchFormat') ? $('requestMatchFormat').value : 'bo1';
-      const finalFormat = $('requestFinalFormat') ? $('requestFinalFormat').value : 'bo3';
-      const decksBeforeFinal = getSelectNumber('requestDecksBeforeFinal', 1);
-      const bansBeforeFinal = getSelectNumber('requestBansBeforeFinal', 0);
-      const decksFinal = getSelectNumber('requestDecksFinal', 1);
-      const bansFinal = getSelectNumber('requestBansFinal', 0);
       const places = Number($('requestPlaces').value || 0);
       let bracketSize = Number($('requestBracketSize').value || 16);
       const swissRounds = Number($('requestSwissRounds')?.value || 3);
@@ -5553,18 +5541,10 @@ swiss_data: {
   endDate: request.endDate || "",
   deckMode: request.deckMode || "none",
   deckVisibility: request.deckVisibility || "visible",
-  matchFormat: request.matchFormat || "bo1",
-  finalFormat: request.finalFormat || "bo3",
   coOrganizers: request.coOrganizers || []
 },
 
 deckMode: request.deckMode || "none",
-matchFormat: request.matchFormat || "bo1",
-finalFormat: request.finalFormat || "bo3",
-decksBeforeFinal: request.decksBeforeFinal || 1,
-bansBeforeFinal: request.bansBeforeFinal || 0,
-decksFinal: request.decksFinal || 1,
-bansFinal: request.bansFinal || 0,
 isPrivate: !!request.isPrivate,
 privatePassword: request.isPrivate ? (request.privatePassword || "") : ""
     })
@@ -5618,12 +5598,6 @@ if($('requestIsPrivate')) $('requestIsPrivate').value='0';
         $('requestPrivateToggle').classList.add('ghost');
       }
       if($('requestPasswordLabel')) $('requestPasswordLabel').style.display='none';
-      if($('requestMatchFormat')) $('requestMatchFormat').value='bo1';
-      if($('requestFinalFormat')) $('requestFinalFormat').value='bo3';
-      if($('requestDecksBeforeFinal')) $('requestDecksBeforeFinal').value='1';
-      if($('requestBansBeforeFinal')) $('requestBansBeforeFinal').value='1';
-      if($('requestDecksFinal')) $('requestDecksFinal').value='1';
-      if($('requestBansFinal')) $('requestBansFinal').value='1';
       toggleTournamentBracketChoice();
     }
 
@@ -7760,8 +7734,6 @@ const players = getPlayers(id);
          <div class="info-row"><span>Формат</span><span>${escapeHtml(t.mode)}</span></div>
          <div class="info-row"><span>Колоды</span><span>${deckModeLabel(t.deckMode)}</span></div>
 <div class="info-row"><span>Колоды видны</span><span>${t.deckVisibility === 'hidden_until_closed' ? 'После закрытия турнира' : 'Да'}</span></div>
-         <div class="info-row"><span>До финала</span><span>${matchFormatLabel(t.matchFormat)} · колод: ${t.decksBeforeFinal || 1} · банов: ${t.bansBeforeFinal || 1}</span></div>
-         <div class="info-row"><span>Финал</span><span>${matchFormatLabel(t.finalFormat)} · колод: ${t.decksFinal || 1} · банов: ${t.bansFinal || 1}</span></div>
          <div class="info-row"><span>Количество мест</span><span>${t.places}</span></div>
          <div class="info-row"><span>${t.format === 'swiss' ? 'Раундов' : 'Размер сетки'}</span><span>${t.format === 'swiss' ? (t.swissRounds || 3) + ' из 10' : bracketSize + ' игроков'}</span></div>
          <div class="info-row"><span>Правила колод</span><span>${escapeHtml(t.deckRules)}</span></div>
@@ -7916,13 +7888,7 @@ if($("requestEndDate")) $("requestEndDate").value = toDateTimeLocal(t.endDate);
   if($("requestSwissRounds")) $("requestSwissRounds").value = String(t.swissRounds || 3);
   if(typeof toggleTournamentBracketChoice === "function") toggleTournamentBracketChoice();
   if($("requestDeckMode")) $("requestDeckMode").value = t.deckMode || "none";
-  if($("requestMatchFormat")) $("requestMatchFormat").value = t.matchFormat || "bo1";
-  if($("requestFinalFormat")) $("requestFinalFormat").value = t.finalFormat || "bo3";
 
-  if($("requestDecksBeforeFinal")) $("requestDecksBeforeFinal").value = t.decksBeforeFinal || 1;
-  if($("requestBansBeforeFinal")) $("requestBansBeforeFinal").value = t.bansBeforeFinal || 0;
-  if($("requestDecksFinal")) $("requestDecksFinal").value = t.decksFinal || 1;
-  if($("requestBansFinal")) $("requestBansFinal").value = t.bansFinal || 0;
 
   if($("requestPlaces")) $("requestPlaces").value = t.places || t.max_players || 8;
 
@@ -8119,8 +8085,6 @@ function openTournamentFromUrl(){
           + '<div class="info-row prize-info-row"><span>Призы</span><span>'+escapeHtml(prizeText(t)).replace(/\s*\|\s*/g, '<br>')+'</span></div>'
           + '<div class="info-row"><span>Формат</span><span>'+escapeHtml(t.mode)+'</span></div>'
           + '<div class="info-row"><span>Колоды</span><span>'+escapeHtml(deckModeLabel(t.deckMode))+'</span></div>'
-          + '<div class="info-row"><span>До финала</span><span>'+escapeHtml(matchFormatLabel(t.matchFormat))+' · колод: '+escapeHtml(t.decksBeforeFinal || 1)+' · банов: '+escapeHtml(t.bansBeforeFinal || 1)+'</span></div>'
-          + '<div class="info-row"><span>Финал</span><span>'+escapeHtml(matchFormatLabel(t.finalFormat))+' · колод: '+escapeHtml(t.decksFinal || 1)+' · банов: '+escapeHtml(t.bansFinal || 1)+'</span></div>'
           + '<div class="info-row"><span>Правила колод</span><span>'+escapeHtml(t.deckRules)+'</span></div>'
           + '</div>'
           + '<div class="places"><div class="places-head"><span>Занято '+busy+'/'+t.places+'</span><span>Свободно: '+free+'</span></div><div class="bar"><i style="width:'+percent+'%"></i></div></div>'
