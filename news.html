@@ -1341,7 +1341,6 @@ function getNewsAuthorColor(news){
     admin: "#6f3cff",
     developer: "#0f7b43",
     moderator: "#57d46a",
-    vip: "#59c8ff",
     creator: "#ff9d42",
     banned: "#ff4d4d"
   };
@@ -2558,7 +2557,6 @@ const roleColors = {
   developer: "#0f7b43",
   moderator: "#57d46a",
   creator: "#ff9d42",
-  vip: "#A2DAFF",
   muted: "#9CA3AF",
   banned: "#111111"
 };
@@ -2661,10 +2659,7 @@ if(currentUser && authBtn){
     authBtn.style.background = "rgba(255,255,255,.06)";
     authBtn.style.border = "1px solid rgba(232,194,112,.35)";
     authBtn.style.boxShadow = "none";
-    const nameColor =
-  statusColors[user.status] && user.status !== "none"
-    ? statusColors[user.status]
-    : (roleColors[user.role] || "#ffffff");
+    const nameColor = roleColors[user.role] || "#ffffff";
 
 authBtn.style.color = nameColor;
 

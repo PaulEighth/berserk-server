@@ -809,7 +809,6 @@
   developer: "#0f7b43",
   moderator: "#57d46a",
   creator: "#ff9d42",
-  vip: "#A2DAFF",
   muted: "#9CA3AF",
   banned: "#111111"
 };
@@ -993,10 +992,7 @@ function setupAuthButton(userOverride = null){
     authBtn.style.background = "rgba(255,255,255,.06)";
     authBtn.style.border = "1px solid rgba(232,194,112,.35)";
     authBtn.style.boxShadow = "none";
-    const nameColor =
-  statusColors[user.status] && user.status !== "none"
-    ? statusColors[user.status]
-    : (roleColors[user.role] || "#ffffff");
+    const nameColor = roleColors[user.role] || "#ffffff";
 
 authBtn.style.color = nameColor;
     authBtn.href = "#";

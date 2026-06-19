@@ -441,11 +441,13 @@
 .role-creator{
   color:#ff9d42;
 }
-
-.role-vip{
-  color:#59c8ff;
+.role-muted{
+  color:#9CA3AF;
 }
 
+.role-banned{
+  color:#111111;
+}
 .partner-star{
   color:#f0d28b;
   text-shadow:0 0 14px rgba(240,210,139,.42);
@@ -940,12 +942,13 @@ function roleClass(role){
   const r = String(role || "user").toLowerCase();
 
   return [
-    "admin",
-    "developer",
-    "moderator",
-    "creator",
-    "vip"
-  ].includes(r)
+  "admin",
+  "developer",
+  "moderator",
+  "creator",
+  "muted",
+  "banned"
+].includes(r)
     ? `role-${r}`
     : "role-user";
 }
