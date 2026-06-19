@@ -4009,12 +4009,18 @@ function roleNickHtml(nick){
 
   const color = roleColors[player.role] || "#ffffff";
 
-  return (
-    medalsHtml(player) +
-    userStatusHtml(player) +
-    userStarHtml(player) +
-    `<span class="role-colored-nick" style="color:${escapeHtml(color)}">${escapeHtml(player.username)}</span>`
-  );
+  return `
+<span class="role-colored-nick"
+      style="
+        color:${escapeHtml(color)};
+        text-shadow:0 0 8px currentColor;
+      ">
+  ${medalsHtml(player)}
+  ${userStatusHtml(player)}
+  ${userStarHtml(player)}
+  ${escapeHtml(player.username)}
+</span>
+`;
 }
 let extraTournamentOrganizers = [];
 
