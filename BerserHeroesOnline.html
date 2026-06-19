@@ -339,7 +339,7 @@ margin-bottom:60px;
             <p>▫️ 🔷 Маркер статуса</p>
           </div>
 
-          <div class="role-info-card">
+          <div class="role-info-card status-big">
             <h3 style="color:#005995;">💎 Роял</h3>
             <p>▫️ Всё из Юзера</p>
             <p>▫️ +6% к удаче</p>
@@ -347,7 +347,7 @@ margin-bottom:60px;
             <p>▫️ 💎 Маркер статуса</p>
           </div>
 
-          <div class="role-info-card" style="grid-column:1 / -1;">
+          <div class="role-info-card status-big">
             <h3 style="color:#002A45;">👑 Легенда</h3>
             <p>▫️ Всё из Юзера</p>
             <p>▫️ +8% к удаче</p>
@@ -565,7 +565,7 @@ margin-bottom:60px;
   color:#fff;
   text-align:center;
 
-  margin:0 0 55px 0;
+  margin:-80px 0 45px 0;
 
   line-height:1;
   letter-spacing:-0.04em;
@@ -579,15 +579,21 @@ margin-bottom:60px;
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:10px;
+  align-items:stretch;
 }
 
 .role-info-card{
-  min-height:auto;
+  min-height:220px;
+  height:100%;
   padding:14px 16px;
   border-radius:18px;
   background:linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.035));
   border:1px solid rgba(232,194,112,.14);
   box-shadow:0 12px 34px rgba(0,0,0,.20);
+}
+
+.status-big{
+  min-height:220px;
 }
 
 .role-info-card h3{
