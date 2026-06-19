@@ -3642,18 +3642,20 @@ rememberUserRole(
   t.organizer_name,
   t.organizer_role || "user",
   !!t.organizer_is_partner,
-  t.organizer_medals || {}
+  t.organizer_medals || {},
+  t.organizer_status || "none"
 );
 
 if(Array.isArray(parsedSwissData.coOrganizers)){
   parsedSwissData.coOrganizers.forEach(org=>{
     if(org?.username){
       rememberUserRole(
-        org.username,
-        org.role || "user",
-        !!org.is_partner,
-        org.medals || {}
-      );
+  org.username,
+  org.role || "user",
+  !!org.is_partner,
+  org.medals || {},
+  org.status || "none"
+);
     }
   });
 }
@@ -3886,7 +3888,7 @@ function authHeaders(extra = {}){
 
     function rememberCurrentUserRole(){
       const user = getLoggedUser();
-      if(user?.username) rememberUserRole(user.username, user.role || "user", !!user.is_partner);
+      if(user?.username) rememberUserRole(user.username, user.role || "user", !!user.is_partner, user.medals || {}, user.status || "none");
     }
 
     function getNickRole(nick){
@@ -4072,11 +4074,12 @@ async function addCoOrganizerPrompt(){
     if(list){
       list.innerHTML = data.users.map(user => {
         rememberUserRole(
-          user.username,
-          user.role || "user",
-          !!user.is_partner,
-          user.medals || {}
-        );
+  user.username,
+  user.role || "user",
+  !!user.is_partner,
+  user.medals || {},
+  user.status || "none"
+);
 
         return `
           <button type="button" class="btn ghost" onclick='addRegisteredCoOrganizer(${JSON.stringify(user).replace(/'/g,"&#39;")})' style="width:100%;justify-content:flex-start">
@@ -4118,11 +4121,12 @@ function addRegisteredCoOrganizer(user){
   }
 
   rememberUserRole(
-    user.username,
-    user.role || "user",
-    !!user.is_partner,
-    user.medals || {}
-  );
+  user.username,
+  user.role || "user",
+  !!user.is_partner,
+  user.medals || {},
+  user.status || "none"
+);
 
   extraTournamentOrganizers.push(user);
   renderCoOrganizersEditor();
@@ -4209,11 +4213,12 @@ function organizerUserHtml(org){
 }
 
   rememberUserRole(
-    org.username,
-    org.role || "user",
-    !!org.is_partner,
-    org.medals || {}
-  );
+  org.username,
+  org.role || "user",
+  !!org.is_partner,
+  org.medals || {},
+  org.status || "none"
+);
 
   return roleNickHtml(org.username);
 }
@@ -8726,10 +8731,12 @@ async function loadTournamentChat(){
   (data.chat || []).forEach(m => {
   if(m.author){
     rememberUserRole(
-      m.author,
-      m.role || "user",
-      !!m.is_partner
-    );
+  m.author,
+  m.role || "user",
+  !!m.is_partner,
+  m.medals || {},
+  m.status || "none"
+);
   }
 });
 
@@ -9499,10 +9506,12 @@ window.loadTournamentChat = async function(){
   (data.chat || []).forEach(m => {
   if(m.author && typeof rememberUserRole === "function"){
     rememberUserRole(
-      m.author,
-      m.role || "user",
-      !!m.is_partner
-    );
+  m.author,
+  m.role || "user",
+  !!m.is_partner,
+  m.medals || {},
+  m.status || "none"
+);
   }
 });
 
