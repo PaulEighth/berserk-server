@@ -1336,16 +1336,34 @@ async function readManyFiles(files){
       if(requestsBtn) requestsBtn.style.display = canOpenNewsRequests() ? "inline-flex" : "none";
     }
 function getNewsAuthorColor(news){
-  const newsRoleColors = {
-    user: "#ffffff",
-    admin: "#6f3cff",
-    developer: "#0f7b43",
-    moderator: "#57d46a",
-    creator: "#ff9d42",
-    banned: "#ff4d4d"
+  const roleColors = {
+    admin:"#6f3cff",
+    developer:"#0f7b43",
+    moderator:"#57d46a",
+    creator:"#ff9d42",
+    banned:"#ff4d4d"
   };
 
-  return newsRoleColors[news.author_role || "user"] || "#ffffff";
+  const statusColors = {
+    vip:"#5aa9ff",
+    premium:"#57d46a",
+    elite:"#b06cff",
+    royal:"#f0d28b",
+    legend:"#ff7a18"
+  };
+
+  const role = news.author_role || "user";
+  const status = news.author_status || "none";
+
+  if(role !== "user" && roleColors[role]){
+    return roleColors[role];
+  }
+
+  if(status !== "none" && statusColors[status]){
+    return statusColors[status];
+  }
+
+  return "#ffffff";
 }
 function parseMedals(user){
   if(!user?.medals) return {};
@@ -1424,7 +1442,8 @@ async function loadNewsComments(){
       id: comment.id,
       author: comment.author_name,
       author_role: comment.author_role || "user",
-      author_is_partner: !!comment.author_is_partner,
+author_status: comment.author_status || "none",
+author_is_partner: !!comment.author_is_partner,
       author_medals: comment.author_medals || {},
       text: comment.text,
       date: new Date(comment.created_at).toLocaleString("ru-RU")
@@ -1584,8 +1603,9 @@ async function loadNewsFromServer(){
       author_id: n.author_id,
 author: n.author_name,
       author_role: n.author_role || "user",
-      author_is_partner: !!n.author_is_partner,
-      author_medals: n.author_medals || {},
+author_status: n.author_status || "none",
+author_is_partner: !!n.author_is_partner,
+author_medals: n.author_medals || {},
 
       cover: n.cover,
 

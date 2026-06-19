@@ -1411,7 +1411,18 @@ function userStarHtmlByAuthor(author){
   return "";
 }
 function getDeckAuthorColor(deck){
-  return roleColors[deck.author_role || "user"] || "#ffffff";
+  const role = deck.author_role || "user";
+  const status = deck.author_status || "none";
+
+  if(role !== "user" && roleColors[role]){
+    return roleColors[role];
+  }
+
+  if(status !== "none" && statusColors[status]){
+    return statusColors[status];
+  }
+
+  return "#ffffff";
 }
 function deckAuthorMedalsHtml(deck){
   return medalsHtml({

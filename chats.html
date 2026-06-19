@@ -536,6 +536,10 @@ function medalsHtml(user){
 }
 function roleNickHtml(username, role, isPartner, medals = {}, status = "none"){
   const nick = String(username || "Игрок");
+  const nickColor =
+  role && role !== "user" && roleColors[role]
+    ? roleColors[role]
+    : (status !== "none" && statusColors[status] ? statusColors[status] : "#ffffff");
 
   const medalsPart =
     Object.entries(medals || {})
@@ -553,7 +557,7 @@ function roleNickHtml(username, role, isPartner, medals = {}, status = "none"){
     ? `<span style="color:${statusColors[status] || "#ffffff"};filter:drop-shadow(0 0 6px ${statusColors[status] || "#ffffff"})">${statusIcon}</span> `
     : "";
 
-  return `${star}${statusPart}${medalsPart ? medalsPart + " " : ""}<span class="author ${roleClass(role)}">${escapeHtml(nick)}</span>`;
+  return `${star}${statusPart}${medalsPart ? medalsPart + " " : ""}<span class="author ${roleClass(role)}" style="color:${nickColor}">${escapeHtml(nick)}</span>`;
 }
 function formatTime(value){
   const date = new Date(value);
@@ -582,17 +586,10 @@ function updateAuthUI(){
   const authLink = document.getElementById("authLink");
   if(authLink && user){
 
-  const roleColors = {
-  user: "#ffffff",
-  admin: "#6f3cff",
-  developer: "#0f7b43",
-  moderator: "#57d46a",
-  creator: "#ff9d42",
-  muted: "#9CA3AF",
-  banned: "#111111"
-};
-
-const nameColor = roleColors[user.role] || "#ffffff";
+  const nameColor =
+  user.role && user.role !== "user" && roleColors[user.role]
+    ? roleColors[user.role]
+    : (user.status !== "none" && statusColors[user.status] ? statusColors[user.status] : "#ffffff");
 
 authLink.innerHTML =
   `<span style="color:${nameColor}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)}${user.username}</span>`;

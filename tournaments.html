@@ -3909,9 +3909,36 @@ function authHeaders(extra = {}){
   return "user";
 }
 
-    function getNickColor(nick){
-      return roleColors[getNickRole(nick)] || "#ffffff";
+    function getNickColor(value){
+  let player = {};
+
+  if(typeof value === "object" && value){
+    player = value;
+  }else{
+    const normalized = normalizeNick(String(value || "")).toLowerCase();
+    const current = getLoggedUser();
+    const cache = getRoleCache();
+
+    player = cache[normalized] || {};
+
+    if(current?.username && normalizeNick(current.username).toLowerCase() === normalized){
+      player = current;
     }
+  }
+
+  const role = player.role || "user";
+  const status = player.status || "none";
+
+  if(role !== "user" && roleColors[role]){
+    return roleColors[role];
+  }
+
+  if(status !== "none" && statusColors[status]){
+    return statusColors[status];
+  }
+
+  return "#ffffff";
+}
 
     function isPartnerByNick(nick){
   const normalized = normalizeNick(String(nick || "")).toLowerCase();
@@ -4007,7 +4034,7 @@ function roleNickHtml(nick){
     medals: player.medals || {}
   };
 
-  const color = roleColors[player.role] || "#ffffff";
+  const color = getNickColor(player);
 
   return `
 <span class="role-colored-nick"
@@ -9076,7 +9103,7 @@ if(currentUser && authBtn){
     authBtn.style.background = "rgba(255,255,255,.06)";
     authBtn.style.border = "1px solid rgba(232,194,112,.35)";
     authBtn.style.boxShadow = "none";
-    const nameColor = roleColors[user.role] || "#ffffff";
+    const nameColor = getNickColor(user);
 
 authBtn.style.color = nameColor;
 

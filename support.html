@@ -1009,7 +1009,20 @@ const statusIcons = {
   royal: "💎",
   legend: "👑"
 };
+function getNickColor(user){
+  const role = user?.role || "user";
+  const status = user?.status || "none";
 
+  if(role !== "user" && roleColors[role]){
+    return roleColors[role];
+  }
+
+  if(status !== "none" && statusColors[status]){
+    return statusColors[status];
+  }
+
+  return "#ffffff";
+}
 function userStatusHtml(user){
   const status = user?.status || "none";
   const icon = statusIcons[status] || "";
@@ -1055,17 +1068,7 @@ function updateAuthUI(){
 
   if(user){
 
-   const roleColors = {
-  user: "#ffffff",
-  admin: "#6f3cff",
-  developer: "#0f7b43",
-  moderator: "#57d46a",
-  creator: "#ff9d42",
-  muted: "#9CA3AF",
-  banned: "#111111"
-};
-
-const nameColor = roleColors[user.role] || "#ffffff";
+   const nameColor = getNickColor(user);
 
 authLink.innerHTML =
   `<span style="color:${nameColor}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)} ${user.username}</span>`;

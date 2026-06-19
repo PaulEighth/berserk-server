@@ -1229,7 +1229,20 @@ const statusIcons = {
   royal: "💎",
   legend: "👑"
 };
+function getNickColor(user){
+  const role = user?.role || "user";
+  const status = user?.status || "none";
 
+  if(role !== "user" && roleColors[role]){
+    return roleColors[role];
+  }
+
+  if(status !== "none" && statusColors[status]){
+    return statusColors[status];
+  }
+
+  return "#ffffff";
+}
 function userStatusHtml(user){
   const status = user?.status || "none";
   const icon = statusIcons[status] || "";
@@ -1281,7 +1294,7 @@ function setupAuthButton(user){
   authBtn.style.background = "rgba(255,255,255,.06)";
   authBtn.style.border = "1px solid rgba(232,194,112,.35)";
   authBtn.style.boxShadow = "none";
-  const nameColor = roleColors[user.role] || "#ffffff";
+  const nameColor = getNickColor(user);
 
 authBtn.style.color = nameColor;
 

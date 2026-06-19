@@ -726,6 +726,21 @@ function userStatusHtml(user){
 
   return `<span style="color:${statusColors[status] || "#ffffff"};filter:drop-shadow(0 0 6px ${statusColors[status] || "#ffffff"})">${icon}</span> `;
 }
+function getNickColor(user){
+  const role = user?.role || "user";
+  const status = user?.status || "none";
+  const roleHasColor = role !== "user" && roleColors[role];
+
+  if(roleHasColor){
+    return roleColors[role];
+  }
+
+  if(status !== "none" && statusColors[status]){
+    return statusColors[status];
+  }
+
+  return roleColors[role] || "#ffffff";
+}
     if (currentUser?.role === "banned") {
 
   localStorage.removeItem("token");
@@ -961,7 +976,7 @@ if(search){
       body.innerHTML = users.map((user,index) => `
         <tr>
           <td>${index + 1}</td>
-                    <td style="color:${roleColors[user.role] || "#ffffff"}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)}${user.username}</td>
+                    <td style="color:${getNickColor(user)}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)}${user.username}</td>
           <td class="muted">${user.email || "—"}</td>
           <td>
   <div style="display:grid;gap:8px;min-width:140px">
@@ -1282,7 +1297,7 @@ authBtn.innerHTML = userStarHtml(freshUser || currentUser) + userStatusHtml(fres
         authBtn.style.boxShadow = "none";
         const user = freshUser || currentUser;
 
-const nameColor = roleColors[user.role] || "#ffffff";
+const nameColor = getNickColor(user);
 
 authBtn.style.color = nameColor;
         authBtn.href = "#";
