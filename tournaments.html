@@ -3737,7 +3737,7 @@ bracketData: Array.isArray(t.bracket) ? t.bracket : [],
     tournamentDeckSubmits = {};
 
     data.participants.forEach(p => {
-  rememberUserRole(p.username, p.role || "user", !!p.is_partner, p.medals || {});
+  rememberUserRole(p.username, p.role || "user", !!p.is_partner, p.medals || {}, p.status || "none");
 
   const tournamentId = String(p.tournament_id);
   if(!registrations[tournamentId]){
@@ -3810,7 +3810,7 @@ function getPlayerContact(id, playerName){
     function getCurrentUserNick(){
       const user = getLoggedUser();
       if(user?.username){
-        rememberUserRole(user.username, user.role || "user");
+        rememberUserRole(user.username, user.role || "user", !!user.is_partner, user.medals || {}, user.status || "none");
         return user.username;
       }
       return localStorage.getItem('currentUserNick') || 'Eighth#2020';
@@ -3867,14 +3867,16 @@ function authHeaders(extra = {}){
       catch(e){}
     }
 
-    function rememberUserRole(username, role, is_partner=false, medals={}){
+    function rememberUserRole(username, role, is_partner=false, medals={}, status="none"){
   const nick = normalizeNick(String(username || ""));
   if(!nick) return;
 
   const cache = getRoleCache();
 
   cache[nick.toLowerCase()] = {
+    username: nick,
     role: role || "user",
+    status: status || "none",
     is_partner: !!is_partner,
     medals: medals || {}
   };
@@ -3985,9 +3987,32 @@ function userStarHtmlByNick(nick){
 function roleNickHtml(nick){
   if(!nick) return "Свободно";
 
-  return medalsByNickHtml(nick) +
-    userStarHtmlByNick(nick) +
-    `<span class="role-colored-nick" style="color:${escapeHtml(getNickColor(nick))}">${escapeHtml(nick)}</span>`;
+  const normalized = normalizeNick(String(nick || "")).toLowerCase();
+  const current = getLoggedUser();
+  const cache = getRoleCache();
+
+  let player = cache[normalized] || {};
+
+  if(current?.username && normalizeNick(current.username).toLowerCase() === normalized){
+    player = current;
+  }
+
+  player = {
+    username: nick,
+    role: player.role || "user",
+    status: player.status || "none",
+    is_partner: !!player.is_partner,
+    medals: player.medals || {}
+  };
+
+  const color = roleColors[player.role] || "#ffffff";
+
+  return (
+    medalsHtml(player) +
+    userStatusHtml(player) +
+    userStarHtml(player) +
+    `<span class="role-colored-nick" style="color:${escapeHtml(color)}">${escapeHtml(player.username)}</span>`
+  );
 }
 let extraTournamentOrganizers = [];
 
@@ -3998,11 +4023,12 @@ function coOrganizerEditorHtml(item){
 }
 
     rememberUserRole(
-      item.username,
-      item.role || "user",
-      !!item.is_partner,
-      item.medals || {}
-    );
+  item.username,
+  item.role || "user",
+  !!item.is_partner,
+  item.medals || {},
+  item.status || "none"
+);
 
     return roleNickHtml(item.username);
   }
@@ -9027,10 +9053,8 @@ adminLinks.forEach(link => {
 if(currentUser && authBtn){
   const renderAuthButton = (user) => {
     authBtn.innerHTML =
-      userStarHtml(user) +
-      userStatusHtml(user) +
-      medalsHtml(user) +
-      user.username;
+  medalsHtml(user) +
+  user.username;
 
     authBtn.classList.remove("gold");
     authBtn.classList.add("ghost");
