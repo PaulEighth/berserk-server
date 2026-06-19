@@ -1052,10 +1052,17 @@ function updateAuthUI(){
 
   if(user){
 
-   const nameColor =
-  statusColors[user.status] && user.status !== "none"
-    ? statusColors[user.status]
-    : "#ffffff";
+   const roleColors = {
+  user: "#ffffff",
+  admin: "#6f3cff",
+  developer: "#0f7b43",
+  moderator: "#57d46a",
+  creator: "#ff9d42",
+  muted: "#9CA3AF",
+  banned: "#111111"
+};
+
+const nameColor = roleColors[user.role] || "#ffffff";
 
 authLink.innerHTML =
   `<span style="color:${nameColor}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)} ${user.username}</span>`;
