@@ -9059,6 +9059,8 @@ adminLinks.forEach(link => {
 if(currentUser && authBtn){
   const renderAuthButton = (user) => {
     authBtn.innerHTML =
+  userStarHtml(user) +
+  userStatusHtml(user) +
   medalsHtml(user) +
   user.username;
 
