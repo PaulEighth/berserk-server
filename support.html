@@ -724,6 +724,22 @@
     0 0 30px rgba(214,168,79,.16),
     0 22px 60px rgba(0,0,0,.28);
 }
+.partner-header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  margin-bottom:30px;
+}
+
+.partner-header b{
+  font-size:36px;
+}
+
+.partner-header .price-gold{
+  margin-top:10px;
+}
 .partner-columns{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -952,8 +968,11 @@
 </div>
 
 <div class="level-card partner-wide">
-  <b style="color:#D6A84F;">⭐ Партнёр</b>
-  <span class="price-gold">9 999 ₽</span>
+
+  <div class="partner-header">
+    <b style="color:#D6A84F;">⭐ Партнёр</b>
+    <span class="price-gold">9 999 ₽</span>
+  </div>
 
   <div class="partner-columns">
 
