@@ -714,6 +714,20 @@
     display:block !important;
   }
 }
+  .partner-wide{
+  grid-column:1 / -1;
+  min-height:auto;
+  margin-top:14px;
+  padding:20px 24px;
+  border-color:rgba(214,168,79,.35);
+  box-shadow:
+    0 0 30px rgba(214,168,79,.16),
+    0 22px 60px rgba(0,0,0,.28);
+}
+
+.secret-card{
+  opacity:.75;
+}
   </style>
 </head>
 <body>
@@ -908,7 +922,16 @@
   <p>▫️ Подписка поддержки проекта — 4 999 ₽ в месяц</p>
 </div>
 
-<div class="level-card">
+<div class="level-card secret-card">
+  <b style="color:#000000;">Засекречено</b>
+  <span class="price-gold">???</span>
+
+  <p>▫️ Информация скрыта</p>
+  <p>▫️ Будет раскрыто позже</p>
+  <p>▫️ ???</p>
+</div>
+
+<div class="level-card partner-wide">
   <b style="color:#D6A84F;">⭐ Партнёр</b>
   <span class="price-gold">9 999 ₽</span>
 
