@@ -3699,7 +3699,9 @@ coOrganizers: Array.isArray(parsedSwissData.coOrganizers) ? parsedSwissData.coOr
 
         prize: t.prize_1 || "Без приза",
     prizeValue: getMoneyPrizeValue(t.prize_1 || ""),
-    prizes: [
+    prizes: Array.isArray(parsedSwissData.prizes) && parsedSwissData.prizes.length
+  ? parsedSwissData.prizes
+  : [
       t.prize_1 || "-",
       t.prize_2 || "-",
       t.prize_3 || "-",
@@ -5618,7 +5620,8 @@ swiss_data: {
   deckVisibility: request.deckVisibility || "visible",
   matchFormat: request.matchFormat || "bo1",
   finalFormat: request.finalFormat || "bo3",
-  coOrganizers: request.coOrganizers || []
+  coOrganizers: request.coOrganizers || [],
+  prizes: request.prizes || []
 },
 
 deckMode: request.deckMode || "none",
