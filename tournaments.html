@@ -7996,10 +7996,15 @@ if($("requestEndDate")) $("requestEndDate").value = toDateTimeLocal(t.endDate);
   $("requestBracketSize").value = String(t.bracketSize || t.bracket || t.grid || t.max_players || 16);
 }
   const prizes = t.prizes || [];
-  if($("requestPrize1")) $("requestPrize1").value = prizes[0] || t.prize_1 || "";
-  if($("requestPrize2")) $("requestPrize2").value = prizes[1] || t.prize_2 || "";
-  if($("requestPrize3")) $("requestPrize3").value = prizes[2] || t.prize_3 || "";
-  if($("requestPrize4")) $("requestPrize4").value = prizes[3] || t.prize_4 || "";
+if($("requestPrize1")) $("requestPrize1").value = prizes[0] || t.prize_1 || "";
+if($("requestPrize2")) $("requestPrize2").value = prizes[1] || t.prize_2 || "";
+if($("requestPrize3")) $("requestPrize3").value = prizes[2] || t.prize_3 || "";
+if($("requestPrize4")) $("requestPrize4").value = prizes[3] || t.prize_4 || "";
+
+if($("requestPrize5")) $("requestPrize5").value = prizes[4] && prizes[4] !== "-" ? prizes[4] : "";
+if($("requestPrize6")) $("requestPrize6").value = prizes[5] && prizes[5] !== "-" ? prizes[5] : "";
+if($("requestPrize7")) $("requestPrize7").value = prizes[6] && prizes[6] !== "-" ? prizes[6] : "";
+if($("requestPrize8")) $("requestPrize8").value = prizes[7] && prizes[7] !== "-" ? prizes[7] : "";
 
   if($("requestRules")) $("requestRules").value = t.deckRules || "";
   if($("requestDescription")) $("requestDescription").value = t.description || "";
