@@ -9596,10 +9596,16 @@ document.addEventListener('click', function(e){
 
     <div id="tournamentChatMessages" style="height:400px;overflow:auto;margin:20px 0"></div>
 
-    <div style="display:flex;gap:10px">
-      <input id="tournamentChatInput" class="field" placeholder="Сообщение...">
-      <button class="btn gold" onclick="sendTournamentChatMessage()">Отправить</button>
-    </div>
+    <div style="display:flex;gap:10px;align-items:flex-end">
+  <textarea
+    id="tournamentChatInput"
+    class="field"
+    placeholder="Сообщение..."
+    rows="3"
+    style="resize:vertical;min-height:74px;line-height:1.45"
+  ></textarea>
+  <button class="btn gold" onclick="sendTournamentChatMessage()">Отправить</button>
+</div>
   </div>
 </div>
 <script>
