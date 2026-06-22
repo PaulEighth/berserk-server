@@ -2082,6 +2082,89 @@ app.delete("/api/tournaments/:id/leave", verifyToken, async (req, res) => {
     });
   }
 });
+// Удалить игрока из турнира — организатор, админ, разработчик, модератор
+app.delete("/api/tournaments/:id/participants/:username", verifyToken, async (req, res) => {
+  try {
+    const tournamentId = req.params.id;
+    const username = decodeURIComponent(req.params.username || "").trim();
+
+    const access = await canDeleteTournament(req, tournamentId);
+
+    if(!access.ok){
+      return res.status(access.status).json({
+        ok:false,
+        error:access.error
+      });
+    }
+
+    if(!username){
+      return res.status(400).json({
+        ok:false,
+        error:"Игрок не указан"
+      });
+    }
+
+    const deleted = await pool.query(`
+      DELETE FROM tournament_participants
+      WHERE tournament_id = $1
+        AND LOWER(username) = LOWER($2)
+      RETURNING *
+    `, [tournamentId, username]);
+
+    if(deleted.rows.length === 0){
+      return res.status(404).json({
+        ok:false,
+        error:"Игрок не найден в турнире"
+      });
+    }
+
+    const tournament = access.tournament;
+    const swissData = parseTournamentJson(tournament.swiss_data);
+
+    function cleanObject(obj){
+      if(!obj || typeof obj !== "object") return obj;
+
+      Object.keys(obj).forEach(key => {
+        const value = obj[key];
+
+        if(String(key).toLowerCase() === username.toLowerCase()){
+          delete obj[key];
+          return;
+        }
+
+        if(typeof value === "string" && value.toLowerCase() === username.toLowerCase()){
+          delete obj[key];
+          return;
+        }
+
+        if(value && typeof value === "object"){
+          cleanObject(value);
+        }
+      });
+
+      return obj;
+    }
+
+    cleanObject(swissData);
+
+    await pool.query(`
+      UPDATE tournaments
+      SET swiss_data = $1
+      WHERE id = $2
+    `, [JSON.stringify(swissData), tournamentId]);
+
+    res.json({
+      ok:true,
+      removed:deleted.rows[0]
+    });
+
+  } catch(error) {
+    res.status(500).json({
+      ok:false,
+      error:error.message
+    });
+  }
+});
 // Редактировать турнир
 app.patch("/api/tournaments/:id", verifyToken, async (req, res) => {
   try {
