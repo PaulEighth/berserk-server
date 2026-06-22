@@ -2802,9 +2802,9 @@ function isTournamentChatStaff(user){
 async function canUseTournamentChat(req, tournamentId){
 
   const tournamentResult = await pool.query(
-    "SELECT id FROM tournaments WHERE id = $1",
-    [tournamentId]
-  );
+  "SELECT * FROM tournaments WHERE id = $1",
+  [tournamentId]
+);
 
   if(tournamentResult.rows.length === 0){
     return {
@@ -2817,7 +2817,15 @@ async function canUseTournamentChat(req, tournamentId){
   if(isTournamentChatStaff(req.user)){
     return { ok:true };
   }
+const tournament = tournamentResult.rows[0];
 
+const isOrganizer =
+  Number(tournament.organizer_id) === Number(req.user.id) ||
+  isTournamentCoOrganizer(req, tournament);
+
+if(isOrganizer){
+  return { ok:true };
+}
   const participantResult = await pool.query(
     `
     SELECT id

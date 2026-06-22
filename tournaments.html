@@ -7014,9 +7014,12 @@ function renderPlayerContactLine(tournamentId, nick){
   return grouped;
 }
 
-    function openDeckView(tournamentId, playerNick, deckIndex){
-      const decks = getSubmittedDecksArray(tournamentId, playerNick);
-      const deck = decks[Number(deckIndex)];
+    async function openDeckView(tournamentId, playerNick, deckIndex){
+
+  await loadTournamentCardDatabase();
+
+  const decks = getSubmittedDecksArray(tournamentId, playerNick);
+  const deck = decks[Number(deckIndex)];
 
       if(!deck){
         showAlert("Колода не найдена");
