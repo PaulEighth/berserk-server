@@ -7111,17 +7111,9 @@ function bothPlayersFinishedBans(room, banLimit){
 }
 
 function shouldShowBanForSide(room, side, banLimit){
-  const currentSide = matchBanSideForCurrentUser(room);
-
-  if(currentSide === "staff") return true;
-
-  if(bothPlayersFinishedBans(room, banLimit)) return true;
-
-  if(currentSide === "a" && side === "b") return true;
-  if(currentSide === "b" && side === "a") return true;
-
-  return false;
+  return bothPlayersFinishedBans(room, banLimit);
 }
+
 function canSeeMatchDecksNow(t, playerNick){
   if(String(t?.deckVisibility || "visible") !== "hidden_until_closed"){
     return true;
