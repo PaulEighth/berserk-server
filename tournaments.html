@@ -6967,6 +6967,21 @@ function renderPlayerContactLine(tournamentId, nick){
     function deckHeroImage(deck){
   const img = deck?.heroImage || getDeckHeroImage(deck?.snapshot || deck) || "";
   return String(img).replace(/\.png$/i, ".webp");
+}function deckHeroImage(deck){
+  if(!deck) return "";
+
+  const source = deck.snapshot || deck.raw || deck;
+
+  const img =
+    deck.heroImage ||
+    source.heroImage ||
+    getCardImage(source.hero) ||
+    getCardImage(source.leader) ||
+    getCardImage(source.commander) ||
+    getDeckHeroImage(source) ||
+    "";
+
+  return String(img || "").replace(/\.png$/i, ".webp");
 }
 
     function getMatchDeckCount(t, round){
@@ -7197,7 +7212,9 @@ if(room[key].includes(idx)){
   openMatchRoom(room.id, room.group, room.side, Number(room.round), Number(room.matchIndex), room.playerA, room.playerB);
 }
 
-    function openMatchRoom(id,group,side,round,matchIndex,a,b){
+    async function openMatchRoom(id,group,side,round,matchIndex,a,b){
+  await loadTournamentCardDatabase();
+
   const t = tournaments.find(item => String(item.id) === String(id));
   if(!t) return;
 
