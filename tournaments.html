@@ -9666,7 +9666,7 @@ window.loadTournamentChat = async function(){
 box.innerHTML = (data.chat || []).map(m => `
   <div style="padding:10px;border-bottom:1px solid rgba(255,255,255,.08)">
     <b>${typeof roleNickHtml === "function" ? roleNickHtml(m.author || "Игрок") : escapeHtml(m.author || "Игрок")}</b>
-    <div style="margin-top:5px;white-space:pre-wrap;word-break:break-word;line-height:1.45">${escapeHtml(m.text || "")}</div>
+    <div style="margin-top:5px;white-space:pre-wrap;word-break:break-word;line-height:1.45">${escapeHtml(m.text || "").replace(/(\s)(\d+\.)/g, "$1\n$2")}</div>
   </div>
 `).join("");
 
