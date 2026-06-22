@@ -7138,8 +7138,15 @@ function renderMatchPlayerDecks(t, room, playerNick, side){
   room[bannedKey] = Array.isArray(room[bannedKey]) ? room[bannedKey] : [];
 
   const realBanned = room[bannedKey];
-  const showBans = decksVisibleNow && shouldShowBanForSide(room, side, banLimit);
-  const visibleBanned = showBans ? realBanned : [];
+  const currentSide = matchBanSideForCurrentUser(room);
+const showBans =
+  decksVisibleNow &&
+  (
+    bothPlayersFinishedBans(room, banLimit) ||
+    currentSide === side
+  );
+
+const visibleBanned = showBans ? realBanned : [];
 
   let html = "";
 
