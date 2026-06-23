@@ -7249,7 +7249,12 @@ function renderMatchPlayerDecks(t, room, playerNick, side){
   }
 
   const banLimit = getMatchBanLimit(t, room.round);
-  const key = side === "a" ? "bannedA" : "bannedB";
+  const key =
+  currentSide === "a"
+    ? "bannedB"
+    : currentSide === "b"
+      ? "bannedA"
+      : (side === "a" ? "bannedA" : "bannedB");
   room[key] = Array.isArray(room[key]) ? room[key] : [];
 
   const idx = Number(deckIndex);
