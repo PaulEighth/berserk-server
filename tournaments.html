@@ -7152,10 +7152,12 @@ function currentUserFinishedOwnBan(room, banLimit){
 function shouldShowBanForSide(room, side, banLimit){
   const currentSide = matchBanSideForCurrentUser(room);
 
-  if(currentSide === "staff") return true;
-  if(currentSide !== side) return true;
+  if(bothPlayersFinishedBans(room, banLimit)) return true;
 
-  return currentUserFinishedOwnBan(room, banLimit);
+  if(currentSide === "a" && side === "b") return true;
+  if(currentSide === "b" && side === "a") return true;
+
+  return false;
 }
 
 function canSeeMatchDecksNow(t, playerNick){
