@@ -7073,15 +7073,17 @@ function renderPlayerContactLine(tournamentId, nick){
       }
 
       const source = deck.snapshot || deck;
-      const cards = resolveDeckCards(source);
-      const grouped = groupDeckCards(cards);
+const cards = resolveDeckCards(source);
+const grouped = groupDeckCards(cards);
+
+const cardCount = Math.max(0, cards.length - 1);
 
       $("deckViewTitle").textContent = `${deck.title || "Колода"} — ${playerNick}`;
       $("deckViewBody").innerHTML = `
         <div class="info-grid">
           <div class="info-row"><span>Игрок</span><span>${escapeHtml(playerNick)}</span></div>
           <div class="info-row"><span>Название</span><span>${escapeHtml(deck.title || "Без названия")}</span></div>
-          <div class="info-row"><span>Карт</span><span>${cards.length}</span></div>
+          <div class="info-row"><span>Карт</span><span>${cardCount}</span></div>
         </div>
         <div class="deck-view-grid">
           ${grouped.map(({card,count}) => {
