@@ -7166,12 +7166,11 @@ function renderMatchPlayerDecks(t, room, playerNick, side){
   const currentSide = matchBanSideForCurrentUser(room);
   const isStaffViewer = currentSide === "staff";
 
-  const showBans =
+    const showBans =
     decksVisibleNow &&
     (
       isStaffViewer ||
-      bothPlayersFinishedBans(room, banLimit) ||
-      currentSide !== side
+      bothPlayersFinishedBans(room, banLimit)
     );
 
   const canClickBan =
