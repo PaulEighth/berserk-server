@@ -7126,7 +7126,7 @@ function renderPlayerContactLine(tournamentId, nick){
   return "staff";
 }
 
-function bothPlayersFinishedBans(room, banLimit){
+ffunction bothPlayersFinishedBans(room, banLimit){
   const bannedA = Array.isArray(room.bannedA) ? room.bannedA : [];
   const bannedB = Array.isArray(room.bannedB) ? room.bannedB : [];
 
@@ -7135,8 +7135,27 @@ function bothPlayersFinishedBans(room, banLimit){
   return bannedA.length >= banLimit && bannedB.length >= banLimit;
 }
 
+function currentUserFinishedOwnBan(room, banLimit){
+  const currentSide = matchBanSideForCurrentUser(room);
+  const bannedA = Array.isArray(room.bannedA) ? room.bannedA : [];
+  const bannedB = Array.isArray(room.bannedB) ? room.bannedB : [];
+
+  if(Number(banLimit) <= 0) return true;
+  if(currentSide === "staff") return true;
+
+  if(currentSide === "a") return bannedB.length >= banLimit;
+  if(currentSide === "b") return bannedA.length >= banLimit;
+
+  return false;
+}
+
 function shouldShowBanForSide(room, side, banLimit){
-  return bothPlayersFinishedBans(room, banLimit);
+  const currentSide = matchBanSideForCurrentUser(room);
+
+  if(currentSide === "staff") return true;
+  if(currentSide !== side) return true;
+
+  return currentUserFinishedOwnBan(room, banLimit);
 }
 
 function canSeeMatchDecksNow(t, playerNick){
@@ -7166,12 +7185,9 @@ function renderMatchPlayerDecks(t, room, playerNick, side){
   const currentSide = matchBanSideForCurrentUser(room);
   const isStaffViewer = currentSide === "staff";
 
-    const showBans =
+      const showBans =
     decksVisibleNow &&
-    (
-      isStaffViewer ||
-      bothPlayersFinishedBans(room, banLimit)
-    );
+    shouldShowBanForSide(room, side, banLimit);
 
   const canClickBan =
     decksVisibleNow &&
