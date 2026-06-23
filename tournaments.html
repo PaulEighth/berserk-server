@@ -4518,21 +4518,27 @@ return String(img).replace(/\.png$/i, ".webp");
     }
 
     function resolveDeckCards(deck){
-      const rawCards = Array.isArray(deck.cards) ? deck.cards : (Array.isArray(deck.deck) ? deck.deck : []);
+  const rawCards = Array.isArray(deck.cards) ? deck.cards : (Array.isArray(deck.deck) ? deck.deck : []);
 
-      return rawCards.map(c => {
-        if(typeof c === "string" || typeof c === "number"){
-          return findCardById(c) || {id:c, name:String(c)};
-        }
-
-        if(c && !getCardImage(c) && (c.id || c.cardId)){
-          const found = findCardById(c.id || c.cardId);
-          return found ? {...found, ...c} : c;
-        }
-
-        return c;
-      }).filter(Boolean);
+  return rawCards.map(c => {
+    if(typeof c === "string" || typeof c === "number"){
+      return findCardById(c) || { id:c, name:String(c) };
     }
+
+    if(c && (c.id || c.cardId)){
+      const found = findCardById(c.id || c.cardId);
+
+      if(found){
+        return {
+          ...c,
+          ...found
+        };
+      }
+    }
+
+    return c;
+  }).filter(Boolean);
+}
 
     function getHeroFromDeckCards(deckCards){
       return deckCards.find(c => {
