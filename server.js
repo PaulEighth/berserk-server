@@ -2808,10 +2808,74 @@ app.patch("/api/tournaments/:id/play", verifyToken, async (req, res) => {
     });
   }
 });// Сохранить матч-комнату
+app.get("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
+  try {
+    const tournamentId = req.params.id;
+    const roomKey = req.query.roomKey;
+
+    if(!roomKey){
+      return res.status(400).json({ ok:false, error:"Не указан roomKey" });
+    }
+
+    const tournamentResult = await pool.query(
+      "SELECT * FROM tournaments WHERE id = $1",
+      [tournamentId]
+    );
+
+    if(tournamentResult.rows.length === 0){
+      return res.status(404).json({ ok:false, error:"Турнир не найден" });
+    }
+
+    const tournament = tournamentResult.rows[0];
+
+    let swissData = {};
+    try{
+      swissData = typeof tournament.swiss_data === "string"
+        ? JSON.parse(tournament.swiss_data || "{}")
+        : (tournament.swiss_data || {});
+    }catch(e){
+      swissData = {};
+    }
+
+    const room = swissData.matchRooms?.[roomKey] || null;
+
+    if(!room){
+      return res.json({ ok:true, room:null });
+    }
+
+    const isStaffUser = isStaff(req.user);
+    const isOrganizer =
+      Number(tournament.organizer_id) === Number(req.user.id) ||
+      isTournamentCoOrganizer(req, tournament);
+
+    const isMatchPlayer =
+      String(req.user.username || "") === String(room.playerA || "") ||
+      String(req.user.username || "") === String(room.playerB || "");
+
+    if(!isStaffUser && !isOrganizer && !isMatchPlayer){
+      return res.status(403).json({
+        ok:false,
+        error:"Смотреть матч могут только игроки матча, организатор или админ"
+      });
+    }
+
+    res.json({ ok:true, room });
+
+  }catch(error){
+    res.status(500).json({ ok:false, error:error.message });
+  }
+});
 app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
   try {
     const tournamentId = req.params.id;
     const { roomKey, room } = req.body;
+
+    if(!roomKey || !room){
+      return res.status(400).json({
+        ok:false,
+        error:"Не хватает данных комнаты матча"
+      });
+    }
 
     const tournamentResult = await pool.query(
       "SELECT * FROM tournaments WHERE id = $1",
@@ -2820,31 +2884,14 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
 
     if(tournamentResult.rows.length === 0){
       return res.status(404).json({
-        ok: false,
-        error: "Турнир не найден"
+        ok:false,
+        error:"Турнир не найден"
       });
     }
 
     const tournament = tournamentResult.rows[0];
 
-    const isStaffUser = isStaff(req.user);
-    const isOrganizer =
-  Number(tournament.organizer_id) === Number(req.user.id) ||
-  isTournamentCoOrganizer(req,tournament);
-
-    const isMatchPlayer =
-      String(req.user.username || "") === String(room?.playerA || "") ||
-      String(req.user.username || "") === String(room?.playerB || "");
-
-    if(!isStaffUser && !isOrganizer && !isMatchPlayer){
-      return res.status(403).json({
-        ok: false,
-        error: "Менять матч могут только игроки матча, организатор или админ"
-      });
-    }
-
     let swissData = {};
-
     try{
       swissData = typeof tournament.swiss_data === "string"
         ? JSON.parse(tournament.swiss_data || "{}")
@@ -2854,7 +2901,88 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
     }
 
     swissData.matchRooms = swissData.matchRooms || {};
-    swissData.matchRooms[roomKey] = room;
+
+    const oldRoom = swissData.matchRooms[roomKey] || {};
+    const sourceRoom = {
+      ...oldRoom,
+      ...room,
+      chat: Array.isArray(oldRoom.chat) ? oldRoom.chat : (Array.isArray(room.chat) ? room.chat : [])
+    };
+
+    const isStaffUser = isStaff(req.user);
+    const isOrganizer =
+      Number(tournament.organizer_id) === Number(req.user.id) ||
+      isTournamentCoOrganizer(req, tournament);
+
+    const isPlayerA = String(req.user.username || "") === String(sourceRoom.playerA || "");
+    const isPlayerB = String(req.user.username || "") === String(sourceRoom.playerB || "");
+    const isMatchPlayer = isPlayerA || isPlayerB;
+
+    if(!isStaffUser && !isOrganizer && !isMatchPlayer){
+      return res.status(403).json({
+        ok:false,
+        error:"Менять матч могут только игроки матча, организатор или админ"
+      });
+    }
+
+    const isFinal = Number(sourceRoom.round) >= 999 || String(sourceRoom.round) === "final";
+
+    const deckCount = Number(
+      isFinal
+        ? (tournament.decksfinal || tournament.decksFinal || tournament.decksbeforefinal || tournament.decksBeforeFinal || 1)
+        : (tournament.decksbeforefinal || tournament.decksBeforeFinal || 1)
+    );
+
+    const banLimit = Number(
+      isFinal
+        ? (tournament.bansfinal || tournament.bansFinal || tournament.bansbeforefinal || tournament.bansBeforeFinal || 0)
+        : (tournament.bansbeforefinal || tournament.bansBeforeFinal || 0)
+    );
+
+    function cleanBanArray(value){
+      return [...new Set(
+        (Array.isArray(value) ? value : [])
+          .map(x => Number(x))
+          .filter(x => Number.isInteger(x) && x >= 0 && x < deckCount)
+      )].slice(0, banLimit);
+    }
+
+    let nextRoom;
+
+    if(isStaffUser || isOrganizer){
+      nextRoom = {
+        ...sourceRoom,
+        bannedA: cleanBanArray(room.bannedA),
+        bannedB: cleanBanArray(room.bannedB),
+        chat: Array.isArray(oldRoom.chat) ? oldRoom.chat : []
+      };
+    }else{
+      nextRoom = {
+        ...oldRoom,
+        id: sourceRoom.id,
+        group: sourceRoom.group,
+        side: sourceRoom.side,
+        round: sourceRoom.round,
+        matchIndex: sourceRoom.matchIndex,
+        playerA: sourceRoom.playerA,
+        playerB: sourceRoom.playerB,
+        scoreA: String(room.scoreA ?? oldRoom.scoreA ?? ""),
+        scoreB: String(room.scoreB ?? oldRoom.scoreB ?? ""),
+        bannedA: cleanBanArray(oldRoom.bannedA),
+        bannedB: cleanBanArray(oldRoom.bannedB),
+        chat: Array.isArray(oldRoom.chat) ? oldRoom.chat : []
+      };
+
+      if(isPlayerA){
+        nextRoom.bannedB = cleanBanArray(room.bannedB);
+      }
+
+      if(isPlayerB){
+        nextRoom.bannedA = cleanBanArray(room.bannedA);
+      }
+    }
+
+    swissData.matchRooms[roomKey] = nextRoom;
 
     const result = await pool.query(`
       UPDATE tournaments
@@ -2867,14 +2995,15 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
     ]);
 
     res.json({
-      ok: true,
-      tournament: result.rows[0]
+      ok:true,
+      tournament: result.rows[0],
+      room: nextRoom
     });
 
   }catch(error){
     res.status(500).json({
-      ok: false,
-      error: error.message
+      ok:false,
+      error:error.message
     });
   }
 });
