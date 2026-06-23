@@ -2808,7 +2808,7 @@ app.patch("/api/tournaments/:id/play", verifyToken, async (req, res) => {
     });
   }
 });// Сохранить матч-комнату
-app.get("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
+app.get("/api/tournaments/:id/match-room", async (req, res) => {
   try {
     const tournamentId = req.params.id;
     const roomKey = req.query.roomKey;
@@ -2841,22 +2841,6 @@ app.get("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
 
     if(!room){
       return res.json({ ok:true, room:null });
-    }
-
-    const isStaffUser = isStaff(req.user);
-    const isOrganizer =
-      Number(tournament.organizer_id) === Number(req.user.id) ||
-      isTournamentCoOrganizer(req, tournament);
-
-    const isMatchPlayer =
-      String(req.user.username || "") === String(room.playerA || "") ||
-      String(req.user.username || "") === String(room.playerB || "");
-
-    if(!isStaffUser && !isOrganizer && !isMatchPlayer){
-      return res.status(403).json({
-        ok:false,
-        error:"Смотреть матч могут только игроки матча, организатор или админ"
-      });
     }
 
     res.json({ ok:true, room });
