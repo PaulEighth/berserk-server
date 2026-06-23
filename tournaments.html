@@ -7334,7 +7334,7 @@ function renderMatchPlayerDecks(t, room, playerNick, side){
   room.playerA = nextA;
   room.playerB = nextB;
 
-  if(isNewMatchRoom || playersChanged){
+    if(!serverRoom && (isNewMatchRoom || playersChanged)){
     room.scoreA = "";
     room.scoreB = "";
     room.bannedA = [];
