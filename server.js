@@ -2908,7 +2908,12 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
       });
     }
 
-    const isFinal = Number(sourceRoom.round) >= 999 || String(sourceRoom.round) === "final";
+        const isFinal =
+      String(sourceRoom.side) === "final" ||
+      String(sourceRoom.side) === "third" ||
+      String(sourceRoom.round) === "final" ||
+      String(sourceRoom.round) === "third" ||
+      Number(sourceRoom.round) >= 999;
 
     const deckCount = Number(
       isFinal
@@ -2930,6 +2935,14 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
       )].slice(0, banLimit);
     }
 
+        function cleanSelfBanArray(value){
+      return [...new Set(
+        (Array.isArray(value) ? value : [])
+          .map(x => Number(x))
+          .filter(x => Number.isInteger(x) && x >= 0)
+      )];
+    }
+
     let nextRoom;
 
     if(isStaffUser || isOrganizer){
@@ -2937,6 +2950,8 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
         ...sourceRoom,
         bannedA: cleanBanArray(room.bannedA),
         bannedB: cleanBanArray(room.bannedB),
+        selfBannedA: cleanSelfBanArray(room.selfBannedA),
+        selfBannedB: cleanSelfBanArray(room.selfBannedB),
         chat: Array.isArray(oldRoom.chat) ? oldRoom.chat : []
       };
     }else{
@@ -2953,14 +2968,18 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
         scoreB: String(room.scoreB ?? oldRoom.scoreB ?? ""),
         bannedA: cleanBanArray(oldRoom.bannedA),
         bannedB: cleanBanArray(oldRoom.bannedB),
+        selfBannedA: cleanSelfBanArray(oldRoom.selfBannedA),
+        selfBannedB: cleanSelfBanArray(oldRoom.selfBannedB),
         chat: Array.isArray(oldRoom.chat) ? oldRoom.chat : []
       };
 
       if(isPlayerA){
+        nextRoom.selfBannedA = cleanSelfBanArray(room.selfBannedA);
         nextRoom.bannedB = cleanBanArray(room.bannedB);
       }
 
       if(isPlayerB){
+        nextRoom.selfBannedB = cleanSelfBanArray(room.selfBannedB);
         nextRoom.bannedA = cleanBanArray(room.bannedA);
       }
     }

@@ -2263,6 +2263,28 @@ html body .tournament-playoff .bracket-pair.match-side-third > button.match-swor
   color:#fff;
   box-shadow:0 0 18px rgba(255,77,77,.35);
 }
+.match-ban-btn.self-active{
+  background:#f28c28;
+  border-color:#f28c28;
+  color:#fff;
+  box-shadow:0 0 18px rgba(242,140,40,.38);
+}
+.match-hero-btn.self-banned{
+  opacity:.34;
+  filter:grayscale(1);
+}
+.match-hero-btn.self-banned::after{
+  content:"BAN";
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  background:rgba(0,0,0,.48);
+  color:#f28c28;
+  font-weight:950;
+  letter-spacing:.12em;
+  transform:rotate(-18deg);
+}
 .match-ban-limit{
   margin-top:8px;
   color:var(--muted);
@@ -4887,18 +4909,20 @@ async function confirmJoin(id){
       
       let selectedDecks = [];
 
-      if(t.deckMode === 'required'){
-        const modal = document.querySelector('.join-modal');
-                const requiredDeckCount = getRequiredTournamentDeckCount(t);
-        const selectedDeckIds = modal ? getSelectedTournamentDeckIds(modal) : [];
-const myDecks = await getPlayerDecksForTournament();
+            const needsDeck = String(t.deckMode || "").toLowerCase() === "required";
 
-selectedDecks = selectedDeckIds
+      if(needsDeck){
+        const modal = document.querySelector('.join-modal');
+        const requiredDeckCount = getRequiredTournamentDeckCount(t);
+        const selectedDeckIds = modal ? getSelectedTournamentDeckIds(modal) : [];
+        const myDecks = await getPlayerDecksForTournament();
+
+        selectedDecks = selectedDeckIds
           .map(deckId => myDecks.find(d => String(d.id) === String(deckId)))
           .filter(Boolean);
 
         if(selectedDecks.length !== requiredDeckCount){
-          showAlert('Для участия нужно выбрать ровно ' + requiredDeckCount + ' колод.');
+          showAlert('Для участия нужно выбрать ровно ' + requiredDeckCount + ' колод. Сейчас выбрано: ' + selectedDecks.length + '.');
           return;
         }
       }
@@ -6991,13 +7015,23 @@ function renderPlayerContactLine(tournamentId, nick){
   return String(img || "").replace(/\.png$/i, ".webp");
 }
 
-    function getMatchDeckCount(t, round){
-      const isFinal = Number(round) >= 999 || String(round) === "final";
+        function isFinalOrThirdMatch(round, side){
+      return (
+        String(side) === "final" ||
+        String(side) === "third" ||
+        String(round) === "final" ||
+        String(round) === "third" ||
+        Number(round) >= 999
+      );
+    }
+
+    function getMatchDeckCount(t, round, side){
+      const isFinal = isFinalOrThirdMatch(round, side);
       return Number(isFinal ? (t.decksFinal || t.decksBeforeFinal || 1) : (t.decksBeforeFinal || 1));
     }
 
-    function getMatchBanLimit(t, round){
-      const isFinal = Number(round) >= 999 || String(round) === "final";
+    function getMatchBanLimit(t, round, side){
+      const isFinal = isFinalOrThirdMatch(round, side);
       return Number(isFinal ? (t.bansFinal || t.bansBeforeFinal || 0) : (t.bansBeforeFinal || 0));
     }
 
@@ -7110,6 +7144,43 @@ const cardCount = Math.max(0, cards.length - 1);
   return "staff";
 }
 
+function selfBanNeedForSide(t, room, playerNick){
+  const deckCount = getMatchDeckCount(t, room.round, room.side);
+  const totalDecks = getSubmittedDecksArray(t.id, playerNick).length;
+  return Math.max(0, totalDecks - deckCount);
+}
+
+function getSelfBannedForSide(room, side){
+  const key = side === "a" ? "selfBannedA" : "selfBannedB";
+  room[key] = Array.isArray(room[key]) ? room[key] : [];
+  return room[key];
+}
+
+function bothPlayersFinishedSelfBans(t, room){
+  const needA = selfBanNeedForSide(t, room, room.playerA);
+  const needB = selfBanNeedForSide(t, room, room.playerB);
+
+  const selfA = getSelfBannedForSide(room, "a");
+  const selfB = getSelfBannedForSide(room, "b");
+
+  return selfA.length >= needA && selfB.length >= needB;
+}
+
+function currentUserFinishedSelfBan(t, room){
+  const currentSide = matchBanSideForCurrentUser(room);
+  if(currentSide === "staff") return true;
+
+  if(currentSide === "a"){
+    return getSelfBannedForSide(room, "a").length >= selfBanNeedForSide(t, room, room.playerA);
+  }
+
+  if(currentSide === "b"){
+    return getSelfBannedForSide(room, "b").length >= selfBanNeedForSide(t, room, room.playerB);
+  }
+
+  return false;
+}
+
 function bothPlayersFinishedBans(room, banLimit){
   const bannedA = Array.isArray(room.bannedA) ? room.bannedA : [];
   const bannedB = Array.isArray(room.bannedB) ? room.bannedB : [];
@@ -7117,20 +7188,6 @@ function bothPlayersFinishedBans(room, banLimit){
   if(Number(banLimit) <= 0) return true;
 
   return bannedA.length >= banLimit && bannedB.length >= banLimit;
-}
-
-function currentUserFinishedOwnBan(room, banLimit){
-  const currentSide = matchBanSideForCurrentUser(room);
-  const bannedA = Array.isArray(room.bannedA) ? room.bannedA : [];
-  const bannedB = Array.isArray(room.bannedB) ? room.bannedB : [];
-
-  if(Number(banLimit) <= 0) return true;
-  if(currentSide === "staff") return true;
-
-  if(currentSide === "a") return bannedB.length >= banLimit;
-  if(currentSide === "b") return bannedA.length >= banLimit;
-
-  return false;
 }
 
 function shouldShowBanForSide(room, side, banLimit){
@@ -7158,56 +7215,74 @@ function canSeeMatchDecksNow(t, playerNick){
 
   return currentNick && targetNick && currentNick === targetNick;
 }
+
 function renderMatchPlayerDecks(t, room, playerNick, side){
-  const deckCount = getMatchDeckCount(t, room.round);
-  const banLimit = getMatchBanLimit(t, room.round);
+  const deckCount = getMatchDeckCount(t, room.round, room.side);
+  const banLimit = getMatchBanLimit(t, room.round, room.side);
   const decksVisibleNow = canSeeMatchDecksNow(t, playerNick);
   const decks = decksVisibleNow ? getSubmittedDecksArray(t.id, playerNick) : [];
 
   const bannedKey = side === "a" ? "bannedA" : "bannedB";
   room[bannedKey] = Array.isArray(room[bannedKey]) ? room[bannedKey] : [];
 
+  const selfBanned = getSelfBannedForSide(room, side);
   const realBanned = room[bannedKey];
+
   const currentSide = matchBanSideForCurrentUser(room);
   const isStaffViewer = currentSide === "staff";
+  const bothSelfDone = bothPlayersFinishedSelfBans(t, room);
+  const selfNeed = selfBanNeedForSide(t, room, playerNick);
+  const isOwnSide = currentSide === side;
 
-      const showBans =
-    decksVisibleNow &&
-    shouldShowBanForSide(room, side, banLimit);
+  const showSelfBans = decksVisibleNow && (bothSelfDone || isOwnSide || isStaffViewer);
+  const showNormalBans = decksVisibleNow && bothSelfDone && shouldShowBanForSide(room, side, banLimit);
 
-  const canClickBan =
-    decksVisibleNow &&
-    (
-      isStaffViewer ||
-      currentSide !== side
-    );
+  const canClickSelfBan = decksVisibleNow && isOwnSide && !bothSelfDone;
+  const canClickNormalBan = decksVisibleNow && bothSelfDone && (isStaffViewer || currentSide !== side);
 
-  const visibleBanned = showBans ? realBanned : [];
+  const visibleSelfBanned = showSelfBans ? selfBanned : [];
+  const visibleNormalBanned = showNormalBans ? realBanned : [];
+
+  const totalDecksToShow = decksVisibleNow ? Math.max(decks.length, deckCount) : deckCount;
 
   let html = "";
 
-  for(let i=0;i<deckCount;i++){
+  for(let i=0;i<totalDecksToShow;i++){
     const deck = decks[i] || null;
     const img = deck ? deckHeroImage(deck) : "";
     const title = decksVisibleNow && deck ? (deck.title || ("Колода " + (i+1))) : "Колода скрыта до закрытия турнира";
-    const isBanned = visibleBanned.includes(i);
+
+    const isSelfBanned = visibleSelfBanned.includes(i);
+    const isNormalBanned = visibleNormalBanned.includes(i);
+
+    const buttonClass = isNormalBanned ? "banned" : (isSelfBanned ? "self-banned" : "");
+    const banButtonClass = isNormalBanned ? "active" : (isSelfBanned ? "self-active" : "");
+
+    const canClickThis = canClickSelfBan ? true : (canClickNormalBan && !selfBanned.includes(i));
+
+    const clickHandler = canClickSelfBan
+      ? `onclick="toggleMatchDeckSelfBan('${side}',${i})"`
+      : (canClickNormalBan && !selfBanned.includes(i) ? `onclick="toggleMatchDeckBan('${side}',${i})"` : "");
 
     html += `
       <div class="match-deck-unit">
-        <button type="button" class="match-hero-btn ${isBanned ? "banned" : ""}" ${decksVisibleNow && deck ? `onclick="openDeckView('${escapeHtml(t.id)}','${escapeHtml(playerNick)}',${i})"` : ""} title="${escapeHtml(title)}">
+        <button type="button" class="match-hero-btn ${buttonClass}" ${decksVisibleNow && deck ? `onclick="openDeckView('${escapeHtml(t.id)}','${escapeHtml(playerNick)}',${i})"` : ""} title="${escapeHtml(title)}">
           ${decksVisibleNow && img ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" onerror="this.style.visibility='hidden'">` : `<span>${decksVisibleNow ? (i+1) : "?"}</span>`}
         </button>
-        <button type="button" class="match-ban-btn ${isBanned ? "active" : ""}" ${canClickBan ? `onclick="toggleMatchDeckBan('${side}',${i})"` : "disabled"}>✕</button>
+        <button type="button" class="match-ban-btn ${banButtonClass}" ${canClickThis ? clickHandler : "disabled"}>✕</button>
       </div>
     `;
   }
 
+  const statusText = !decksVisibleNow
+    ? "Колоды соперника откроются после закрытия турнира"
+    : (!bothSelfDone ? `Самобан: ${visibleSelfBanned.length}/${selfNeed}` : `Банов: ${visibleNormalBanned.length}/${banLimit}`);
+
   return `
     <div class="match-decks-line">${html}</div>
-    <div class="match-ban-limit">${decksVisibleNow ? `Банов: ${visibleBanned.length}/${banLimit}` : "Колоды соперника откроются после закрытия турнира"}</div>
+    <div class="match-ban-limit">${statusText}</div>
   `;
 }
-
     async function toggleMatchDeckBan(side, deckIndex){
   const room = getCurrentMatchRoom();
   if(!room) return;
@@ -7216,6 +7291,11 @@ function renderMatchPlayerDecks(t, room, playerNick, side){
   if(!t) return;
 
   const currentSide = matchBanSideForCurrentUser(room);
+
+  if(!bothPlayersFinishedSelfBans(t, room)){
+    showAlert("Сначала оба игрока должны самозабанить лишние колоды.");
+    return;
+  }
 
   if(currentSide !== "staff" && currentSide === side){
     showAlert("Нельзя банить свою колоду. Нужно банить колоду соперника.");
@@ -7234,13 +7314,23 @@ function renderMatchPlayerDecks(t, room, playerNick, side){
     return;
   }
 
-  const banLimit = getMatchBanLimit(t, room.round);
+  const banLimit = getMatchBanLimit(t, room.round, room.side);
+
   const key =
-  currentSide === "a"
-    ? "bannedB"
-    : currentSide === "b"
-      ? "bannedA"
-      : (side === "a" ? "bannedA" : "bannedB");
+    currentSide === "a"
+      ? "bannedB"
+      : currentSide === "b"
+        ? "bannedA"
+        : (side === "a" ? "bannedA" : "bannedB");
+
+  const selfKey = side === "a" ? "selfBannedA" : "selfBannedB";
+  room[selfKey] = Array.isArray(room[selfKey]) ? room[selfKey] : [];
+
+  if(room[selfKey].includes(Number(deckIndex))){
+    showAlert("Эта колода уже самозабанена игроком. Её нельзя банить повторно.");
+    return;
+  }
+
   room[key] = Array.isArray(room[key]) ? room[key] : [];
 
   const idx = Number(deckIndex);
@@ -7264,6 +7354,65 @@ function renderMatchPlayerDecks(t, room, playerNick, side){
     await openMatchRoom(room.id, room.group, room.side, Number(room.round), Number(room.matchIndex), room.playerA, room.playerB);
   }catch(error){
     showAlert(error.message || "Не удалось сохранить бан.");
+  }
+}
+
+async function toggleMatchDeckSelfBan(side, deckIndex){
+  const room = getCurrentMatchRoom();
+  if(!room) return;
+
+  const t = tournaments.find(item => String(item.id) === String(room.id));
+  if(!t) return;
+
+  const currentSide = matchBanSideForCurrentUser(room);
+
+  if(currentSide !== side){
+    showAlert("Самобанить можно только свои колоды.");
+    return;
+  }
+
+  if(!canEditMatchRoom(t, room.playerA, room.playerB)){
+    showAlert("У вас нет прав менять этот матч.");
+    return;
+  }
+
+  if(bothPlayersFinishedSelfBans(t, room)){
+    showAlert("Самобаны уже завершены.");
+    return;
+  }
+
+  const playerNick = side === "a" ? room.playerA : room.playerB;
+  const need = selfBanNeedForSide(t, room, playerNick);
+
+  if(need <= 0){
+    showAlert("В этом матче не нужно самобанить колоды.");
+    return;
+  }
+
+  const key = side === "a" ? "selfBannedA" : "selfBannedB";
+  room[key] = Array.isArray(room[key]) ? room[key] : [];
+
+  const idx = Number(deckIndex);
+
+  if(room[key].includes(idx)){
+    showAlert("Эта колода уже выбрана для самобана. Изменить выбор нельзя.");
+    return;
+  }
+
+  if(room[key].length >= need){
+    showAlert("Вы уже самозабанили нужное количество колод.");
+    return;
+  }
+
+  room[key].push(idx);
+
+  saveMatchRooms();
+
+  try{
+    await saveMatchRoomToServer(currentMatchRoomKey);
+    await openMatchRoom(room.id, room.group, room.side, Number(room.round), Number(room.matchIndex), room.playerA, room.playerB);
+  }catch(error){
+    showAlert(error.message || "Не удалось сохранить самобан.");
   }
 }
     async function openMatchRoom(id,group,side,round,matchIndex,a,b){
@@ -7303,8 +7452,10 @@ function renderMatchPlayerDecks(t, room, playerNick, side){
       playerB: b || "",
       scoreA: "",
       scoreB: "",
-      bannedA: [],
+            bannedA: [],
       bannedB: [],
+      selfBannedA: [],
+      selfBannedB: [],
       chat: []
     };
   }
@@ -7329,22 +7480,26 @@ function renderMatchPlayerDecks(t, room, playerNick, side){
     if(!serverRoom && (isNewMatchRoom || playersChanged)){
     room.scoreA = "";
     room.scoreB = "";
-    room.bannedA = [];
+        room.bannedA = [];
     room.bannedB = [];
+    room.selfBannedA = [];
+    room.selfBannedB = [];
     room.chat = [];
     saveMatchRooms();
     saveMatchRoomToServer(key);
   }
 
-  room.bannedA = Array.isArray(room.bannedA) ? room.bannedA : [];
+    room.bannedA = Array.isArray(room.bannedA) ? room.bannedA : [];
   room.bannedB = Array.isArray(room.bannedB) ? room.bannedB : [];
+  room.selfBannedA = Array.isArray(room.selfBannedA) ? room.selfBannedA : [];
+  room.selfBannedB = Array.isArray(room.selfBannedB) ? room.selfBannedB : [];
   room.chat = Array.isArray(room.chat) ? room.chat : [];
 
       window.currentMatchRoomKey = key;
 
       const canEdit = canEditMatchRoom(t, room.playerA, room.playerB);
-      const deckCount = getMatchDeckCount(t, round);
-      const banLimit = getMatchBanLimit(t, round);
+            const deckCount = getMatchDeckCount(t, round, side);
+      const banLimit = getMatchBanLimit(t, round, side);
 
       $("matchRoomTitle").textContent = `${room.playerA || "Игрок 1"} против ${room.playerB || "Игрок 2"}`;
 
@@ -7550,6 +7705,7 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
     window.openDeckView = openDeckView;
     window.closeDeckView = closeDeckView;
     window.toggleMatchDeckBan = toggleMatchDeckBan;
+    window.toggleMatchDeckSelfBan = toggleMatchDeckSelfBan;
     window.saveMatchRoomState = saveMatchRoomState;
     window.sendMatchRoomChatMessage = sendMatchRoomChatMessage;
 
