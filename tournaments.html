@@ -3860,7 +3860,24 @@ function getPlayerContact(id, playerName){
       return prizes.map((p,i)=>`${i+1} место: ${p || '-'}`).join(' | ');
     }
 
-    function statusTag(status){ const item = statusMap[status] || ['Неизвестно','']; return '<span class="tag '+item[1]+'">'+item[0]+'</span>'; }
+    function getTournamentVisualStatus(t){
+  const free = Math.max(0, Number(t?.free || 0));
+
+  if(t?.status === "finished"){
+    return "finished";
+  }
+
+  if(free <= 0){
+    return "closed";
+  }
+
+  return t?.status || "open";
+}
+
+function statusTag(status){
+  const item = statusMap[status] || ['Неизвестно',''];
+  return '<span class="tag '+item[1]+'">'+item[0]+'</span>';
+}
     function normalizeNick(nick){ return nick.trim().replace(/\s+/g,''); }
     function isValidNick(nick){ return /^[A-Za-zА-Яа-яЁё0-9_\-]{2,24}#[0-9]{3,6}$/.test(nick); }
 
@@ -8536,9 +8553,14 @@ function openTournamentFromUrl(){
         const free = Math.max(0, t.free);
         const busy = t.places - free;
         const percent = Math.max(0, Math.min(100, Math.round(busy / t.places * 100)));
-        const disabled = t.status === 'closed' || t.status === 'finished' || free <= 0;
-        return '<article class="tournament-card">'
-          + '<div class="tournament-top"><span class="tag">'+escapeHtml(formatMap[t.format])+'</span>'+statusTag(t.status)+'</div>'
+        const visualStatus = getTournamentVisualStatus(t);
+const disabled = visualStatus === 'closed' || visualStatus === 'finished' || !t.registrationOpen;
+const joinButtonText = visualStatus === 'closed'
+  ? 'Нет мест'
+  : (disabled ? 'Регистрация закрыта' : 'Участвовать');
+
+return '<article class="tournament-card">'
+  + '<div class="tournament-top"><span class="tag">'+escapeHtml(formatMap[t.format])+'</span>'+statusTag(visualStatus)+'</div>'
           + '<h3>'+escapeHtml(t.title)+'</h3><p class="desc">'+escapeHtml(t.description)+'</p>'
           + '<div class="info-grid">'
           + '<div class="info-row"><span>Дата</span><span>'+formatDate(t.date)+'</span></div>'
@@ -8553,7 +8575,7 @@ function openTournamentFromUrl(){
           + '<div class="places"><div class="places-head"><span>Занято '+busy+'/'+t.places+'</span><span>Свободно: '+free+'</span></div><div class="bar"><i style="width:'+percent+'%"></i></div></div>'
           + renderPlayers(t.id)
           + '<div class="card-actions">'
-+ '<button class="btn gold" '+(disabled ? 'disabled' : '')+' onclick="openJoinModal('+t.id+')">'+(disabled ? 'Регистрация закрыта' : 'Участвовать')+'</button>'
++ '<button class="btn gold" '+(disabled ? 'disabled' : '')+' onclick="openJoinModal('+t.id+')">'+joinButtonText+'</button>'
 + '<button type="button" class="btn ghost track-tournament-btn" data-track-id="'+escapeHtml(String(t.id))+'" onclick="forceOpenTrackModal(\''+escapeHtml(String(t.id))+'\')">Отслеживать</button>'
 + (isCurrentUserInTournament(t.id) ? '<button type="button" class="btn ghost" onclick="openTournamentDeckManagerModal(\''+escapeHtml(String(t.id))+'\')">Мои колоды</button>' : '')
 
