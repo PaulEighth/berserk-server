@@ -1829,8 +1829,6 @@ telegram_link,
 bracket,
   swiss_data,
   deckMode,
-  matchFormat,
-  finalFormat,
   decksBeforeFinal,
   bansBeforeFinal,
   decksFinal,
@@ -1866,8 +1864,6 @@ telegram_link,
 bracket,
         swiss_data,
         deckMode,
-matchFormat,
-finalFormat,
 decksBeforeFinal,
 bansBeforeFinal,
 decksFinal,
@@ -1875,7 +1871,7 @@ bansFinal,
 is_private,
 private_password
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24)
       RETURNING *
     `, [
       title,
@@ -1897,8 +1893,6 @@ Number(bracket) || Number(max_players) || 16,
       JSON.stringify(swiss_data || {}),
 
       deckMode || "none",
-matchFormat || "bo1",
-finalFormat || "bo3",
 Number(decksBeforeFinal) || 1,
 Number(bansBeforeFinal) || 0,
 Number(decksFinal) || 1,
@@ -2192,8 +2186,6 @@ app.patch("/api/tournaments/:id", verifyToken, async (req, res) => {
   telegram_link,
   swiss_data,
   deckMode,
-  matchFormat,
-  finalFormat,
   decksBeforeFinal,
   bansBeforeFinal,
   decksFinal,
@@ -2223,17 +2215,15 @@ const nextSwissData = await enrichTournamentSwissData({
 end_date = $10,
 telegram_link = $11,
 deckMode = $12,
-        matchFormat = $13,
-        finalFormat = $14,
-        decksBeforeFinal = $15,
-        bansBeforeFinal = $16,
-        decksFinal = $17,
-        bansFinal = $18,
-        is_private = $19,
-private_password = $20,
-bracket = $21,
-swiss_data = $22
-WHERE id = $23
+                decksBeforeFinal = $13,
+        bansBeforeFinal = $14,
+        decksFinal = $15,
+        bansFinal = $16,
+        is_private = $17,
+private_password = $18,
+bracket = $19,
+swiss_data = $20
+WHERE id = $21
       RETURNING *
     `, [
       title || "",
@@ -2248,9 +2238,7 @@ WHERE id = $23
 end_date || null,
 telegram_link || "",
 deckMode || "none",
-      matchFormat || "bo1",
-      finalFormat || "bo3",
-      Number(decksBeforeFinal) || 1,
+            Number(decksBeforeFinal) || 1,
       Number(bansBeforeFinal) || 0,
       Number(decksFinal) || 1,
       Number(bansFinal) || 0,
@@ -2445,8 +2433,6 @@ app.post("/api/tournaments", verifyToken, requireRoles("admin", "developer", "mo
   bracket,
   swiss_data,
   deckMode,
-  matchFormat,
-  finalFormat,
   decksBeforeFinal,
   bansBeforeFinal,
   decksFinal,
@@ -2481,8 +2467,6 @@ privatePassword
         bracket,
         swiss_data,
         deckMode,
-matchFormat,
-finalFormat,
 decksBeforeFinal,
 bansBeforeFinal,
 decksFinal,
@@ -2490,7 +2474,7 @@ bansFinal,
 is_private,
 private_password
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23)
       RETURNING *
     `, [
       title,
@@ -2510,8 +2494,7 @@ private_password
       Number(bracket) || Number(max_players) || 16,
       JSON.stringify(await enrichTournamentSwissData(swiss_data || {})),
       deckMode || "none",
-matchFormat || "bo1",
-finalFormat || "bo3",
+
 Number(decksBeforeFinal) || 1,
 Number(bansBeforeFinal) || 0,
 Number(decksFinal) || 1,
@@ -2606,7 +2589,23 @@ if(
         error: "Ты уже записан на этот турнир"
       });
     }
+const deckMode = String(tournament.deckmode || tournament.deckMode || "none");
 
+if(deckMode !== "none"){
+  const requiredDeckCount = Math.max(
+    Number(tournament.decksbeforefinal || tournament.decksBeforeFinal || 1),
+    Number(tournament.decksfinal || tournament.decksFinal || 1)
+  );
+
+  const selectedDecks = Array.isArray(decks) ? decks : [];
+
+  if(selectedDecks.length !== requiredDeckCount){
+    return res.status(400).json({
+      ok: false,
+      error: "Для участия нужно выбрать ровно " + requiredDeckCount + " колод"
+    });
+  }
+}
     const result = await pool.query(`
       INSERT INTO tournament_participants (
   tournament_id,
