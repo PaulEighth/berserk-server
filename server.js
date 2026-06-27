@@ -2091,10 +2091,32 @@ app.delete("/api/tournaments/:id/participants/:username", verifyToken, async (re
       });
     }
 
-    if(!username){
+        if(!username){
       return res.status(400).json({
         ok:false,
         error:"Игрок не указан"
+      });
+    }
+
+    const targetUserResult = await pool.query(`
+      SELECT username, role
+      FROM users
+      WHERE LOWER(username) = LOWER($1)
+      LIMIT 1
+    `, [username]);
+
+    const targetUser = targetUserResult.rows[0];
+
+    if(
+      targetUser &&
+      (
+        targetUser.role === "admin" ||
+        targetUser.username === ADMIN_USERNAME
+      )
+    ){
+      return res.status(403).json({
+        ok:false,
+        error:"Админа нельзя удалить из турнира"
       });
     }
 
