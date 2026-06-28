@@ -331,7 +331,6 @@
   class="btn gold"
   href="auth.html"
   id="authLink"
-  style="visibility:hidden"
 >
   Войти
 </a>
@@ -475,6 +474,16 @@ function userStarHtml(user){
 
   return "";
 }
+const roleColors = {
+  user:"#ffffff",
+  admin:"#6f3cff",
+  developer:"#0f7b43",
+  moderator:"#57d46a",
+  creator:"#ff9d42",
+  muted:"#b8ae9f",
+  banned:"#ff4d4d"
+};
+
 const statusColors = {
   none: "#ffffff",
   vip: "#A2DAFF",
@@ -581,32 +590,59 @@ function canDeleteMessage(message){
 }
 function updateAuthUI(){
   const user = getLoggedUser();
+
   const adminLink = document.getElementById("adminPanelLink");
-  if(adminLink && user && ["admin","developer","moderator"].includes(user.role)) adminLink.style.display = "inline";
+  if(adminLink){
+    adminLink.style.display =
+      user && ["admin","developer","moderator"].includes(user.role)
+        ? "inline"
+        : "none";
+  }
+
   const authLink = document.getElementById("authLink");
+
   if(authLink && user){
 
-  const nameColor =
-  user.role && user.role !== "user" && roleColors[user.role]
-    ? roleColors[user.role]
-    : (user.status !== "none" && statusColors[user.status] ? statusColors[user.status] : "#ffffff");
+    const nameColor =
+      user.role && user.role !== "user" && roleColors[user.role]
+        ? roleColors[user.role]
+        : (user.status !== "none" && statusColors[user.status]
+            ? statusColors[user.status]
+            : "#ffffff");
 
-authLink.innerHTML =
-  `<span style="color:${nameColor}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)}${user.username}</span>`;
-  authLink.style.visibility = "visible";
+    authLink.innerHTML =
+      `<span style="color:${nameColor}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)}${user.username}</span>`;
 
-  authLink.classList.remove("gold");
-  authLink.classList.add("ghost");
+    authLink.style.visibility = "visible";
 
-  authLink.href = "#";
+    authLink.classList.remove("gold");
+    authLink.classList.add("ghost");
 
-  authLink.onclick = e => {
-    e.preventDefault();
-    document.getElementById("logoutModal").style.display = "flex";
-  };
-}
-  document.getElementById("authBox").style.display = isLoggedIn() ? "none" : "block";
-  document.getElementById("composer").style.display = isLoggedIn() ? "grid" : "none";
+    authLink.href = "#";
+
+    authLink.onclick = e => {
+      e.preventDefault();
+      document.getElementById("logoutModal").style.display = "flex";
+    };
+
+  }else if(authLink){
+
+    authLink.innerHTML = "Войти";
+    authLink.href = "auth.html";
+
+    authLink.classList.remove("ghost");
+    authLink.classList.add("gold");
+
+    authLink.style.visibility = "visible";
+
+    authLink.onclick = null;
+  }
+
+  document.getElementById("authBox").style.display =
+    isLoggedIn() ? "none" : "block";
+
+  document.getElementById("composer").style.display =
+    isLoggedIn() ? "grid" : "none";
 }
 
 async function loadMessages(){
