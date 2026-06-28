@@ -8532,6 +8532,94 @@ function openTournamentFromUrl(){
     openTrackModal(t.id);
   }, 500);
 }
+function getTournamentWinnerBlock(t){
+  if(!t || getTournamentVisualStatus(t) !== "finished") return "";
+
+  const id = t.id;
+  const players = getPlayers(id);
+  const bracketSize = getTournamentBracketSize(t);
+
+  let winner = null;
+
+  if(bracketSize === 8){
+    const left = players.slice(0,4);
+    const right = players.slice(4,8);
+
+    const leftWinner = getSideChampion(id,"main","left",2,left,2,1);
+    const rightWinner = getSideChampion(id,"main","right",2,right,2,5);
+
+    const a = slotValue(id,"main","final",1,0,leftWinner,entrySeed(leftWinner,1));
+    const b = slotValue(id,"main","final",1,1,rightWinner,entrySeed(rightWinner,5));
+
+    winner = getAdvancingWinner(id,"main","final",1,0,a,b);
+  }
+
+  if(bracketSize === 16){
+    const left = players.slice(0,8);
+    const right = players.slice(8,16);
+
+    const leftWinner = getSideChampion(id,"main","left",3,left,2,1);
+    const rightWinner = getSideChampion(id,"main","right",3,right,2,9);
+
+    const a = slotValue(id,"main","final",1,0,leftWinner,entrySeed(leftWinner,1));
+    const b = slotValue(id,"main","final",1,1,rightWinner,entrySeed(rightWinner,9));
+
+    winner = getAdvancingWinner(id,"main","final",1,0,a,b);
+  }
+
+  if(bracketSize === 32){
+    const groupA = players.slice(0,16);
+    const groupB = players.slice(16,32);
+
+    const groupAWinner = getGroupChampion(id,"groupA",groupA,1);
+    const groupBWinner = getGroupChampion(id,"groupB",groupB,17);
+
+    const a = slotValue(id,"tournament","final",1,0,groupAWinner,entrySeed(groupAWinner,1));
+    const b = slotValue(id,"tournament","final",1,1,groupBWinner,entrySeed(groupBWinner,17));
+
+    winner = getAdvancingWinner(id,"tournament","final",1,0,a,b);
+  }
+
+  if(bracketSize === 64){
+    const groupA = players.slice(0,16);
+    const groupB = players.slice(16,32);
+    const groupC = players.slice(32,48);
+    const groupD = players.slice(48,64);
+
+    const a = slotValue(id,"tournament64","left",1,0,getGroupChampion(id,"groupA",groupA,1),1);
+    const b = slotValue(id,"tournament64","left",1,1,getGroupChampion(id,"groupB",groupB,17),17);
+    const c = slotValue(id,"tournament64","right",1,0,getGroupChampion(id,"groupC",groupC,33),33);
+    const d = slotValue(id,"tournament64","right",1,1,getGroupChampion(id,"groupD",groupD,49),49);
+
+    const leftWinner = getAdvancingWinner(id,"tournament64","left",1,0,a,b);
+    const rightWinner = getAdvancingWinner(id,"tournament64","right",1,0,c,d);
+
+    const finalA = slotValue(id,"tournament64","final",1,0,leftWinner,entrySeed(leftWinner,1));
+    const finalB = slotValue(id,"tournament64","final",1,1,rightWinner,entrySeed(rightWinner,33));
+
+    winner = getAdvancingWinner(id,"tournament64","final",1,0,finalA,finalB);
+  }
+
+  const nick = entryNick(winner);
+  if(!nick) return "";
+
+  return `
+    <div style="
+      margin:14px 0 16px;
+      padding:13px 14px;
+      border-radius:18px;
+      background:rgba(214,168,79,.10);
+      border:1px solid rgba(240,210,139,.32);
+      box-shadow:0 0 24px rgba(214,168,79,.14);
+      text-align:center;
+      font-size:18px;
+      font-weight:950;
+      color:#f0d28b;
+    ">
+      🏆 ${roleNickHtml(nick)} 🏆
+    </div>
+  `;
+}
     function applyFilters(){
       const q = $('search').value.trim().toLowerCase();
       const status = $('status').value, format = $('format').value, sort = $('sort').value;
@@ -8562,6 +8650,7 @@ const joinButtonText = visualStatus === 'closed'
 return '<article class="tournament-card">'
   + '<div class="tournament-top"><span class="tag">'+escapeHtml(formatMap[t.format])+'</span>'+statusTag(visualStatus)+'</div>'
           + '<h3>'+escapeHtml(t.title)+'</h3><p class="desc">'+escapeHtml(t.description)+'</p>'
++ getTournamentWinnerBlock(t)
           + '<div class="info-grid">'
           + '<div class="info-row"><span>Дата</span><span>'+formatDate(t.date)+'</span></div>'
           + '<div class="info-row"><span>Организаторы</span><span>'+organizersHtml(t)+'</span></div>'
