@@ -1013,10 +1013,8 @@ if(search){
   <div class="actions">
 
     <div class="top-actions">
-      ${user.username === ADMIN_USERNAME ? "" : `
-        <button class="btn ghost" onclick="changeStatus(${user.id})">Сохранить статус</button>
-        <button class="btn ghost" onclick="changeUsername(${user.id})">Сменить ник</button>
-      `}
+      <button class="btn ghost" onclick="changeStatus(${user.id})">Сохранить статус</button>
+      <button class="btn ghost" onclick="changeUsername(${user.id})">Сменить ник</button>
     </div>
 
     <div class="bottom-actions">
