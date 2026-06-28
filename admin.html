@@ -1098,16 +1098,84 @@ if(protectedUser?.username === ADMIN_USERNAME){
         showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
       }
     }
+    function askNicknameModal(currentNick){
+  return new Promise(resolve => {
+    const old = document.getElementById("nickModal");
+    if(old) old.remove();
+
+    const modal = document.createElement("div");
+    modal.className = "modal show";
+    modal.id = "nickModal";
+
+    modal.innerHTML = `
+      <div class="modal-box">
+        <h3>Сменить ник</h3>
+        <p>Введите новый ник в формате <b>Name#1234</b> или <b>Name#12345</b></p>
+
+        <input
+          id="nickModalInput"
+          value="${String(currentNick || "").replace(/"/g, "&quot;")}"
+          style="
+            width:100%;
+            margin:0 0 20px;
+            padding:14px 16px;
+            border-radius:16px;
+            border:1px solid rgba(232,194,112,.22);
+            background:rgba(255,255,255,.06);
+            color:#f4efe6;
+            outline:none;
+            font-weight:850;
+            font-size:16px;
+          "
+        >
+
+        <div class="modal-actions">
+          <button class="btn gold" id="nickModalSave">Сохранить</button>
+          <button class="btn ghost" id="nickModalCancel">Отмена</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const input = document.getElementById("nickModalInput");
+    const save = document.getElementById("nickModalSave");
+    const cancel = document.getElementById("nickModalCancel");
+
+    input.focus();
+    input.select();
+
+    save.onclick = () => {
+      const value = input.value.trim();
+      modal.remove();
+      resolve(value);
+    };
+
+    cancel.onclick = () => {
+      modal.remove();
+      resolve("");
+    };
+
+    modal.onclick = e => {
+      if(e.target === modal){
+        modal.remove();
+        resolve("");
+      }
+    };
+
+    input.onkeydown = e => {
+      if(e.key === "Enter") save.click();
+      if(e.key === "Escape") cancel.click();
+    };
+  });
+}
     async function changeUsername(userId){
   if(!checkAdmin()) return;
 
   const user = allUsers.find(u => Number(u.id) === Number(userId));
   if(!user) return;
 
-  const username = prompt(
-    "Введите новый ник в формате Name#1234 или Name#12345",
-    user.username
-  );
+  const username = await askNicknameModal(user.username);
 
   if(!username) return;
 
