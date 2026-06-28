@@ -723,7 +723,25 @@
     <div class="stats-card"><b id="shownCards">0</b><span>карт в текущем обновлении</span></div>
   </section>
 
-  <section class="wrap filters-panel" aria-label="Фильтры карт">
+  <section class="wrap filters-panel" aria-label="Импорт колоды из игры">
+  <div class="filters-title">
+    <h2>Импорт колоды из игры</h2>
+    <button class="btn gold" type="button" onclick="importDeckFromGameCode()">Собрать колоду</button>
+  </div>
+
+  <textarea
+    class="textarea"
+    id="gameDeckImportInput"
+    placeholder="Вставь сюда код колоды из игры. Например: ### Название колоды, # Герой: Валинда, # 3x (1) Возрождение..."
+    style="min-height:180px;margin-bottom:12px"
+  ></textarea>
+
+  <div class="notice">
+    Вставь полный код колоды из игры. Сайт найдёт героя и карты по названиям в базе карт и автоматически соберёт колоду слева.
+  </div>
+</section>
+
+<section class="wrap filters-panel" aria-label="Фильтры карт">
     <div class="filters-title"><h2>Фильтры</h2><button class="btn ghost" id="resetFilters">Сбросить все</button></div>
     <div class="filters-grid">
       <label><span class="filter-label">Название</span><input class="field" id="nameFilter" type="search" placeholder="Например: дракон"></label>
@@ -1501,7 +1519,165 @@ if(!syncedToTournament){
 
     function createFallbackCards(count=300){const types=['Герой','Существо','Магия','Артефакт','Событие'];const sets=['Основной сет','Промо','Турнирный','Тьма'];return Array.from({length:count},(_,i)=>{const id=i+1;const el=ELEMENTS[i%ELEMENTS.length].id;const second=(i%7===0)?ELEMENTS[(i+3)%ELEMENTS.length].id:null;return {id,name:'Карта '+id,type:types[i%types.length],cost:(i%9)+1,attack:i%8,health:(i%10)+1,elements:second?[el,second]:[el],set:sets[i%sets.length],text:'Тестовый текст карты '+id+'. Можно заменить данными из cards.json.',rarity:RARITIES[i%RARITIES.length].id,image:'images/'+id+'.png'}})}
 
-    function useCardsData(data, source='cards.json') { const list = Array.isArray(data) ? data : [data]; cards = list.map(normalizeCard); setupFilters(); renderRarityChips(); renderTypeChips(); renderElementChips(); applyFilters(); renderDeck(); updateStats(); showToast(source + ' загружен: ' + cards.length + ' карт'); }
+    function normalizeImportedCardName(value){
+  return String(value || "")
+    .toLowerCase()
+    .replace(/ё/g, "е")
+    .replace(/[«»"]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function findCardByImportedName(name, type){
+  const key = normalizeImportedCardName(name);
+
+  let found = cards.filter(card =>
+    normalizeImportedCardName(card.name) === key
+  );
+
+  if(type === "hero"){
+    found = found.filter(isHeroCard);
+  }else{
+    found = found.filter(card => !isHeroCard(card));
+  }
+
+  return found[0] || null;
+}
+
+function parseGameDeckCode(rawText){
+  const lines = String(rawText || "").split(/\r?\n/);
+  const result = {
+    title: "",
+    heroName: "",
+    cards: []
+  };
+
+  for(const rawLine of lines){
+    const line = String(rawLine || "")
+      .replace(/^\s*#\s?/, "")
+      .trim();
+
+    if(!line) continue;
+
+    if(line.startsWith("###")){
+      result.title = line.replace(/^###\s*/, "").trim();
+      continue;
+    }
+
+    const heroMatch = line.match(/^Герой\s*:\s*(.+)$/i);
+    if(heroMatch){
+      result.heroName = heroMatch[1].trim();
+      continue;
+    }
+
+    const cardMatch = line.match(/^(\d+)\s*x\s*\(\s*\d+\s*\)\s*(.+)$/i);
+    if(cardMatch){
+      result.cards.push({
+        count: Number(cardMatch[1]),
+        name: cardMatch[2].trim()
+      });
+    }
+  }
+
+  return result;
+}
+
+function importDeckFromGameCode(){
+  const input = $("gameDeckImportInput");
+  const rawText = input ? input.value.trim() : "";
+
+  if(!rawText){
+    showCustomAlert("Вставь код колоды из игры.");
+    return;
+  }
+
+  if(!cards.length){
+    showCustomAlert("База карт ещё не загружена. Подожди пару секунд и попробуй снова.");
+    return;
+  }
+
+  const parsed = parseGameDeckCode(rawText);
+
+  if(!parsed.heroName && !parsed.cards.length){
+    showCustomAlert("Не удалось найти в тексте героя и карты. Проверь, что вставлен полный код колоды из игры.");
+    return;
+  }
+
+  const nextDeck = [];
+  const errors = [];
+
+  if(parsed.heroName){
+    const hero = findCardByImportedName(parsed.heroName, "hero");
+
+    if(hero){
+      nextDeck.push(hero);
+    }else{
+      errors.push("Не найден герой: " + parsed.heroName);
+    }
+  }
+
+  for(const item of parsed.cards){
+    const card = findCardByImportedName(item.name, "card");
+
+    if(!card){
+      errors.push("Не найдена карта: " + item.name);
+      continue;
+    }
+
+    const limit = maxCopiesForCard(card);
+
+    if(item.count > limit){
+      errors.push("Слишком много копий: " + item.name + " — " + item.count + "x, лимит " + limit + "x");
+      continue;
+    }
+
+    for(let i = 0; i < item.count; i++){
+      nextDeck.push(card);
+    }
+  }
+
+  const cardsOnlyCount = nextDeck.filter(card => !isHeroCard(card)).length;
+
+  if(cardsOnlyCount > MAX_DECK){
+    errors.push("В колоде больше " + MAX_DECK + " карт без героя.");
+  }
+
+  if(errors.length){
+    showCustomAlert(
+      "Колода не импортирована.\n\n" +
+      errors.slice(0, 12).join("\n") +
+      (errors.length > 12 ? "\n..." : "")
+    );
+    return;
+  }
+
+  deck = nextDeck;
+
+  saveDeck();
+  renderDeck();
+  applyFilters();
+  updateStats();
+
+  if(parsed.title){
+    const nameInput = $("createdDeckTitle");
+    if(nameInput && !nameInput.value.trim()){
+      nameInput.value = parsed.title;
+    }
+  }
+
+  showCustomAlert(
+    "Колода успешно собрана из игрового кода.\n\n" +
+    "Герой: " + (parsed.heroName || "не указан") + "\n" +
+    "Карт: " + cardsOnlyCount
+  );
+
+  const deckPanel = $("deck");
+  if(deckPanel){
+    deckPanel.scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+}
+
+function useCardsData(data, source='cards.json') { const list = Array.isArray(data) ? data : [data]; cards = list.map(normalizeCard); setupFilters(); renderRarityChips(); renderTypeChips(); renderElementChips(); applyFilters(); renderDeck(); updateStats(); showToast(source + ' загружен: ' + cards.length + ' карт'); }
     async function loadCards(){
   try {
     const files = [
