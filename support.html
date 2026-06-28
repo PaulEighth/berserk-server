@@ -873,7 +873,21 @@
         <h2 class="boosty-title">Поддержка помогает <span>развивать сайт</span></h2>
         <p class="boosty-subtitle">Средства идут на поддержку работы проекта, новые функции, улучшение разделов сайта, турниры, конкурсы и розыгрыши для игроков.</p>
 
-        <div class="roadmap">
+<div style="
+  margin:18px 0 22px;
+  padding:14px 18px;
+  border-radius:16px;
+  background:rgba(255,70,70,.08);
+  border:1px solid rgba(255,70,70,.28);
+  color:#ff6b6b;
+  font-weight:800;
+  line-height:1.55;
+  font-size:15px;
+">
+  ⚠️ <b>Важно!</b> При приобретении ежемесячной поддержки обязательно укажите свой ник и <b>#</b> в комментарии к поддержке или отправьте его мне напрямую в личные сообщения в Telegram, для получения соответствующего статуса на сайте.
+</div>
+
+<div class="roadmap">
           <h3>На что идут донаты</h3>
 
           <div class="roadmap-grid">
@@ -1183,51 +1197,60 @@ async function refreshCurrentUser(){
 }
 function updateAuthUI(){
 
-  const user =
-    JSON.parse(localStorage.getItem("user") || "null");
-
-  const authLink =
-    document.getElementById("authLink");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const authLink = document.getElementById("authLink");
 
   if(!authLink) return;
 
   if(user){
 
-   const nameColor = getNickColor(user);
+    const nameColor = getNickColor(user);
 
-authLink.innerHTML =
-  `<span style="color:${nameColor}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)} ${user.username}</span>`;
+    authLink.innerHTML =
+      userStarHtml(user) +
+      userStatusHtml(user) +
+      medalsHtml(user) +
+      (user.username || "Профиль");
 
     authLink.classList.remove("gold");
     authLink.classList.add("ghost");
 
-    authLink.href = "#";
+    authLink.style.background = "rgba(255,255,255,.06)";
+    authLink.style.border = "1px solid rgba(232,194,112,.35)";
+    authLink.style.boxShadow = "none";
+    authLink.style.color = nameColor;
 
+    authLink.href = "#";
     authLink.style.visibility = "visible";
 
-    authLink.onclick = e=>{
+    authLink.onclick = function(e){
       e.preventDefault();
 
-      if(document.getElementById("logoutModal")){
-        document.getElementById("logoutModal").style.display="flex";
-      }
+      const ok = confirm("Выйти из аккаунта?");
+      if(!ok) return;
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      location.href = "auth.html";
     };
 
   }else{
 
+    authLink.innerHTML = "Войти";
+    authLink.href = "auth.html";
+    authLink.classList.remove("ghost");
+    authLink.classList.add("gold");
     authLink.style.visibility = "visible";
-
+    authLink.onclick = null;
   }
 
-  const adminLink =
-    document.getElementById("adminPanelLink");
+  const adminLink = document.getElementById("adminPanelLink");
 
-  if(
-    adminLink &&
-    user &&
-    ["admin","developer","moderator"].includes(user.role)
-  ){
-    adminLink.style.display = "inline";
+  if(adminLink){
+    adminLink.style.display =
+      user && ["admin","developer","moderator"].includes(user.role)
+        ? "inline-flex"
+        : "none";
   }
 }
 </script>
