@@ -8629,9 +8629,38 @@ function getTournamentWinnerBlock(t){
         return (!q || text.includes(q)) && (status === 'all' || t.status === status) && (format === 'all' || t.format === format);
       });
       list.sort((a,b) => {
-        const freeA = a.free, freeB = b.free;
-        return sort === 'places' ? freeB-freeA : sort === 'prize' ? b.prizeValue-a.prizeValue : new Date(a.date.replace(' ','T'))-new Date(b.date.replace(' ','T'));
-      });
+  const statusOrder = {
+    active: 0,
+    open: 1,
+    soon: 2,
+    closed: 3,
+    finished: 4
+  };
+
+  const sa = getTournamentVisualStatus(a);
+  const sb = getTournamentVisualStatus(b);
+
+  if(sort === "places"){
+    return Number(b.free || 0) - Number(a.free || 0);
+  }
+
+  if(sort === "prize"){
+    return Number(b.prizeValue || 0) - Number(a.prizeValue || 0);
+  }
+
+  if((statusOrder[sa] ?? 99) !== (statusOrder[sb] ?? 99)){
+    return (statusOrder[sa] ?? 99) - (statusOrder[sb] ?? 99);
+  }
+
+  const da = new Date(String(a.date || "").replace(" ","T")).getTime() || 0;
+  const db = new Date(String(b.date || "").replace(" ","T")).getTime() || 0;
+
+  if(sa === "finished"){
+    return db - da;
+  }
+
+  return da - db;
+});
       render(list); updateStats();
     }
 
