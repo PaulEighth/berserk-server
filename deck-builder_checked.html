@@ -723,10 +723,10 @@
     <div class="stats-card"><b id="shownCards">0</b><span>карт в текущем обновлении</span></div>
   </section>
 
-  <section class="wrap filters-panel" aria-label="Импорт колоды из игры">
+  <section class="wrap filters-panel" id="deckImportPanel" aria-label="Импорт колоды из игры">
   <div class="filters-title">
     <h2>Импорт колоды из игры</h2>
-    <button class="btn gold" type="button" onclick="importDeckFromGameCode()">Собрать колоду</button>
+    <button class="btn gold" id="deckImportButton" type="button" onclick="importDeckFromGameCode()">Собрать колоду</button>
   </div>
 
   <textarea
@@ -736,7 +736,7 @@
     style="min-height:180px;margin-bottom:12px"
   ></textarea>
 
-  <div class="notice">
+  <div class="notice" id="deckImportNotice">
     Вставь полный код колоды из игры. Сайт найдёт героя и карты по названиям в базе карт и автоматически соберёт колоду слева.
   </div>
 </section>
@@ -1583,6 +1583,11 @@ function parseGameDeckCode(rawText){
 }
 
 function importDeckFromGameCode(){
+  if(!canUseDeckImport()){
+    showCustomAlert("Импорт колоды из игры доступен для Premium, Elite, Royal, Legend, партнёров и команды сайта.");
+    return;
+  }
+
   const input = $("gameDeckImportInput");
   const rawText = input ? input.value.trim() : "";
 
@@ -2159,6 +2164,49 @@ function canModerateContent(){
 function canCreateContent(){
   return ["admin", "developer", "moderator", "creator"].includes(getUserRole());
 }
+
+function canUseDeckImport(){
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  if(!user) return false;
+
+  const role = String(user.role || "user").toLowerCase();
+  const status = String(user.status || "none").toLowerCase();
+
+  if(["admin", "developer", "moderator", "creator"].includes(role)){
+    return true;
+  }
+
+  if(["premium", "elite", "royal", "legend"].includes(status)){
+    return true;
+  }
+
+  if(user.is_partner){
+    return true;
+  }
+
+  return false;
+}
+
+function updateDeckImportAccess(){
+  const panel = document.getElementById("deckImportPanel");
+  const input = document.getElementById("gameDeckImportInput");
+  const button = document.getElementById("deckImportButton");
+  const notice = document.getElementById("deckImportNotice");
+
+  if(!panel || !input || !button || !notice) return;
+
+  if(canUseDeckImport()){
+    input.style.display = "block";
+    button.style.display = "inline-flex";
+    notice.innerHTML = "Вставь полный код колоды из игры. Сайт найдёт героя и карты по названиям в базе карт и автоматически соберёт колоду слева.";
+    return;
+  }
+
+  input.style.display = "none";
+  button.style.display = "none";
+  notice.innerHTML = "🔒 Импорт колоды из игры доступен для Premium, Elite, Royal, Legend, партнёров и команды сайта.";
+}
 if (currentUser?.role === "banned") {
 
   localStorage.removeItem("token");
@@ -2339,12 +2387,15 @@ authBtn.style.color = nameColor;
 
   renderAuthButton(currentUser);
 
-  refreshCurrentUser().then(freshUser => {
+    refreshCurrentUser().then(freshUser => {
     if(!freshUser) return;
     localStorage.setItem("user", JSON.stringify(freshUser));
     renderAuthButton(freshUser);
+    updateDeckImportAccess();
   });
 }
+
+document.addEventListener("DOMContentLoaded", updateDeckImportAccess);
 
 function confirmLogout(){
   localStorage.removeItem("token");
