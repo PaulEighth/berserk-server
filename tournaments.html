@@ -8603,6 +8603,47 @@ function getTournamentWinnerBlock(t){
   const nick = entryNick(winner);
   if(!nick) return "";
 
+  const decks = getSubmittedDecksArray(id, nick);
+
+  const decksHtml = decks.length ? `
+    <div style="
+      margin-top:12px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    ">
+      ${decks.map((deck,index)=>{
+        const img = deckHeroImage(deck);
+        const title = deck.title || ("Колода " + (index + 1));
+
+        return `
+          <button
+            type="button"
+            onclick="openDeckView(${jsArg(id)},${jsArg(nick)},${index})"
+            title="${escapeHtml(title)}"
+            style="
+              width:54px;
+              height:72px;
+              border-radius:13px;
+              border:1px solid rgba(240,210,139,.42);
+              background:rgba(255,255,255,.06);
+              overflow:hidden;
+              cursor:pointer;
+              padding:0;
+              box-shadow:0 10px 24px rgba(0,0,0,.28);
+            "
+          >
+            ${img
+              ? `<img src="${escapeHtml(img)}" alt="${escapeHtml(title)}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.style.visibility='hidden'">`
+              : `<span style="display:grid;place-items:center;width:100%;height:100%;color:#f0d28b;font-weight:950">${index + 1}</span>`
+            }
+          </button>
+        `;
+      }).join("")}
+    </div>
+  ` : "";
+
   return `
     <div style="
       margin:14px 0 16px;
@@ -8616,7 +8657,8 @@ function getTournamentWinnerBlock(t){
       font-weight:950;
       color:#f0d28b;
     ">
-      🏆 ${roleNickHtml(nick)} 🏆
+      <div>🏆 ${roleNickHtml(nick)} 🏆</div>
+      ${decksHtml}
     </div>
   `;
 }
