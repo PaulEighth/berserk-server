@@ -245,10 +245,18 @@ table{
 
     .actions{
   display:flex;
+  flex-direction:column;
+  align-items:flex-end;
   gap:10px;
+  min-width:320px;
+}
+
+.actions .top-actions,
+.actions .bottom-actions{
+  display:flex;
   flex-wrap:wrap;
   justify-content:flex-end;
-  min-width:500px;
+  gap:10px;
 }
 
     .notice{
@@ -1003,23 +1011,30 @@ if(search){
 <td>${renderMedalEditor(user)}</td>
 <td>
   <div class="actions">
-    ${user.username === ADMIN_USERNAME
-  ? ""
-  : `<button class="btn gold" onclick="changeRole(${user.id})">Сохранить роль</button>
- <button class="btn ghost" onclick="changeStatus(${user.id})">Сохранить статус</button>
- <button class="btn ghost" onclick="changeUsername(${user.id})">Сменить ник</button>`
-}
 
-${user.username === ADMIN_USERNAME ? "" : `
-  <button class="btn ghost" onclick="togglePartner(${user.id}, ${user.is_partner ? "false" : "true"})">
-    ${user.is_partner ? "Убрать ⭐" : "Дать ⭐"}
-  </button>
-`}
+    <div class="top-actions">
+      ${user.username === ADMIN_USERNAME ? "" : `
+        <button class="btn ghost" onclick="changeStatus(${user.id})">Сохранить статус</button>
+        <button class="btn ghost" onclick="changeUsername(${user.id})">Сменить ник</button>
+      `}
+    </div>
 
-${user.username === ADMIN_USERNAME ? "" : `<button class="btn ghost" onclick="quickBan(${user.id})">Бан</button>`}
-              ${user.username === ADMIN_USERNAME ? "" : `<button class="btn red" onclick="deleteUser(${user.id}, '${String(user.username).replace(/'/g, "\\'")}')">Удалить</button>`}
-            </div>
-          </td>
+    <div class="bottom-actions">
+      ${user.username === ADMIN_USERNAME ? "" : `
+        <button class="btn gold" onclick="changeRole(${user.id})">Сохранить роль</button>
+
+        <button class="btn ghost" onclick="togglePartner(${user.id}, ${user.is_partner ? "false" : "true"})">
+          ${user.is_partner ? "Убрать ⭐" : "Дать ⭐"}
+        </button>
+
+        <button class="btn ghost" onclick="quickBan(${user.id})">Бан</button>
+
+        <button class="btn red" onclick="deleteUser(${user.id}, '${String(user.username).replace(/'/g, "\\'")}')">Удалить</button>
+      `}
+    </div>
+
+  </div>
+</td>
         </tr>
       `).join("");
     }
