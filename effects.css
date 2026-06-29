@@ -34,3 +34,13 @@
 .btn .particle span{
   font-size:10px !important;
 }
+/* FIX: чтобы E1.4 / E1.5 тоже переливались */
+.color-mountain4,.color-mountain5,
+.color-steppe4,.color-steppe5,
+.color-dark4,.color-dark5,
+.color-forest4,.color-forest5,
+.color-neutral4,.color-neutral5,
+.color-swamp4,.color-swamp5{
+  background-size:420% 100% !important;
+  animation:flow 3.2s linear infinite !important;
+}
