@@ -14,3 +14,23 @@
 @keyframes spin{to{transform:rotate(360deg)}}@keyframes flow{from{background-position:0% 50%}to{background-position:440% 50%}}
 @keyframes scalePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}@keyframes slideSoft{0%,100%{transform:translateX(0)}50%{transform:translateX(14px)}}@keyframes jump{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}@keyframes shakeX{0%,100%{transform:translateX(0)}33%{transform:translateX(2px)}66%{transform:translateX(-2px)}}@keyframes rotateTiny{0%,100%{transform:rotate(0)}50%{transform:rotate(-4deg)}}@keyframes breath{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.04);opacity:1}}@keyframes waveText{0%,100%{transform:skewX(0)}50%{transform:skewX(-8deg)}}@keyframes blinkSoft{0%,100%{opacity:.55}50%{opacity:1}}@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}@keyframes heartbeat{0%,100%{transform:scale(1)}20%{transform:scale(1.08)}35%{transform:scale(.98)}50%{transform:scale(1.12)}}
 @keyframes floatItem{0%{top:82%;opacity:0;transform:translateY(0) scale(.7) rotate(0)}20%{opacity:1}80%{opacity:1}100%{top:4%;opacity:0;transform:translateY(-10px) scale(1.15) rotate(25deg)}}
+/* Ник в кнопке аккаунта — обычный размер */
+/* Ник в кнопке аккаунта */
+.btn .nick-wrap{
+  min-height:auto !important;
+}
+
+.btn .nick{
+  font-size:inherit !important;
+  line-height:inherit !important;
+  font-weight:inherit !important;
+  letter-spacing:inherit !important;
+}
+
+.btn .particle{
+  inset:-14px -18px !important;
+}
+
+.btn .particle span{
+  font-size:10px !important;
+}
