@@ -64,6 +64,49 @@ h3{margin:24px 0 12px;color:#fff;font-size:24px;letter-spacing:-.03em}
   transform:translateY(-2px);
   background:rgba(214,168,79,.14);
 }
+
+/* FIX COLORS 2026-06: особые + стихии */
+.special-orangeblack{
+  background:linear-gradient(90deg,#ff8a00,#000000,#ff4b00,#160700,#ff8a00) !important;
+  background-size:440% 100% !important;
+  -webkit-background-clip:text !important;
+  -webkit-text-fill-color:transparent !important;
+  animation:flow 2.7s linear infinite,jump 2.4s ease-in-out infinite !important;
+  filter:drop-shadow(0 0 18px #ff7a18cc) !important;
+}
+
+.special-blueyellow{
+  background:linear-gradient(90deg,#ffe600,#7b2cff,#fff2a0,#3b176e,#ffe600) !important;
+  background-size:440% 100% !important;
+  -webkit-background-clip:text !important;
+  -webkit-text-fill-color:transparent !important;
+  animation:flow 2.7s linear infinite,jump 2.4s ease-in-out infinite !important;
+  filter:drop-shadow(0 0 18px #7b2cffcc) !important;
+}
+
+/* 5 уровень у всех стихий темнее, 4 уровень отличимее */
+.color-mountain4{background:linear-gradient(90deg,#9fc9ff,#3b63b8,#12306f,#9fc9ff) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #3b63b8aa) !important}
+.color-mountain5{background:linear-gradient(90deg,#6fa8ff,#1b3f91,#020816,#6fa8ff) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #020816cc) !important}
+
+.color-steppe4{background:linear-gradient(90deg,#ffcf6b,#c8781c,#4a2200,#ffcf6b) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #c8781caa) !important}
+.color-steppe5{background:linear-gradient(90deg,#b87922,#5a2a00,#160800,#b87922) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #160800cc) !important}
+
+.color-dark4{background:linear-gradient(90deg,#7f4dff,#2c0f59,#050008,#7f4dff) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #2c0f59aa) !important}
+.color-dark5{background:linear-gradient(90deg,#4b1cff,#09030f,#000000,#4b1cff) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #000000cc) !important}
+
+.color-forest4{background:linear-gradient(90deg,#67e86f,#16853e,#023018,#67e86f) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #16853eaa) !important}
+.color-forest5{background:linear-gradient(90deg,#42bd72,#00572c,#020f08,#42bd72) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #020f08cc) !important}
+
+.color-swamp4{background:linear-gradient(90deg,#35d6cf,#006c70,#001f24,#35d6cf) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #006c70aa) !important}
+.color-swamp5{background:linear-gradient(90deg,#00a896,#004d4f,#001012,#00a896) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #001012cc) !important}
+
+/* Нейтральные — красные, не степные/оранжевые */
+.color-neutral1{background:linear-gradient(90deg,#ffd6d6,#ff8a8a,#ff3b3b,#ffd6d6) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #ff3b3baa) !important}
+.color-neutral2{background:linear-gradient(90deg,#ffb3b3,#ff4d4d,#b80018,#ffb3b3) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #ff4d4daa) !important}
+.color-neutral3{background:linear-gradient(90deg,#ff7070,#d90024,#6b0012,#ff7070) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #d90024aa) !important}
+.color-neutral4{background:linear-gradient(90deg,#d90024,#7a0015,#210005,#d90024) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #7a0015aa) !important}
+.color-neutral5{background:linear-gradient(90deg,#8f0018,#340008,#050000,#8f0018) !important;background-size:380% 100% !important;-webkit-background-clip:text !important;-webkit-text-fill-color:transparent !important;filter:drop-shadow(0 0 15px #050000cc) !important}
+
 </style>
 </head>
 <body>
@@ -229,12 +272,12 @@ h3{margin:24px 0 12px;color:#fff;font-size:24px;letter-spacing:-.03em}
 </div>
 <div class="shop-card">
 <div class="label">E2.4 + FX</div>
-<div class="preview"><span class="nick-wrap"><span class="particle"><span>●</span><span>◉</span><span>●</span><span>◉</span><span>●</span></span><span class="nick color-steppe5 anim-slideSoft">Player#0001 1200₽</span></span></div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>●</span><span>◉</span><span>●</span><span>◉</span><span>●</span></span><span class="nick color-steppe4 anim-slideSoft">Player#0001 1200₽</span></span></div>
 <div class="note">☀ цвет + движение + эффект стихии</div>
 </div>
 <div class="shop-card">
 <div class="label">E2.5 + FX</div>
-<div class="preview"><span class="nick-wrap"><span class="particle"><span>●</span><span>◉</span><span>●</span><span>◉</span><span>●</span></span><span class="nick color-steppe4 anim-slideSoft">Player#0001 1500₽</span></span></div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>●</span><span>◉</span><span>●</span><span>◉</span><span>●</span></span><span class="nick color-steppe5 anim-slideSoft">Player#0001 1500₽</span></span></div>
 <div class="note">☀ цвет + движение + эффект стихии</div>
 </div>
 </div>
@@ -310,32 +353,32 @@ h3{margin:24px 0 12px;color:#fff;font-size:24px;letter-spacing:-.03em}
 
 
 </div>
-<h3>🔥 Нейтральные</h3>
+<h3>🔴 Нейтральные</h3>
 <div class="grid">
 <div class="shop-card">
 <div class="label">E5.1 + FX</div>
-<div class="preview"><span class="nick-wrap"><span class="particle"><span>✹</span><span>•</span><span>✹</span><span>•</span><span>✹</span></span><span class="nick color-neutral1 anim-scalePulse">Player#0001 300₽</span></span></div>
-<div class="note">🔥 цвет + движение + эффект стихии</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>🔴</span><span>●</span><span>🔴</span><span>●</span><span>🔴</span></span><span class="nick color-neutral1 anim-scalePulse">Player#0001 300₽</span></span></div>
+<div class="note">🔴 цвет + движение + эффект стихии</div>
 </div>
 <div class="shop-card">
 <div class="label">E5.2 + FX</div>
-<div class="preview"><span class="nick-wrap"><span class="particle"><span>✹</span><span>•</span><span>✹</span><span>•</span><span>✹</span></span><span class="nick color-neutral2 anim-scalePulse">Player#0001 600₽</span></span></div>
-<div class="note">🔥 цвет + движение + эффект стихии</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>🔴</span><span>●</span><span>🔴</span><span>●</span><span>🔴</span></span><span class="nick color-neutral2 anim-scalePulse">Player#0001 600₽</span></span></div>
+<div class="note">🔴 цвет + движение + эффект стихии</div>
 </div>
 <div class="shop-card">
 <div class="label">E5.3 + FX</div>
-<div class="preview"><span class="nick-wrap"><span class="particle"><span>✹</span><span>•</span><span>✹</span><span>•</span><span>✹</span></span><span class="nick color-neutral3 anim-scalePulse">Player#0001 900₽</span></span></div>
-<div class="note">🔥 цвет + движение + эффект стихии</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>🔴</span><span>●</span><span>🔴</span><span>●</span><span>🔴</span></span><span class="nick color-neutral3 anim-scalePulse">Player#0001 900₽</span></span></div>
+<div class="note">🔴 цвет + движение + эффект стихии</div>
 </div>
 <div class="shop-card">
 <div class="label">E5.4 + FX</div>
-<div class="preview"><span class="nick-wrap"><span class="particle"><span>✹</span><span>•</span><span>✹</span><span>•</span><span>✹</span></span><span class="nick color-neutral5 anim-scalePulse">Player#0001 1200₽</span></span></div>
-<div class="note">🔥 цвет + движение + эффект стихии</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>🔴</span><span>●</span><span>🔴</span><span>●</span><span>🔴</span></span><span class="nick color-neutral4 anim-scalePulse">Player#0001 1200₽</span></span></div>
+<div class="note">🔴 цвет + движение + эффект стихии</div>
 </div>
 <div class="shop-card">
 <div class="label">E5.5 + FX</div>
-<div class="preview"><span class="nick-wrap"><span class="particle"><span>✹</span><span>•</span><span>✹</span><span>•</span><span>✹</span></span><span class="nick color-neutral4 anim-scalePulse">Player#0001 1500₽</span></span></div>
-<div class="note">🔥 цвет + движение + эффект стихии</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>🔴</span><span>●</span><span>🔴</span><span>●</span><span>🔴</span></span><span class="nick color-neutral5 anim-scalePulse">Player#0001 1500₽</span></span></div>
+<div class="note">🔴 цвет + движение + эффект стихии</div>
 </div></div>
 <div class="grid">
 
@@ -362,12 +405,12 @@ h3{margin:24px 0 12px;color:#fff;font-size:24px;letter-spacing:-.03em}
 </div>
 <div class="shop-card">
 <div class="label">E6.4 + FX</div>
-<div class="preview"><span class="nick-wrap"><span class="particle"><span>○</span><span>◌</span><span>○</span><span>◌</span><span>○</span></span><span class="nick color-swamp5 anim-waveText">Player#0001 1200₽</span></span></div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>○</span><span>◌</span><span>○</span><span>◌</span><span>○</span></span><span class="nick color-swamp4 anim-waveText">Player#0001 1200₽</span></span></div>
 <div class="note">○ цвет + движение + эффект стихии</div>
 </div>
 <div class="shop-card">
 <div class="label">E6.5 + FX</div>
-<div class="preview"><span class="nick-wrap"><span class="particle"><span>○</span><span>◌</span><span>○</span><span>◌</span><span>○</span></span><span class="nick color-swamp4 anim-waveText">Player#0001 1500₽</span></span></div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>○</span><span>◌</span><span>○</span><span>◌</span><span>○</span></span><span class="nick color-swamp5 anim-waveText">Player#0001 1500₽</span></span></div>
 <div class="note">○ цвет + движение + эффект стихии</div>
 </div>
 </div>
@@ -416,7 +459,7 @@ h3{margin:24px 0 12px;color:#fff;font-size:24px;letter-spacing:-.03em}
 <div class="shop-card">
 <div class="label">S9</div>
 <div class="preview"><span class="nick-wrap"><span class="particle"><span>✹</span><span>●</span><span>✹</span><span>●</span><span>✹</span></span><span class="nick special-orangeblack">Оранжево-чёрный 2000₽</span></span></div>
-<div class="note">Жёлто-фиолетовый — мистический контраст</div>
+<div class="note">Оранжево-чёрный — огонь, ночь и жёсткий контраст</div>
 </div>
 <div class="shop-card">
 <div class="label">S10</div>
