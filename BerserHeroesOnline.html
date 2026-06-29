@@ -1437,10 +1437,17 @@ function setupAuthButton(user){
   if(!user || !authBtn) return;
 
   authBtn.innerHTML =
-    userStarHtml(user) +
-    userStatusHtml(user) +
-    medalsHtml(user) +
-    '<span class="special-valentine">' + user.username + '</span>';
+  userStarHtml(user) +
+  userStatusHtml(user) +
+  medalsHtml(user) +
+  `
+  <span class="nick-wrap">
+    <span class="particle">
+      <span>♥</span><span>♡</span><span>♥</span><span>♡</span><span>♥</span>
+    </span>
+    <span class="nick special-valentine">${user.username}</span>
+  </span>
+  `;
 
   authBtn.href = "#";
   authBtn.classList.remove("gold");
