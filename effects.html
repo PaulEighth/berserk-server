@@ -180,6 +180,38 @@ h3{margin:24px 0 12px;color:#fff;font-size:24px;letter-spacing:-.03em}
   -webkit-text-fill-color:transparent !important;
   animation:flow 1.4s linear infinite !important;
 }
+/* REAL FIX: яркий перелив для стихий 4/5 */
+.color-mountain4{background:linear-gradient(90deg,#ffffff,#5f8fd6,#244b9b,#ffffff)!important}
+.color-mountain5{background:linear-gradient(90deg,#bfe7ff,#203f86,#000814,#bfe7ff)!important}
+
+.color-steppe4{background:linear-gradient(90deg,#ffe8a0,#c67822,#2a1203,#ffe8a0)!important}
+.color-steppe5{background:linear-gradient(90deg,#ffd35a,#6b3308,#050200,#ffd35a)!important}
+
+.color-dark4{background:linear-gradient(90deg,#c39aff,#4a247a,#050009,#c39aff)!important}
+.color-dark5{background:linear-gradient(90deg,#8d57ff,#1b0b38,#000000,#8d57ff)!important}
+
+.color-forest4{background:linear-gradient(90deg,#b5ff89,#1b8c48,#011b0c,#b5ff89)!important}
+.color-forest5{background:linear-gradient(90deg,#78ff9a,#0b4d27,#000704,#78ff9a)!important}
+
+.color-neutral4{background:linear-gradient(90deg,#ff9b9b,#b40017,#1d0003,#ff9b9b)!important}
+.color-neutral5{background:linear-gradient(90deg,#ff4949,#65000c,#050000,#ff4949)!important}
+
+.color-swamp4{background:linear-gradient(90deg,#72ffdf,#00756c,#001316,#72ffdf)!important}
+.color-swamp5{background:linear-gradient(90deg,#8ffff0,#003c3a,#000606,#8ffff0)!important}
+
+.color-mountain4,.color-mountain5,
+.color-steppe4,.color-steppe5,
+.color-dark4,.color-dark5,
+.color-forest4,.color-forest5,
+.color-neutral4,.color-neutral5,
+.color-swamp4,.color-swamp5{
+  background-size:440% 100%!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+  color:transparent!important;
+  animation:flow 2s linear infinite!important;
+}
 </style>
 </head>
 <body>
