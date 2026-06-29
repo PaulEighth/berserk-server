@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Berserk Heroes Online — Nick Shop Special</title>
+<style>
+:root{--text:#f4efe6;--muted:#b8ae9f;--gold2:#f0d28b}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at 85% 5%,rgba(124,108,255,.18),transparent 32%),radial-gradient(circle at 12% 18%,rgba(224,120,48,.16),transparent 30%),linear-gradient(180deg,#05060a,#0a0d15 45%,#07090f)}
+body:before{content:"";position:fixed;inset:0;background-image:radial-gradient(rgba(255,255,255,.13) 1px,transparent 1px);background-size:22px 22px;opacity:.10;pointer-events:none}
+.wrap{width:min(1500px,calc(100% - 32px));margin:0 auto;padding:42px 0;position:relative}
+.box{padding:30px;border-radius:30px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.045));border:1px solid rgba(232,194,112,.18);box-shadow:0 28px 90px rgba(0,0,0,.42);backdrop-filter:blur(10px)}
+h1{margin:0 0 8px;font-size:clamp(42px,6vw,82px);line-height:.95;letter-spacing:-.07em;background:linear-gradient(135deg,#fff 15%,#f0d28b 58%,#b16b2c);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{margin:34px 0 16px;color:var(--gold2);font-size:36px;letter-spacing:-.04em}
+h3{margin:24px 0 12px;color:#fff;font-size:24px;letter-spacing:-.03em}
+.lead{margin:0 0 18px;color:#d7cec0;font-size:18px;line-height:1.5}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.special-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.shop-card{position:relative;overflow:hidden;min-height:132px;padding:18px;border-radius:22px;background:rgba(255,255,255,.045);border:1px solid rgba(232,194,112,.14)}
+.shop-card:before{content:"";position:absolute;inset:-60%;opacity:.16;background:radial-gradient(circle,rgba(214,168,79,.18),transparent 44%);animation:spin 9s linear infinite}
+.shop-card>*{position:relative}
+.label{color:var(--muted);font-weight:850;margin-bottom:10px}
+.preview{min-height:44px;display:flex;align-items:center}
+.nick{display:inline-block;font-size:clamp(20px,2vw,32px);font-weight:950;letter-spacing:-.035em;line-height:1.15}
+.base-white{color:#fff;text-shadow:0 0 10px rgba(255,255,255,.2)}
+.note{margin-top:8px;color:#9f978c;font-size:13px}
+.nick-wrap{position:relative;display:inline-flex;align-items:center;min-height:46px}
+.particle{position:absolute;inset:-30px -40px;pointer-events:none;overflow:hidden}
+.particle span{position:absolute;font-size:16px;opacity:0;animation:floatItem 4s linear infinite}
+.particle span:nth-child(1){left:12%;animation-delay:.1s}.particle span:nth-child(2){left:28%;animation-delay:.9s}.particle span:nth-child(3){left:52%;animation-delay:1.7s}.particle span:nth-child(4){left:75%;animation-delay:2.4s}.particle span:nth-child(5){left:88%;animation-delay:3.1s}
+.anim-scalePulse{animation:scalePulse 2s ease-in-out infinite}.anim-slideSoft{animation:slideSoft 2.5s ease-in-out infinite}.anim-jump{animation:jump 1.8s ease-in-out infinite}.anim-shakeX{animation:shakeX .45s linear infinite}.anim-rotateTiny{animation:rotateTiny 2.2s ease-in-out infinite}.anim-breath{animation:breath 3s ease-in-out infinite}.anim-waveText{animation:waveText 2.4s ease-in-out infinite}.anim-blinkSoft{animation:blinkSoft 2s ease-in-out infinite}.anim-floatY{animation:floatY 2.6s ease-in-out infinite}.anim-heartbeat{animation:heartbeat 1.4s ease-in-out infinite}
+.color-mountain1{background:linear-gradient(90deg,#ffffff,#effcff,#bfe7ff,#ffffff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #ffffffaa)}.color-mountain2{background:linear-gradient(90deg,#eefaff,#bfe7ff,#7dbdff,#eefaff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #eefaffaa)}.color-mountain3{background:linear-gradient(90deg,#d7e8ff,#7b9bd6,#304c8f,#d7e8ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #d7e8ffaa)}.color-mountain4{background:linear-gradient(90deg,#b8d8ff,#5b78bf,#182c68,#b8d8ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #b8d8ffaa)}.color-mountain5{background:linear-gradient(90deg,#e8f6ff,#4566b8,#071535,#e8f6ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #e8f6ffaa)}.color-steppe1{background:linear-gradient(90deg,#fff8d6,#fff0b0,#ffd36d,#fff8d6);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #fff8d6aa)}.color-steppe2{background:linear-gradient(90deg,#fff0b0,#ffd36d,#e8a83a,#fff0b0);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #fff0b0aa)}.color-steppe3{background:linear-gradient(90deg,#ffe28a,#fff5c8,#d6a84f,#ffe28a);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #ffe28aaa)}.color-steppe4{background:linear-gradient(90deg,#f0b45c,#c77a2e,#6f3b12,#f0b45c);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #f0b45caa)}.color-steppe5{background:linear-gradient(90deg,#fff4b8,#b47a1f,#3a2108,#fff4b8);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #fff4b8aa)}.color-dark1{background:linear-gradient(90deg,#f1e8ff,#c7a7ff,#7d4dff,#f1e8ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #f1e8ffaa)}.color-dark2{background:linear-gradient(90deg,#c7a7ff,#8d57ff,#35145e,#c7a7ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #c7a7ffaa)}.color-dark3{background:linear-gradient(90deg,#b889ff,#6d35ff,#12081f,#b889ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #b889ffaa)}.color-dark4{background:linear-gradient(90deg,#8a63ff,#3b176e,#050509,#8a63ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #8a63ffaa)}.color-dark5{background:linear-gradient(90deg,#6b35ff,#111111,#000000,#6b35ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #6b35ffaa)}.color-forest1{background:linear-gradient(90deg,#efffdf,#b8ffbd,#52ff9a,#efffdf);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #efffdfaa)}.color-forest2{background:linear-gradient(90deg,#d8ffb0,#8dff7a,#1fa84f,#d8ffb0);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #d8ffb0aa)}.color-forest3{background:linear-gradient(90deg,#b8ffbd,#52ff9a,#008a4d,#b8ffbd);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #b8ffbdaa)}.color-forest4{background:linear-gradient(90deg,#8bff8b,#1eb85d,#064f2c,#8bff8b);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #8bff8baa)}.color-forest5{background:linear-gradient(90deg,#9cffc5,#008044,#061f12,#9cffc5);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #9cffc5aa)}.color-neutral1{background:linear-gradient(90deg,#fff3d0,#ffd36d,#ff9d42,#fff3d0);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #fff3d0aa)}.color-neutral2{background:linear-gradient(90deg,#fff0a8,#ff9d42,#ff4b2b,#fff0a8);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #fff0a8aa)}.color-neutral3{background:linear-gradient(90deg,#ffd36d,#ff6a2a,#7a0b00,#ffd36d);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #ffd36daa)}.color-neutral4{background:linear-gradient(90deg,#ff6b6b,#b50000,#280000,#ff6b6b);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #ff6b6baa)}.color-neutral5{background:linear-gradient(90deg,#fff5c8,#ff7a18,#320800,#fff5c8);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #fff5c8aa)}.color-swamp1{background:linear-gradient(90deg,#e8fff9,#b7fff2,#74ffe4,#e8fff9);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #e8fff9aa)}.color-swamp2{background:linear-gradient(90deg,#d8fff7,#74ffe4,#00a896,#d8fff7);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #d8fff7aa)}.color-swamp3{background:linear-gradient(90deg,#9fffe8,#2ee6c4,#00756c,#9fffe8);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #9fffe8aa)}.color-swamp4{background:linear-gradient(90deg,#5ee7ff,#008fa3,#002d34,#5ee7ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #5ee7ffaa)}.color-swamp5{background:linear-gradient(90deg,#b7fff2,#008f83,#001f24,#b7fff2);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #b7fff2aa)}
+.special-valentine{background:linear-gradient(90deg,#ff4b8d,#ffffff,#ff9ac9,#ff4b8d);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,heartbeat 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ff9ac9cc)}.special-dark{background:linear-gradient(90deg,#000000,#161616,#050505,#000000);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,slideSoft 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #050505cc)}.special-bw{background:linear-gradient(90deg,#000000,#ffffff,#000000,#000000);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,waveText 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #000000cc)}.special-brown{background:linear-gradient(90deg,#8b5a2b,#4b2b12,#1e1007,#8b5a2b);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,breath 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #1e1007cc)}.special-yellowgold{background:linear-gradient(90deg,#ffe45c,#ffffff,#d6a84f,#ffe45c);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,scalePulse 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #d6a84fcc)}.special-redwine{background:linear-gradient(90deg,#ff2b2b,#8b0018,#2a0008,#ff2b2b);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,heartbeat 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #2a0008cc)}.special-orangefire{background:linear-gradient(90deg,#ff9d42,#ff5e00,#5a1900,#ff9d42);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,shakeX 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #5a1900cc)}.special-pride{background:linear-gradient(90deg,#ff004c,#ffea00,#00ff88,#00c8ff,#8b5cff,#ff004c);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,scalePulse 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #00c8ff,#8b5cffcc)}.special-darkpride{background:linear-gradient(90deg,#320016,#0b1630,#103018,#3b176e,#320016);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,blinkSoft 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #3b176ecc)}.special-male{background:linear-gradient(90deg,#5a351a,#073b24,#0b1d4f,#2d0f4f,#5a351a);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,slideSoft 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #2d0f4fcc)}.special-female{background:linear-gradient(90deg,#ff7abf,#ffe45c,#ff8a2a,#ff7abf);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,floatY 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ff8a2acc)}.special-police{background:linear-gradient(90deg,#005eff,#ffffff,#ff1f3d,#005eff);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,shakeX 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ff1f3dcc)}.special-quarantine{background:linear-gradient(90deg,#000000,#ffe600,#000000,#ffe600,#000000);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,scalePulse 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ffe600cc)}.special-redwhite{background:linear-gradient(90deg,#ff1f3d,#ffffff,#b00018,#ff1f3d);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,blinkSoft 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #b00018cc)}.special-yellowblack{background:linear-gradient(90deg,#ffe600,#000000,#ffe600,#ffe600);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,shakeX 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ffe600cc)}.special-orangeblack{background:linear-gradient(90deg,#ffe600,#7b2cff,#ffe600,#ff7a18);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,jump 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ff9d42cc)}.special-greenwhite{background:linear-gradient(90deg,#00d66f,#ffffff,#007a3d,#00d66f);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,breath 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #007a3dcc)}.special-bluewhite{background:linear-gradient(90deg,#007bff,#ffffff,#003f9e,#007bff);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,waveText 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #003f9ecc)}.special-redyellow{background:linear-gradient(90deg,#ff1f3d,#ffe600,#ff6a00,#ff1f3d);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,scalePulse 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ff6a00cc)}.special-greenred{background:linear-gradient(90deg,#00d66f,#ff1f3d,#005c2f,#00d66f);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,slideSoft 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #005c2fcc)}.special-blueyellow{background:linear-gradient(90deg,#005eff,#ffe600,#003a9e,#005eff);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,jump 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #003a9ecc)}.special-whitered{background:linear-gradient(90deg,#ffffff,#ff1f3d,#ffffff,#ffffff);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,heartbeat 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ffffffcc)}.special-blackwhite{background:linear-gradient(90deg,#000000,#ffffff,#000000,#000000);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,breath 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #000000cc)}.special-purpleblack{background:linear-gradient(90deg,#8d57ff,#000000,#3b176e,#8d57ff);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,blinkSoft 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #3b176ecc)}.special-greenyellow{background:linear-gradient(90deg,#00d66f,#ffe600,#1f7a00,#00d66f);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,floatY 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #1f7a00cc)}.special-blueorange{background:linear-gradient(90deg,#005eff,#ff7a18,#002e7a,#005eff);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,shakeX 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #002e7acc)}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes flow{from{background-position:0% 50%}to{background-position:440% 50%}}
+@keyframes scalePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}@keyframes slideSoft{0%,100%{transform:translateX(0)}50%{transform:translateX(14px)}}@keyframes jump{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}@keyframes shakeX{0%,100%{transform:translateX(0)}33%{transform:translateX(2px)}66%{transform:translateX(-2px)}}@keyframes rotateTiny{0%,100%{transform:rotate(0)}50%{transform:rotate(-4deg)}}@keyframes breath{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.04);opacity:1}}@keyframes waveText{0%,100%{transform:skewX(0)}50%{transform:skewX(-8deg)}}@keyframes blinkSoft{0%,100%{opacity:.55}50%{opacity:1}}@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}@keyframes heartbeat{0%,100%{transform:scale(1)}20%{transform:scale(1.08)}35%{transform:scale(.98)}50%{transform:scale(1.12)}}
+@keyframes floatItem{0%{top:82%;opacity:0;transform:translateY(0) scale(.7) rotate(0)}20%{opacity:1}80%{opacity:1}100%{top:4%;opacity:0;transform:translateY(-10px) scale(1.15) rotate(25deg)}}
+@media(max-width:1200px){.grid,.special-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:800px){.grid,.special-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.grid,.special-grid{grid-template-columns:1fr}.box{padding:20px}}
+.back-btn{
+  position:fixed;
+  top:22px;
+  right:24px;
+  z-index:100;
+  padding:14px 20px;
+  border-radius:999px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(232,194,112,.35);
+  color:#f0d28b;
+  text-decoration:none;
+  font-weight:950;
+  backdrop-filter:blur(14px);
+}
+
+.back-btn:hover{
+  background:rgba(214,168,79,.16);
+}
+</style>
+</head>
+<body>
+    <a class="back-btn" href="BerserHeroesOnline.html#cards">
+  ← Вернуться назад
+</a>
+<div class="wrap">
+<div class="box">
+<h1>Магазин эффектов ника</h1>
+<p class="lead">Пункт 3 удалён. В “Особых” осталась Валентинка и добавлены новые дорогие эффекты по твоему списку.</p>
+<h2>0. Базовый ник</h2>
+<div class="grid">
+<div class="shop-card">
+<div class="label">БАЗА</div>
+<div class="preview"><span class="nick base-white">Player#0001</span></div>
+<div class="note">обычный ник без цвета и анимаций</div>
+</div></div>
+<h2>1. Белый ник + базовая анимация — 100 ₽</h2>
+<div class="grid">
+<div class="shop-card">
+<div class="label">A1</div>
+<div class="preview"><span class="nick base-white anim-scalePulse">Player#0001</span></div>
+<div class="note">увеличение / уменьшение</div>
+</div>
+<div class="shop-card">
+<div class="label">A2</div>
+<div class="preview"><span class="nick base-white anim-slideSoft">Player#0001</span></div>
+<div class="note">мягко влево / вправо</div>
+</div>
+<div class="shop-card">
+<div class="label">A3</div>
+<div class="preview"><span class="nick base-white anim-jump">Player#0001</span></div>
+<div class="note">лёгкий прыжок</div>
+</div>
+<div class="shop-card">
+<div class="label">A4</div>
+<div class="preview"><span class="nick base-white anim-shakeX">Player#0001</span></div>
+<div class="note">дрожание</div>
+</div>
+<div class="shop-card">
+<div class="label">A5</div>
+<div class="preview"><span class="nick base-white anim-rotateTiny">Player#0001</span></div>
+<div class="note">маленький поворот</div>
+</div>
+<div class="shop-card">
+<div class="label">A6</div>
+<div class="preview"><span class="nick base-white anim-breath">Player#0001</span></div>
+<div class="note">дыхание</div>
+</div>
+<div class="shop-card">
+<div class="label">A7</div>
+<div class="preview"><span class="nick base-white anim-waveText">Player#0001</span></div>
+<div class="note">волна</div>
+</div>
+<div class="shop-card">
+<div class="label">A8</div>
+<div class="preview"><span class="nick base-white anim-blinkSoft">Player#0001</span></div>
+<div class="note">мягкое мигание</div>
+</div>
+<div class="shop-card">
+<div class="label">A9</div>
+<div class="preview"><span class="nick base-white anim-floatY">Player#0001</span></div>
+<div class="note">плавание вверх / вниз</div>
+</div>
+<div class="shop-card">
+<div class="label">A10</div>
+<div class="preview"><span class="nick base-white anim-heartbeat">Player#0001</span></div>
+<div class="note">сердцебиение</div>
+</div></div>
+<h2>2. Белый ник + эффект рядом — 100 ₽</h2>
+<div class="grid">
+<div class="shop-card">
+<div class="label">P1</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></span><span class="nick base-white">Player#0001</span></span></div>
+<div class="note">звёздочки</div>
+</div>
+<div class="shop-card">
+<div class="label">P2</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>♥</span><span>♡</span><span>♥</span><span>♡</span><span>♥</span></span><span class="nick base-white">Player#0001</span></span></div>
+<div class="note">сердечки</div>
+</div>
+<div class="shop-card">
+<div class="label">P3</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>❄</span><span>✧</span><span>❄</span><span>✧</span><span>❄</span></span><span class="nick base-white">Player#0001</span></span></div>
+<div class="note">снежинки</div>
+</div>
+<div class="shop-card">
+<div class="label">P4</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>⚡</span><span>ϟ</span><span>⚡</span><span>ϟ</span><span>⚡</span></span><span class="nick base-white">Player#0001</span></span></div>
+<div class="note">молнии</div>
+</div>
+<div class="shop-card">
+<div class="label">P5</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>✹</span><span>•</span><span>✹</span><span>•</span><span>✹</span></span><span class="nick base-white">Player#0001</span></span></div>
+<div class="note">искры</div>
+</div>
+<div class="shop-card">
+<div class="label">P6</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>🍃</span><span>•</span><span>🍃</span><span>•</span><span>🍃</span></span><span class="nick base-white">Player#0001</span></span></div>
+<div class="note">листья</div>
+</div>
+<div class="shop-card">
+<div class="label">P7</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>☁</span><span>◌</span><span>☁</span><span>◌</span><span>☁</span></span><span class="nick base-white">Player#0001</span></span></div>
+<div class="note">дым</div>
+</div>
+<div class="shop-card">
+<div class="label">P8</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>☠</span><span>✧</span><span>☠</span><span>✧</span><span>☠</span></span><span class="nick base-white">Player#0001</span></span></div>
+<div class="note">черепа</div>
+</div></div>
+<h2>3. Стихийные раскраски + эффекты — 500 ₽ / 700 ₽ / 900 ₽ / 1200 ₽ / 1500 ₽</h2>
+<h3>❄ Горы — 5 оттенков</h3>
+<div class="grid">
+
+
+
+
+</div>
+<h3>❄ Горы — те же 5 оттенков + эффекты</h3>
+<div class="grid">
+<div class="shop-card">
+<div class="label">E1.1 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>❄</span><span>✧</span><span>❄</span><span>✧</span><span>❄</span></span><span class="nick color-mountain1 anim-breath">Player#0001</span></span></div>
+<div class="note">❄ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E1.2 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>❄</span><span>✧</span><span>❄</span><span>✧</span><span>❄</span></span><span class="nick color-mountain2 anim-breath">Player#0001</span></span></div>
+<div class="note">❄ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E1.3 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>❄</span><span>✧</span><span>❄</span><span>✧</span><span>❄</span></span><span class="nick color-mountain3 anim-breath">Player#0001</span></span></div>
+<div class="note">❄ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E1.4 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>❄</span><span>✧</span><span>❄</span><span>✧</span><span>❄</span></span><span class="nick color-mountain4 anim-breath">Player#0001</span></span></div>
+<div class="note">❄ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E1.5 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>❄</span><span>✧</span><span>❄</span><span>✧</span><span>❄</span></span><span class="nick color-mountain5 anim-breath">Player#0001</span></span></div>
+<div class="note">❄ цвет + движение + эффект стихии</div>
+</div></div>
+<h3>☀ Степи — 5 оттенков</h3>
+<div class="grid">
+
+
+
+
+</div>
+<h3>☀ Степи — те же 5 оттенков + эффекты</h3>
+<div class="grid">
+<div class="shop-card">
+<div class="label">E2.1 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>●</span><span>◉</span><span>●</span><span>◉</span><span>●</span></span><span class="nick color-steppe1 anim-slideSoft">Player#0001</span></span></div>
+<div class="note">☀ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E2.2 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>●</span><span>◉</span><span>●</span><span>◉</span><span>●</span></span><span class="nick color-steppe2 anim-slideSoft">Player#0001</span></span></div>
+<div class="note">☀ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E2.3 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>●</span><span>◉</span><span>●</span><span>◉</span><span>●</span></span><span class="nick color-steppe3 anim-slideSoft">Player#0001</span></span></div>
+<div class="note">☀ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E2.4 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>●</span><span>◉</span><span>●</span><span>◉</span><span>●</span></span><span class="nick color-steppe4 anim-slideSoft">Player#0001</span></span></div>
+<div class="note">☀ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E2.5 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>●</span><span>◉</span><span>●</span><span>◉</span><span>●</span></span><span class="nick color-steppe5 anim-slideSoft">Player#0001</span></span></div>
+<div class="note">☀ цвет + движение + эффект стихии</div>
+</div></div>
+<h3>☠ Тьма — 5 оттенков</h3>
+<div class="grid">
+
+
+
+
+</div>
+<h3>☠ Тьма — те же 5 оттенков + эффекты</h3>
+<div class="grid">
+<div class="shop-card">
+<div class="label">E3.1 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>☠</span><span>✧</span><span>☠</span><span>✧</span><span>☠</span></span><span class="nick color-dark1 anim-blinkSoft">Player#0001</span></span></div>
+<div class="note">☠ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E3.2 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>☠</span><span>✧</span><span>☠</span><span>✧</span><span>☠</span></span><span class="nick color-dark2 anim-blinkSoft">Player#0001</span></span></div>
+<div class="note">☠ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E3.3 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>☠</span><span>✧</span><span>☠</span><span>✧</span><span>☠</span></span><span class="nick color-dark3 anim-blinkSoft">Player#0001</span></span></div>
+<div class="note">☠ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E3.4 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>☠</span><span>✧</span><span>☠</span><span>✧</span><span>☠</span></span><span class="nick color-dark4 anim-blinkSoft">Player#0001</span></span></div>
+<div class="note">☠ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E3.5 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>☠</span><span>✧</span><span>☠</span><span>✧</span><span>☠</span></span><span class="nick color-dark5 anim-blinkSoft">Player#0001</span></span></div>
+<div class="note">☠ цвет + движение + эффект стихии</div>
+</div></div>
+<h3>🍃 Лес — 5 оттенков</h3>
+<div class="grid">
+
+
+
+
+</div>
+<h3>🍃 Лес — те же 5 оттенков + эффекты</h3>
+<div class="grid">
+<div class="shop-card">
+<div class="label">E4.1 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>🍃</span><span>•</span><span>🍃</span><span>•</span><span>🍃</span></span><span class="nick color-forest1 anim-floatY">Player#0001</span></span></div>
+<div class="note">🍃 цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E4.2 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>🍃</span><span>•</span><span>🍃</span><span>•</span><span>🍃</span></span><span class="nick color-forest2 anim-floatY">Player#0001</span></span></div>
+<div class="note">🍃 цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E4.3 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>🍃</span><span>•</span><span>🍃</span><span>•</span><span>🍃</span></span><span class="nick color-forest3 anim-floatY">Player#0001</span></span></div>
+<div class="note">🍃 цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E4.4 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>🍃</span><span>•</span><span>🍃</span><span>•</span><span>🍃</span></span><span class="nick color-forest4 anim-floatY">Player#0001</span></span></div>
+<div class="note">🍃 цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E4.5 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>🍃</span><span>•</span><span>🍃</span><span>•</span><span>🍃</span></span><span class="nick color-forest5 anim-floatY">Player#0001</span></span></div>
+<div class="note">🍃 цвет + движение + эффект стихии</div>
+</div></div>
+<h3>🔥 Нейтральные — 5 оттенков</h3>
+<div class="grid">
+
+
+
+
+</div>
+<h3>🔥 Нейтральные — те же 5 оттенков + эффекты</h3>
+<div class="grid">
+<div class="shop-card">
+<div class="label">E5.1 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>✹</span><span>•</span><span>✹</span><span>•</span><span>✹</span></span><span class="nick color-neutral1 anim-scalePulse">Player#0001</span></span></div>
+<div class="note">🔥 цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E5.2 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>✹</span><span>•</span><span>✹</span><span>•</span><span>✹</span></span><span class="nick color-neutral2 anim-scalePulse">Player#0001</span></span></div>
+<div class="note">🔥 цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E5.3 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>✹</span><span>•</span><span>✹</span><span>•</span><span>✹</span></span><span class="nick color-neutral3 anim-scalePulse">Player#0001</span></span></div>
+<div class="note">🔥 цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E5.4 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>✹</span><span>•</span><span>✹</span><span>•</span><span>✹</span></span><span class="nick color-neutral4 anim-scalePulse">Player#0001</span></span></div>
+<div class="note">🔥 цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E5.5 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>✹</span><span>•</span><span>✹</span><span>•</span><span>✹</span></span><span class="nick color-neutral5 anim-scalePulse">Player#0001</span></span></div>
+<div class="note">🔥 цвет + движение + эффект стихии</div>
+</div></div>
+<h3>○ Болото — 5 оттенков</h3>
+<div class="grid">
+
+
+
+
+</div>
+<h3>○ Болото — те же 5 оттенков + эффекты</h3>
+<div class="grid">
+<div class="shop-card">
+<div class="label">E6.1 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>○</span><span>◌</span><span>○</span><span>◌</span><span>○</span></span><span class="nick color-swamp1 anim-waveText">Player#0001</span></span></div>
+<div class="note">○ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E6.2 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>○</span><span>◌</span><span>○</span><span>◌</span><span>○</span></span><span class="nick color-swamp2 anim-waveText">Player#0001</span></span></div>
+<div class="note">○ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E6.3 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>○</span><span>◌</span><span>○</span><span>◌</span><span>○</span></span><span class="nick color-swamp3 anim-waveText">Player#0001</span></span></div>
+<div class="note">○ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E6.4 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>○</span><span>◌</span><span>○</span><span>◌</span><span>○</span></span><span class="nick color-swamp4 anim-waveText">Player#0001</span></span></div>
+<div class="note">○ цвет + движение + эффект стихии</div>
+</div>
+<div class="shop-card">
+<div class="label">E6.5 + FX</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>○</span><span>◌</span><span>○</span><span>◌</span><span>○</span></span><span class="nick color-swamp5 anim-waveText">Player#0001</span></span></div>
+<div class="note">○ цвет + движение + эффект стихии</div>
+</div></div>
+<h2>4. Особые — 2500 ₽</h2>
+<div class="special-grid">
+<div class="shop-card">
+<div class="label">S1</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>♥</span><span>♡</span><span>♥</span><span>♡</span><span>♥</span></span><span class="nick special-valentine">Валентинка</span></span></div>
+<div class="note">Валентинка — розовое сердце, мягкий премиум-вайб</div>
+</div>
+<div class="shop-card">
+<div class="label">S2</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>☁</span><span>◌</span><span>☁</span><span>◌</span><span>☁</span></span><span class="nick special-dark">Dark</span></span></div>
+<div class="note">Dark — чёрный перелив, дым и глубокая тень</div>
+</div>
+<div class="shop-card">
+<div class="label">S3</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>◆</span><span>◇</span><span>◆</span><span>◇</span><span>◆</span></span><span class="nick special-bw">ЧБ</span></span></div>
+<div class="note">ЧБ — чёрно-белый контраст, минимализм и шахматный стиль</div>
+</div>
+<div class="shop-card">
+<div class="label">S4</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>●</span><span>◉</span><span>●</span><span>◉</span><span>●</span></span><span class="nick special-brown">Brown</span></span></div>
+<div class="note">Brown — коричневый в тёмный коричневый, тяжёлый премиум</div>
+</div>
+<div class="shop-card">
+<div class="label">S6</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>♥</span><span>✦</span><span>♥</span><span>✦</span><span>♥</span></span><span class="nick special-redwine">Bordeaux</span></span></div>
+<div class="note">Bordeaux — красный в бордовый, бархат и кровь</div>
+</div>
+<div class="shop-card">
+<div class="label">S8</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>✦</span><span>♥</span><span>✧</span><span>♥</span><span>✦</span></span><span class="nick special-pride">Pride</span></span></div>
+<div class="note">Pride — все цвета радуги, яркий праздничный эффект</div>
+</div>
+<div class="shop-card">
+<div class="label">S12</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>⚡</span><span>●</span><span>⚡</span><span>●</span><span>⚡</span></span><span class="nick special-police">Police</span></span></div>
+<div class="note">Police — синий и красный, мигалка и резкий контраст</div>
+</div>
+<div class="shop-card">
+<div class="label">S13</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>⚠</span><span>✦</span><span>⚠</span><span>✦</span><span>⚠</span></span><span class="nick special-quarantine">Quarantine</span></span></div>
+<div class="note">Quarantine — чёрный/жёлтый, опасная маркировка</div>
+</div>
+<div class="shop-card">
+<div class="label">S16</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>✹</span><span>●</span><span>✹</span><span>●</span><span>✹</span></span><span class="nick special-orangeblack">Оранжево-чёрный</span></span></div>
+<div class="note">Жёлто-фиолетовый — мистический контраст</div>
+</div>
+<div class="shop-card">
+<div class="label">S20</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>●</span><span>✦</span><span>●</span><span>✦</span><span>●</span></span><span class="nick special-greenred">Зелёно-красный</span></span></div>
+<div class="note">Зелёно-красный — старт/стоп, разрешено/запрещено</div>
+</div>
+<div class="shop-card">
+<div class="label">S21</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>⚠</span><span>✦</span><span>⚠</span><span>✦</span><span>⚠</span></span><span class="nick special-blueyellow">Сине-жёлтый</span></span></div>
+<div class="note">Сине-жёлтый — внимание, предупреждение, символика</div>
+</div>
+<div class="shop-card">
+<div class="label">S26</div>
+<div class="preview"><span class="nick-wrap"><span class="particle"><span>⚙</span><span>✦</span><span>⚙</span><span>✦</span><span>⚙</span></span><span class="nick special-blueorange">Сине-оранжевый</span></span></div>
+<div class="note">Сине-оранжевый — спасатели, техника, контрастная маркировка</div>
+</div></div>
+</div>
+</div>
+</body>
+</html>
