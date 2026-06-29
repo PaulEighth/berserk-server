@@ -168,52 +168,6 @@ h3{margin:24px 0 12px;color:#fff;font-size:24px;letter-spacing:-.03em}
   animation:flow 3.2s linear infinite !important;
 }
 
-
-
-/* ===== FINAL ELEMENTAL FLOW FIX =====
-   Исправляет 4 и 5 столбцы стихий: цвет ника снова переливается.
-   Причина: обычные anim-* классы и стихийный flow используют одно свойство animation,
-   поэтому без этих правил одна анимация может перетирать другую. */
-.color-mountain1,.color-mountain2,.color-mountain3,.color-mountain4,.color-mountain5,
-.color-steppe1,.color-steppe2,.color-steppe3,.color-steppe4,.color-steppe5,
-.color-dark1,.color-dark2,.color-dark3,.color-dark4,.color-dark5,
-.color-forest1,.color-forest2,.color-forest3,.color-forest4,.color-forest5,
-.color-neutral1,.color-neutral2,.color-neutral3,.color-neutral4,.color-neutral5,
-.color-swamp1,.color-swamp2,.color-swamp3,.color-swamp4,.color-swamp5{
-  background-size:520% 100% !important;
-  -webkit-background-clip:text !important;
-  background-clip:text !important;
-  -webkit-text-fill-color:transparent !important;
-  color:transparent !important;
-}
-
-/* 4-5 уровни сделаны контрастнее, чтобы перелив был виден даже на тёмном фоне */
-.color-mountain4{background:linear-gradient(90deg,#eaf7ff,#5f8fd6,#071f55,#5f8fd6,#eaf7ff) !important;filter:drop-shadow(0 0 16px #5f8fd6cc) !important}
-.color-mountain5{background:linear-gradient(90deg,#ffffff,#2f6eea,#000814,#2f6eea,#ffffff) !important;filter:drop-shadow(0 0 18px #2f6eeacc) !important}
-
-.color-steppe4{background:linear-gradient(90deg,#ffe6a3,#c67822,#2a1203,#c67822,#ffe6a3) !important;filter:drop-shadow(0 0 16px #c67822cc) !important}
-.color-steppe5{background:linear-gradient(90deg,#fff1b8,#9d4f0f,#050200,#9d4f0f,#fff1b8) !important;filter:drop-shadow(0 0 18px #9d4f0fcc) !important}
-
-.color-dark4{background:linear-gradient(90deg,#c9a8ff,#4a247a,#050009,#4a247a,#c9a8ff) !important;filter:drop-shadow(0 0 16px #7f4dffcc) !important}
-.color-dark5{background:linear-gradient(90deg,#b68cff,#2d115c,#000000,#2d115c,#b68cff) !important;filter:drop-shadow(0 0 18px #8d57ffcc) !important}
-
-.color-forest4{background:linear-gradient(90deg,#b8ffbf,#1b8c48,#011b0c,#1b8c48,#b8ffbf) !important;filter:drop-shadow(0 0 16px #1b8c48cc) !important}
-.color-forest5{background:linear-gradient(90deg,#9cffc5,#0b7a3a,#000704,#0b7a3a,#9cffc5) !important;filter:drop-shadow(0 0 18px #0b7a3acc) !important}
-
-.color-neutral4{background:linear-gradient(90deg,#ffb3b3,#b40017,#1d0003,#b40017,#ffb3b3) !important;filter:drop-shadow(0 0 16px #b40017cc) !important}
-.color-neutral5{background:linear-gradient(90deg,#ffd0d0,#8f0018,#050000,#8f0018,#ffd0d0) !important;filter:drop-shadow(0 0 18px #8f0018cc) !important}
-
-.color-swamp4{background:linear-gradient(90deg,#bffff8,#00756c,#001316,#00756c,#bffff8) !important;filter:drop-shadow(0 0 16px #00756ccc) !important}
-.color-swamp5{background:linear-gradient(90deg,#a8fff5,#006b65,#000606,#006b65,#a8fff5) !important;filter:drop-shadow(0 0 18px #006b65cc) !important}
-
-/* Совмещаем перелив цвета с движением конкретной стихии */
-.color-mountain1.anim-breath,.color-mountain2.anim-breath,.color-mountain3.anim-breath,.color-mountain4.anim-breath,.color-mountain5.anim-breath{animation:flow 3.2s linear infinite,breath 3s ease-in-out infinite !important}
-.color-steppe1.anim-slideSoft,.color-steppe2.anim-slideSoft,.color-steppe3.anim-slideSoft,.color-steppe4.anim-slideSoft,.color-steppe5.anim-slideSoft{animation:flow 3.2s linear infinite,slideSoft 2.5s ease-in-out infinite !important}
-.color-dark1.anim-blinkSoft,.color-dark2.anim-blinkSoft,.color-dark3.anim-blinkSoft,.color-dark4.anim-blinkSoft,.color-dark5.anim-blinkSoft{animation:flow 3.2s linear infinite,blinkSoft 2s ease-in-out infinite !important}
-.color-forest1.anim-floatY,.color-forest2.anim-floatY,.color-forest3.anim-floatY,.color-forest4.anim-floatY,.color-forest5.anim-floatY{animation:flow 3.2s linear infinite,floatY 2.6s ease-in-out infinite !important}
-.color-neutral1.anim-scalePulse,.color-neutral2.anim-scalePulse,.color-neutral3.anim-scalePulse,.color-neutral4.anim-scalePulse,.color-neutral5.anim-scalePulse{animation:flow 3.2s linear infinite,scalePulse 2s ease-in-out infinite !important}
-.color-swamp1.anim-waveText,.color-swamp2.anim-waveText,.color-swamp3.anim-waveText,.color-swamp4.anim-waveText,.color-swamp5.anim-waveText{animation:flow 3.2s linear infinite,waveText 2.4s ease-in-out infinite !important}
-
 </style>
 </head>
 <body>
