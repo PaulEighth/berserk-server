@@ -1,36 +1,673 @@
 /* ===== NICK EFFECTS — Berserk Heroes Online ===== */
 /* Подключай этот CSS ко всем HTML, где должны отображаться красивые ники. */
-
-.nick{display:inline-block;font-size:clamp(20px,2vw,32px);font-weight:950;letter-spacing:-.035em;line-height:1.15}
-.base-white{color:#fff;text-shadow:0 0 10px rgba(255,255,255,.2)}
-.note{margin-top:8px;color:#9f978c;font-size:13px}
-.nick-wrap{position:relative;display:inline-flex;align-items:center;min-height:46px}
-.particle{position:absolute;inset:-30px -40px;pointer-events:none;overflow:hidden}
-.particle span{position:absolute;font-size:16px;opacity:0;animation:floatItem 4s linear infinite}
-.particle span:nth-child(1){left:12%;animation-delay:.1s}.particle span:nth-child(2){left:28%;animation-delay:.9s}.particle span:nth-child(3){left:52%;animation-delay:1.7s}.particle span:nth-child(4){left:75%;animation-delay:2.4s}.particle span:nth-child(5){left:88%;animation-delay:3.1s}
-.anim-scalePulse{animation:scalePulse 2s ease-in-out infinite}.anim-slideSoft{animation:slideSoft 2.5s ease-in-out infinite}.anim-jump{animation:jump 1.8s ease-in-out infinite}.anim-shakeX{animation:shakeX .45s linear infinite}.anim-rotateTiny{animation:rotateTiny 2.2s ease-in-out infinite}.anim-breath{animation:breath 3s ease-in-out infinite}.anim-waveText{animation:waveText 2.4s ease-in-out infinite}.anim-blinkSoft{animation:blinkSoft 2s ease-in-out infinite}.anim-floatY{animation:floatY 2.6s ease-in-out infinite}.anim-heartbeat{animation:heartbeat 1.4s ease-in-out infinite}
-.color-mountain1{background:linear-gradient(90deg,#ffffff,#effcff,#bfe7ff,#ffffff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #ffffffaa)}.color-mountain2{background:linear-gradient(90deg,#eefaff,#bfe7ff,#7dbdff,#eefaff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #eefaffaa)}.color-mountain3{background:linear-gradient(90deg,#d7e8ff,#7b9bd6,#304c8f,#d7e8ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #d7e8ffaa)}.color-mountain4{background:linear-gradient(90deg,#b8d8ff,#5b78bf,#182c68,#b8d8ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #b8d8ffaa)}.color-mountain5{background:linear-gradient(90deg,#e8f6ff,#4566b8,#071535,#e8f6ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #e8f6ffaa)}.color-steppe1{background:linear-gradient(90deg,#fff8d6,#fff0b0,#ffd36d,#fff8d6);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #fff8d6aa)}.color-steppe2{background:linear-gradient(90deg,#fff0b0,#ffd36d,#e8a83a,#fff0b0);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #fff0b0aa)}.color-steppe3{background:linear-gradient(90deg,#ffe28a,#fff5c8,#d6a84f,#ffe28a);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #ffe28aaa)}.color-steppe4{background:linear-gradient(90deg,#f0b45c,#c77a2e,#6f3b12,#f0b45c);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #f0b45caa)}.color-steppe5{background:linear-gradient(90deg,#fff4b8,#b47a1f,#3a2108,#fff4b8);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #fff4b8aa)}.color-dark1{background:linear-gradient(90deg,#f1e8ff,#c7a7ff,#7d4dff,#f1e8ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #f1e8ffaa)}.color-dark2{background:linear-gradient(90deg,#c7a7ff,#8d57ff,#35145e,#c7a7ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #c7a7ffaa)}.color-dark3{background:linear-gradient(90deg,#b889ff,#6d35ff,#12081f,#b889ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #b889ffaa)}.color-dark4{background:linear-gradient(90deg,#8a63ff,#3b176e,#050509,#8a63ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #8a63ffaa)}.color-dark5{background:linear-gradient(90deg,#6b35ff,#111111,#000000,#6b35ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #6b35ffaa)}.color-forest1{background:linear-gradient(90deg,#efffdf,#b8ffbd,#52ff9a,#efffdf);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #efffdfaa)}.color-forest2{background:linear-gradient(90deg,#d8ffb0,#8dff7a,#1fa84f,#d8ffb0);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #d8ffb0aa)}.color-forest3{background:linear-gradient(90deg,#b8ffbd,#52ff9a,#008a4d,#b8ffbd);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #b8ffbdaa)}.color-forest4{background:linear-gradient(90deg,#8bff8b,#1eb85d,#064f2c,#8bff8b);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #8bff8baa)}.color-forest5{background:linear-gradient(90deg,#9cffc5,#008044,#061f12,#9cffc5);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #9cffc5aa)}.color-neutral1{background:linear-gradient(90deg,#fff3d0,#ffd36d,#ff9d42,#fff3d0);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #fff3d0aa)}.color-neutral2{background:linear-gradient(90deg,#fff0a8,#ff9d42,#ff4b2b,#fff0a8);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #fff0a8aa)}.color-neutral3{background:linear-gradient(90deg,#ffd36d,#ff6a2a,#7a0b00,#ffd36d);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #ffd36daa)}.color-neutral4{background:linear-gradient(90deg,#ff6b6b,#b50000,#280000,#ff6b6b);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #ff6b6baa)}.color-neutral5{background:linear-gradient(90deg,#fff5c8,#ff7a18,#320800,#fff5c8);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #fff5c8aa)}.color-swamp1{background:linear-gradient(90deg,#e8fff9,#b7fff2,#74ffe4,#e8fff9);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #e8fff9aa)}.color-swamp2{background:linear-gradient(90deg,#d8fff7,#74ffe4,#00a896,#d8fff7);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #d8fff7aa)}.color-swamp3{background:linear-gradient(90deg,#9fffe8,#2ee6c4,#00756c,#9fffe8);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #9fffe8aa)}.color-swamp4{background:linear-gradient(90deg,#5ee7ff,#008fa3,#002d34,#5ee7ff);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #5ee7ffaa)}.color-swamp5{background:linear-gradient(90deg,#b7fff2,#008f83,#001f24,#b7fff2);background-size:380% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 3.5s linear infinite;filter:drop-shadow(0 0 15px #b7fff2aa)}
-.special-valentine{background:linear-gradient(90deg,#ff4b8d,#ffffff,#ff9ac9,#ff4b8d);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,heartbeat 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ff9ac9cc)}.special-dark{background:linear-gradient(90deg,#000000,#161616,#050505,#000000);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,slideSoft 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #050505cc)}.special-bw{background:linear-gradient(90deg,#000000,#ffffff,#000000,#000000);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,waveText 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #000000cc)}.special-brown{background:linear-gradient(90deg,#8b5a2b,#4b2b12,#1e1007,#8b5a2b);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,breath 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #1e1007cc)}.special-yellowgold{background:linear-gradient(90deg,#ffe45c,#ffffff,#d6a84f,#ffe45c);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,scalePulse 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #d6a84fcc)}.special-redwine{background:linear-gradient(90deg,#ff2b2b,#8b0018,#2a0008,#ff2b2b);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,heartbeat 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #2a0008cc)}.special-orangefire{background:linear-gradient(90deg,#ff9d42,#ff5e00,#5a1900,#ff9d42);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,shakeX 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #5a1900cc)}.special-pride{background:linear-gradient(90deg,#ff004c,#ffea00,#00ff88,#00c8ff,#8b5cff,#ff004c);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,scalePulse 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #00c8ff,#8b5cffcc)}.special-darkpride{background:linear-gradient(90deg,#320016,#0b1630,#103018,#3b176e,#320016);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,blinkSoft 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #3b176ecc)}.special-male{background:linear-gradient(90deg,#5a351a,#073b24,#0b1d4f,#2d0f4f,#5a351a);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,slideSoft 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #2d0f4fcc)}.special-female{background:linear-gradient(90deg,#ff7abf,#ffe45c,#ff8a2a,#ff7abf);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,floatY 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ff8a2acc)}.special-police{background:linear-gradient(90deg,#005eff,#ffffff,#ff1f3d,#005eff);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,shakeX 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ff1f3dcc)}.special-quarantine{background:linear-gradient(90deg,#000000,#ffe600,#000000,#ffe600,#000000);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,scalePulse 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ffe600cc)}.special-redwhite{background:linear-gradient(90deg,#ff1f3d,#ffffff,#b00018,#ff1f3d);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,blinkSoft 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #b00018cc)}.special-yellowblack{background:linear-gradient(90deg,#ffe600,#000000,#ffe600,#ffe600);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,shakeX 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ffe600cc)}.special-orangeblack{background:linear-gradient(90deg,#ffe600,#7b2cff,#ffe600,#ff7a18);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,jump 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ff9d42cc)}.special-greenwhite{background:linear-gradient(90deg,#00d66f,#ffffff,#007a3d,#00d66f);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,breath 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #007a3dcc)}.special-bluewhite{background:linear-gradient(90deg,#007bff,#ffffff,#003f9e,#007bff);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,waveText 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #003f9ecc)}.special-redyellow{background:linear-gradient(90deg,#ff1f3d,#ffe600,#ff6a00,#ff1f3d);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,scalePulse 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ff6a00cc)}.special-greenred{background:linear-gradient(90deg,#00d66f,#ff1f3d,#005c2f,#00d66f);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,slideSoft 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #005c2fcc)}.special-blueyellow{background:linear-gradient(90deg,#005eff,#ffe600,#003a9e,#005eff);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,jump 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #003a9ecc)}.special-whitered{background:linear-gradient(90deg,#ffffff,#ff1f3d,#ffffff,#ffffff);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,heartbeat 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #ffffffcc)}.special-blackwhite{background:linear-gradient(90deg,#000000,#ffffff,#000000,#000000);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,breath 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #000000cc)}.special-purpleblack{background:linear-gradient(90deg,#8d57ff,#000000,#3b176e,#8d57ff);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,blinkSoft 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #3b176ecc)}.special-greenyellow{background:linear-gradient(90deg,#00d66f,#ffe600,#1f7a00,#00d66f);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,floatY 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #1f7a00cc)}.special-blueorange{background:linear-gradient(90deg,#005eff,#ff7a18,#002e7a,#005eff);background-size:440% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:flow 2.7s linear infinite,shakeX 2.4s ease-in-out infinite;filter:drop-shadow(0 0 18px #002e7acc)}
-@keyframes spin{to{transform:rotate(360deg)}}@keyframes flow{from{background-position:0% 50%}to{background-position:440% 50%}}
-@keyframes scalePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}@keyframes slideSoft{0%,100%{transform:translateX(0)}50%{transform:translateX(14px)}}@keyframes jump{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}@keyframes shakeX{0%,100%{transform:translateX(0)}33%{transform:translateX(2px)}66%{transform:translateX(-2px)}}@keyframes rotateTiny{0%,100%{transform:rotate(0)}50%{transform:rotate(-4deg)}}@keyframes breath{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.04);opacity:1}}@keyframes waveText{0%,100%{transform:skewX(0)}50%{transform:skewX(-8deg)}}@keyframes blinkSoft{0%,100%{opacity:.55}50%{opacity:1}}@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}@keyframes heartbeat{0%,100%{transform:scale(1)}20%{transform:scale(1.08)}35%{transform:scale(.98)}50%{transform:scale(1.12)}}
-@keyframes floatItem{0%{top:82%;opacity:0;transform:translateY(0) scale(.7) rotate(0)}20%{opacity:1}80%{opacity:1}100%{top:4%;opacity:0;transform:translateY(-10px) scale(1.15) rotate(25deg)}}
+.nick {
+    display:inline-block;
+    font-size:clamp(20px,2vw,32px);
+    font-weight:950;
+    letter-spacing:-.035em;
+    line-height:1.15
+}
+.base-white {
+    color:#fff;
+    text-shadow:0 0 10px rgba(255,255,255,.2)
+}
+.note {
+    margin-top:8px;
+    color:#9f978c;
+    font-size:13px
+}
+.nick-wrap {
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    min-height:46px
+}
+.particle {
+    position:absolute;
+    inset:-30px -40px;
+    pointer-events:none;
+    overflow:hidden
+}
+.particle span {
+    position:absolute;
+    font-size:16px;
+    opacity:0;
+    animation:floatItem 4s linear infinite
+}
+.particle span:nth-child(1) {
+    left:12%;
+    animation-delay:.1s
+}
+.particle span:nth-child(2) {
+    left:28%;
+    animation-delay:.9s
+}
+.particle span:nth-child(3) {
+    left:52%;
+    animation-delay:1.7s
+}
+.particle span:nth-child(4) {
+    left:75%;
+    animation-delay:2.4s
+}
+.particle span:nth-child(5) {
+    left:88%;
+    animation-delay:3.1s
+}
+.anim-scalePulse {
+    animation:scalePulse 2s ease-in-out infinite
+}
+.anim-slideSoft {
+    animation:slideSoft 2.5s ease-in-out infinite
+}
+.anim-jump {
+    animation:jump 1.8s ease-in-out infinite
+}
+.anim-shakeX {
+    animation:shakeX .45s linear infinite
+}
+.anim-rotateTiny {
+    animation:rotateTiny 2.2s ease-in-out infinite
+}
+.anim-breath {
+    animation:breath 3s ease-in-out infinite
+}
+.anim-waveText {
+    animation:waveText 2.4s ease-in-out infinite
+}
+.anim-blinkSoft {
+    animation:blinkSoft 2s ease-in-out infinite
+}
+.anim-floatY {
+    animation:floatY 2.6s ease-in-out infinite
+}
+.anim-heartbeat {
+    animation:heartbeat 1.4s ease-in-out infinite
+}
+.color-mountain1 {
+    background:linear-gradient(90deg,#ffffff,#effcff,#bfe7ff,#ffffff);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #ffffffaa)
+}
+.color-mountain2 {
+    background:linear-gradient(90deg,#eefaff,#bfe7ff,#7dbdff,#eefaff);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #eefaffaa)
+}
+.color-mountain3 {
+    background:linear-gradient(90deg,#d7e8ff,#7b9bd6,#304c8f,#d7e8ff);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #d7e8ffaa)
+}
+.color-mountain4 {
+    background:linear-gradient(90deg,#b8d8ff,#5b78bf,#182c68,#b8d8ff);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #b8d8ffaa)
+}
+.color-mountain5 {
+    background:linear-gradient(90deg,#e8f6ff,#4566b8,#071535,#e8f6ff);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #e8f6ffaa)
+}
+.color-steppe1 {
+    background:linear-gradient(90deg,#fff8d6,#fff0b0,#ffd36d,#fff8d6);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #fff8d6aa)
+}
+.color-steppe2 {
+    background:linear-gradient(90deg,#fff0b0,#ffd36d,#e8a83a,#fff0b0);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #fff0b0aa)
+}
+.color-steppe3 {
+    background:linear-gradient(90deg,#ffe28a,#fff5c8,#d6a84f,#ffe28a);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #ffe28aaa)
+}
+.color-steppe4 {
+    background:linear-gradient(90deg,#f0b45c,#c77a2e,#6f3b12,#f0b45c);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #f0b45caa)
+}
+.color-steppe5 {
+    background:linear-gradient(90deg,#fff4b8,#b47a1f,#3a2108,#fff4b8);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #fff4b8aa)
+}
+.color-dark1 {
+    background:linear-gradient(90deg,#f1e8ff,#c7a7ff,#7d4dff,#f1e8ff);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #f1e8ffaa)
+}
+.color-dark2 {
+    background:linear-gradient(90deg,#c7a7ff,#8d57ff,#35145e,#c7a7ff);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #c7a7ffaa)
+}
+.color-dark3 {
+    background:linear-gradient(90deg,#b889ff,#6d35ff,#12081f,#b889ff);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #b889ffaa)
+}
+.color-dark4 {
+    background:linear-gradient(90deg,#8a63ff,#3b176e,#050509,#8a63ff);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #8a63ffaa)
+}
+.color-dark5 {
+    background:linear-gradient(90deg,#6b35ff,#111111,#000000,#6b35ff);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #6b35ffaa)
+}
+.color-forest1 {
+    background:linear-gradient(90deg,#efffdf,#b8ffbd,#52ff9a,#efffdf);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #efffdfaa)
+}
+.color-forest2 {
+    background:linear-gradient(90deg,#d8ffb0,#8dff7a,#1fa84f,#d8ffb0);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #d8ffb0aa)
+}
+.color-forest3 {
+    background:linear-gradient(90deg,#b8ffbd,#52ff9a,#008a4d,#b8ffbd);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #b8ffbdaa)
+}
+.color-forest4 {
+    background:linear-gradient(90deg,#8bff8b,#1eb85d,#064f2c,#8bff8b);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #8bff8baa)
+}
+.color-forest5 {
+    background:linear-gradient(90deg,#9cffc5,#008044,#061f12,#9cffc5);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #9cffc5aa)
+}
+.color-neutral1 {
+    background:linear-gradient(90deg,#fff3d0,#ffd36d,#ff9d42,#fff3d0);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #fff3d0aa)
+}
+.color-neutral2 {
+    background:linear-gradient(90deg,#fff0a8,#ff9d42,#ff4b2b,#fff0a8);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #fff0a8aa)
+}
+.color-neutral3 {
+    background:linear-gradient(90deg,#ffd36d,#ff6a2a,#7a0b00,#ffd36d);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #ffd36daa)
+}
+.color-neutral4 {
+    background:linear-gradient(90deg,#ff6b6b,#b50000,#280000,#ff6b6b);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #ff6b6baa)
+}
+.color-neutral5 {
+    background:linear-gradient(90deg,#fff5c8,#ff7a18,#320800,#fff5c8);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #fff5c8aa)
+}
+.color-swamp1 {
+    background:linear-gradient(90deg,#e8fff9,#b7fff2,#74ffe4,#e8fff9);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #e8fff9aa)
+}
+.color-swamp2 {
+    background:linear-gradient(90deg,#d8fff7,#74ffe4,#00a896,#d8fff7);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #d8fff7aa)
+}
+.color-swamp3 {
+    background:linear-gradient(90deg,#9fffe8,#2ee6c4,#00756c,#9fffe8);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #9fffe8aa)
+}
+.color-swamp4 {
+    background:linear-gradient(90deg,#5ee7ff,#008fa3,#002d34,#5ee7ff);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #5ee7ffaa)
+}
+.color-swamp5 {
+    background:linear-gradient(90deg,#b7fff2,#008f83,#001f24,#b7fff2);
+    background-size:380% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 3.5s linear infinite;
+    filter:drop-shadow(0 0 15px #b7fff2aa)
+}
+.special-valentine {
+    background:linear-gradient(90deg,#ff4b8d,#ffffff,#ff9ac9,#ff4b8d);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,heartbeat 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #ff9ac9cc)
+}
+.special-dark {
+    background:linear-gradient(90deg,#000000,#161616,#050505,#000000);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,slideSoft 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #050505cc)
+}
+.special-bw {
+    background:linear-gradient(90deg,#000000,#ffffff,#000000,#000000);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,waveText 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #000000cc)
+}
+.special-brown {
+    background:linear-gradient(90deg,#8b5a2b,#4b2b12,#1e1007,#8b5a2b);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,breath 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #1e1007cc)
+}
+.special-yellowgold {
+    background:linear-gradient(90deg,#ffe45c,#ffffff,#d6a84f,#ffe45c);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,scalePulse 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #d6a84fcc)
+}
+.special-redwine {
+    background:linear-gradient(90deg,#ff2b2b,#8b0018,#2a0008,#ff2b2b);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,heartbeat 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #2a0008cc)
+}
+.special-orangefire {
+    background:linear-gradient(90deg,#ff9d42,#ff5e00,#5a1900,#ff9d42);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,shakeX 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #5a1900cc)
+}
+.special-pride {
+    background:linear-gradient(90deg,#ff004c,#ffea00,#00ff88,#00c8ff,#8b5cff,#ff004c);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,scalePulse 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #00c8ff,#8b5cffcc)
+}
+.special-darkpride {
+    background:linear-gradient(90deg,#320016,#0b1630,#103018,#3b176e,#320016);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,blinkSoft 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #3b176ecc)
+}
+.special-male {
+    background:linear-gradient(90deg,#5a351a,#073b24,#0b1d4f,#2d0f4f,#5a351a);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,slideSoft 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #2d0f4fcc)
+}
+.special-female {
+    background:linear-gradient(90deg,#ff7abf,#ffe45c,#ff8a2a,#ff7abf);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,floatY 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #ff8a2acc)
+}
+.special-police {
+    background:linear-gradient(90deg,#005eff,#ffffff,#ff1f3d,#005eff);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,shakeX 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #ff1f3dcc)
+}
+.special-quarantine {
+    background:linear-gradient(90deg,#000000,#ffe600,#000000,#ffe600,#000000);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,scalePulse 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #ffe600cc)
+}
+.special-redwhite {
+    background:linear-gradient(90deg,#ff1f3d,#ffffff,#b00018,#ff1f3d);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,blinkSoft 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #b00018cc)
+}
+.special-yellowblack {
+    background:linear-gradient(90deg,#ffe600,#000000,#ffe600,#ffe600);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,shakeX 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #ffe600cc)
+}
+.special-orangeblack {
+    background:linear-gradient(90deg,#ffe600,#7b2cff,#ffe600,#ff7a18);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,jump 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #ff9d42cc)
+}
+.special-greenwhite {
+    background:linear-gradient(90deg,#00d66f,#ffffff,#007a3d,#00d66f);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,breath 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #007a3dcc)
+}
+.special-bluewhite {
+    background:linear-gradient(90deg,#007bff,#ffffff,#003f9e,#007bff);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,waveText 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #003f9ecc)
+}
+.special-redyellow {
+    background:linear-gradient(90deg,#ff1f3d,#ffe600,#ff6a00,#ff1f3d);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,scalePulse 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #ff6a00cc)
+}
+.special-greenred {
+    background:linear-gradient(90deg,#00d66f,#ff1f3d,#005c2f,#00d66f);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,slideSoft 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #005c2fcc)
+}
+.special-blueyellow {
+    background:linear-gradient(90deg,#005eff,#ffe600,#003a9e,#005eff);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,jump 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #003a9ecc)
+}
+.special-whitered {
+    background:linear-gradient(90deg,#ffffff,#ff1f3d,#ffffff,#ffffff);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,heartbeat 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #ffffffcc)
+}
+.special-blackwhite {
+    background:linear-gradient(90deg,#000000,#ffffff,#000000,#000000);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,breath 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #000000cc)
+}
+.special-purpleblack {
+    background:linear-gradient(90deg,#8d57ff,#000000,#3b176e,#8d57ff);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,blinkSoft 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #3b176ecc)
+}
+.special-greenyellow {
+    background:linear-gradient(90deg,#00d66f,#ffe600,#1f7a00,#00d66f);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,floatY 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #1f7a00cc)
+}
+.special-blueorange {
+    background:linear-gradient(90deg,#005eff,#ff7a18,#002e7a,#005eff);
+    background-size:440% 100%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:flow 2.7s linear infinite,shakeX 2.4s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px #002e7acc)
+}
+@keyframes spin {
+    to {
+        transform:rotate(360deg)
+    }
+}
+@keyframes flow {
+    from {
+        background-position:0% 50%
+    }
+    to {
+        background-position:440% 50%
+    }
+}
+@keyframes scalePulse {
+    0%,100% {
+        transform:scale(1)
+    }
+    50% {
+        transform:scale(1.08)
+    }
+}
+@keyframes slideSoft {
+    0%,100% {
+        transform:translateX(0)
+    }
+    50% {
+        transform:translateX(14px)
+    }
+}
+@keyframes jump {
+    0%,100% {
+        transform:translateY(0)
+    }
+    50% {
+        transform:translateY(-8px)
+    }
+}
+@keyframes shakeX {
+    0%,100% {
+        transform:translateX(0)
+    }
+    33% {
+        transform:translateX(2px)
+    }
+    66% {
+        transform:translateX(-2px)
+    }
+}
+@keyframes rotateTiny {
+    0%,100% {
+        transform:rotate(0)
+    }
+    50% {
+        transform:rotate(-4deg)
+    }
+}
+@keyframes breath {
+    0%,100% {
+        transform:scale(1);
+        opacity:.85
+    }
+    50% {
+        transform:scale(1.04);
+        opacity:1
+    }
+}
+@keyframes waveText {
+    0%,100% {
+        transform:skewX(0)
+    }
+    50% {
+        transform:skewX(-8deg)
+    }
+}
+@keyframes blinkSoft {
+    0%,100% {
+        opacity:.55
+    }
+    50% {
+        opacity:1
+    }
+}
+@keyframes floatY {
+    0%,100% {
+        transform:translateY(0)
+    }
+    50% {
+        transform:translateY(-7px)
+    }
+}
+@keyframes heartbeat {
+    0%,100% {
+        transform:scale(1)
+    }
+    20% {
+        transform:scale(1.08)
+    }
+    35% {
+        transform:scale(.98)
+    }
+    50% {
+        transform:scale(1.12)
+    }
+}
+@keyframes floatItem {
+    0% {
+        top:82%;
+        opacity:0;
+        transform:translateY(0) scale(.7) rotate(0)
+    }
+    20% {
+        opacity:1
+    }
+    80% {
+        opacity:1
+    }
+    100% {
+        top:4%;
+        opacity:0;
+        transform:translateY(-10px) scale(1.15) rotate(25deg)
+    }
+}
 /* Ник в кнопке аккаунта — обычный размер */
 /* Ник в кнопке аккаунта */
-.btn .nick-wrap{
-  min-height:auto !important;
+.btn .nick-wrap {
+    min-height:auto !important;
 }
-
-.btn .nick{
-  font-size:inherit !important;
-  line-height:inherit !important;
-  font-weight:inherit !important;
-  letter-spacing:inherit !important;
+.btn .nick {
+    font-size:inherit !important;
+    line-height:inherit !important;
+    font-weight:inherit !important;
+    letter-spacing:inherit !important;
 }
-
-.btn .particle{
-  inset:-14px -18px !important;
+.btn .particle {
+    inset:-14px -18px !important;
 }
-
-.btn .particle span{
-  font-size:10px !important;
+.btn .particle span {
+    font-size:10px !important;
 }
