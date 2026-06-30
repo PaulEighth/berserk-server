@@ -34,18 +34,3 @@
 .btn .particle span{
   font-size:10px !important;
 }
-/* HARD FIX: E1.4 / E1.5 и все 4/5 уровни явно переливаются */
-.color-mountain4,.color-mountain5,
-.color-steppe4,.color-steppe5,
-.color-dark4,.color-dark5,
-.color-forest4,.color-forest5,
-.color-neutral4,.color-neutral5,
-.color-swamp4,.color-swamp5{
-  background-size:900% 100% !important;
-  background-position:0% 50%;
-  -webkit-background-clip:text !important;
-  background-clip:text !important;
-  color:transparent !important;
-  -webkit-text-fill-color:transparent !important;
-  animation:flow 1.6s linear infinite, breath 3s ease-in-out infinite !important;
-}
