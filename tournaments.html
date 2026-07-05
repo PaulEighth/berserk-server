@@ -3282,7 +3282,7 @@ html body .bracket-cell.alive{
         <label><span class="label">Дата окончания</span><input class="field" id="requestEndDate" type="datetime-local"></label>
         <label><span class="label">Формат</span><select class="select" id="requestFormat" onchange="toggleTournamentBracketChoice()"><option value="bo1">BO1</option><option value="bo3">BO3</option><option value="bo5">BO5</option><option value="bo7">BO7</option><option value="swiss">Швейцарка</option><option value="single">Олимпийка</option></select></label>
         <label><span class="label">Колоды</span><select class="select" id="requestDeckMode"><option value="none" selected>Без колод</option><option value="required">Колоды обязательны</option></select></label>
-        <label><span class="label">Колоды видны</span><select class="select" id="requestDeckVisibility"><option value="visible" selected>Да</option><option value="hidden_until_closed">Нет</option></select></label>
+        <label><span class="label">Колоды видны</span><select class="select" id="requestDeckVisibility"><option value="hidden_until_closed" selected>После закрытия турнира</option><option value="visible">Сразу</option></select></label>
         <label><span class="label">Колод до финала</span><select class="select" id="requestDecksBeforeFinal"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
         <label><span class="label">Банов до финала</span><select class="select" id="requestBansBeforeFinal"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
         <label><span class="label">Колод в финале</span><select class="select" id="requestDecksFinal"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></label>
@@ -5756,7 +5756,7 @@ renderCoOrganizersEditor();
       if($('requestSwissRounds')) $('requestSwissRounds').value='3';
       if($('requestEditRights')) $('requestEditRights').value='organizer';
 if($('requestDeckMode')) $('requestDeckMode').value='none';
-if($('requestDeckVisibility')) $('requestDeckVisibility').value='visible';
+if($('requestDeckVisibility')) $('requestDeckVisibility').value='hidden_until_closed';
 if($('requestIsPrivate')) $('requestIsPrivate').value='0';
       if($('requestPrivateToggle')){
         $('requestPrivateToggle').textContent='Открытый турнир';
@@ -7153,7 +7153,12 @@ function renderPlayerContactLine(tournamentId, nick){
 }
 
     async function openDeckView(tournamentId, playerNick, deckIndex){
+  const t = tournaments.find(item => String(item.id) === String(tournamentId));
 
+  if(!canSeeMatchDecksNow(t, playerNick)){
+    showAlert("Колоды соперника откроются только после закрытия турнира.");
+    return;
+  }
   await loadTournamentCardDatabase();
 
   const decks = getSubmittedDecksArray(tournamentId, playerNick);
@@ -7270,18 +7275,27 @@ function shouldShowBanForSide(room, side, banLimit){
 }
 
 function canSeeMatchDecksNow(t, playerNick){
-  if(String(t?.deckVisibility || "visible") !== "hidden_until_closed"){
-    return true;
-  }
+  if(!t) return false;
 
-  if(t.registrationOpen === false || t.status === "closed" || t.status === "finished"){
-    return true;
-  }
+  const isClosedForReveal =
+    t.status === "closed" ||
+    t.status === "finished";
 
   const currentNick = normalizeMatchNick(getCurrentUserNick());
   const targetNick = normalizeMatchNick(playerNick);
+  const isOwnDeck = currentNick && targetNick && currentNick === targetNick;
 
-  return currentNick && targetNick && currentNick === targetNick;
+  if(isOwnDeck) return true;
+
+  if(t.format === "swiss"){
+    return isClosedForReveal;
+  }
+
+  if(String(t.deckVisibility || "visible") !== "hidden_until_closed"){
+    return true;
+  }
+
+  return isClosedForReveal;
 }
 
 function renderMatchPlayerDecks(t, room, playerNick, side){
