@@ -5871,7 +5871,7 @@ if($('requestIsPrivate')) $('requestIsPrivate').value='0';
       applyFilters();
     }
 
-    async function openTrackModal(id){
+    function openTrackModal(id){
   currentTrackTournamentId = id;
 
   const modal = $('trackModal');
@@ -5889,7 +5889,6 @@ if($('requestIsPrivate')) $('requestIsPrivate').value='0';
   }
 
   try{
-    await loadTournamentsFromServer();
     renderTrackModal(id);
 
     if(typeof drawBracketLines === "function"){
