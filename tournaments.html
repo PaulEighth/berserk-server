@@ -3728,8 +3728,8 @@ if(Array.isArray(parsedSwissData.coOrganizers)){
   Object.assign(matchRooms, parsedSwissData.matchRooms);
 }
 
-if (parsedSwissData.swissRounds) {
-  swissRoundsData[tid] = parsedSwissData.swissRounds;
+if (parsedSwissData.swissRoundsState && typeof parsedSwissData.swissRoundsState === "object") {
+  swissRoundsData[tid] = parsedSwissData.swissRoundsState;
 }
 
   return {
@@ -3788,7 +3788,7 @@ bansFinal: Number(t.bansfinal || t.bansFinal || 0),
     bracketSize: Number(t.bracket_size || t.bracketSize || t.bracket || t.grid || t.max_players) || 8,
 grid: Number(t.bracket_size || t.bracketSize || t.bracket || t.grid || t.max_players) || 8,
 bracket: Number(t.bracket_size || t.bracketSize || t.bracket || t.grid || t.max_players) || 8,
-swissRounds: Number(parsedSwissData.swissRounds || t.swissRounds || 3),
+swissRounds: Number(t.swissRounds || parsedSwissData.roundsCount || parsedSwissData.swissRounds || 3),
 bracketData: Array.isArray(t.bracket) ? t.bracket : [],
 
     swissData: parsedSwissData
@@ -5944,7 +5944,7 @@ async function saveTournamentPlayToServer(id){
         bracket: getTournamentBracketSize(t),
         swiss_data: {
   ...(t.swissData || {}),
-  swissRounds: swissRoundsData[String(id)] || null,
+  swissRoundsState: swissRoundsData[String(id)] || null,
   manualCells: tournamentManualCells[String(id)] || {},
   manualScores: tournamentManualScores[String(id)] || {},
   winners: tournamentWinners[String(id)] || {},
