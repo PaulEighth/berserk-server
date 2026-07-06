@@ -3178,9 +3178,11 @@ app.post("/api/tournaments/:id/match-room-chat", verifyToken, async (req, res) =
     const isStaffUser = isStaff(req.user);
 const isOrganizer = Number(result.rows[0].organizer_id) === Number(req.user.id);
 
+const requestNick = normalizeTournamentNick(req.user.username);
+
 const isMatchPlayer =
-  String(req.user.username || "") === String(room.playerA || "") ||
-  String(req.user.username || "") === String(room.playerB || "");
+  requestNick === normalizeTournamentNick(room.playerA) ||
+  requestNick === normalizeTournamentNick(room.playerB);
 
 if (!isStaffUser && !isOrganizer && !isMatchPlayer) {
   return res.status(403).json({
@@ -3190,11 +3192,11 @@ if (!isStaffUser && !isOrganizer && !isMatchPlayer) {
 }
 
     room.chat = Array.isArray(room.chat) ? room.chat : [];
-    room.chat.push({
-      author,
-      text,
-      time: new Date().toISOString()
-    });
+room.chat.push({
+  author: req.user.username,
+  text: String(text || "").trim(),
+  time: new Date().toISOString()
+});
 
     swissData.matchRooms[roomKey] = room;
 

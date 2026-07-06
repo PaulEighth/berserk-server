@@ -7504,7 +7504,9 @@ async function toggleMatchDeckSelfBan(side, deckIndex){
   const t = tournaments.find(item => String(item.id) === String(id));
   if(!t) return;
 
-  const key = matchRoomKey(id,group,side,round,matchIndex);
+  const key = String(group) === "swiss"
+  ? matchRoomKey(id, group, side, round, `${matchIndex}::${normalizeMatchNick(a)}::${normalizeMatchNick(b)}`)
+  : matchRoomKey(id, group, side, round, matchIndex);
   const serverRoom = await loadMatchRoomFromServer(id, key);
 
   let isNewMatchRoom = false;
