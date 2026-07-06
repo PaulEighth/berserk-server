@@ -6527,11 +6527,12 @@ async function randomizeTournamentStartOrder(id){
     };
 
     saveSwissRounds();
-    renderTrackModal(id);
-    applyFilters();
+await saveTournamentPlayToServer(id);
+renderTrackModal(id);
+applyFilters();
 
-    showAlert("Пары швейцарки перемешаны.");
-    return;
+showAlert("Пары швейцарки перемешаны.");
+return;
   }
 
   const bracketSize = getTournamentBracketSize(t);
@@ -7950,30 +7951,29 @@ showAlert("Окно матча сохранено.");
       saveSwissRounds();
       renderTrackModal(id);
     }
-    function setSwissPairScore(id,roundIndex,pairIndex,side,value){
-      const data=swissRoundsData[String(id)];
-      if(!data || !data.rounds[roundIndex] || !data.rounds[roundIndex].pairings[pairIndex]) return;
-      const pair=data.rounds[roundIndex].pairings[pairIndex];
-      const clean=String(value ?? '').replace(/[^0-9]/g,'').slice(0,3);
-      if(side==='a') pair.scoreA=clean;
-      if(side==='b' && pair.b !== 'BYE') pair.scoreB=clean;
+    async function setSwissPairScore(id,roundIndex,pairIndex,side,value){
+  const data=swissRoundsData[String(id)];
+  if(!data || !data.rounds[roundIndex] || !data.rounds[roundIndex].pairings[pairIndex]) return;
+  const pair=data.rounds[roundIndex].pairings[pairIndex];
+  const clean=String(value ?? '').replace(/[^0-9]/g,'').slice(0,3);
+  if(side==='a') pair.scoreA=clean;
+  if(side==='b' && pair.b !== 'BYE') pair.scoreB=clean;
 
-      if(pair.b === 'BYE'){
-        // BYE не даёт победу автоматически при создании раунда.
-        // Победа засчитывается только после ввода положительного счёта у игрока слева.
-        pair.scoreB='';
-        pair.result = Number(pair.scoreA || 0) > 0 ? 'a' : null;
-      } else if(pair.scoreA==='' || pair.scoreB==='' || pair.scoreA===undefined || pair.scoreB===undefined){
-        pair.result=null;
-      } else {
-        const a=Number(pair.scoreA);
-        const b=Number(pair.scoreB);
-        pair.result = a>b ? 'a' : b>a ? 'b' : 'draw';
-      }
+  if(pair.b === 'BYE'){
+    pair.scoreB='';
+    pair.result = Number(pair.scoreA || 0) > 0 ? 'a' : null;
+  } else if(pair.scoreA==='' || pair.scoreB==='' || pair.scoreA===undefined || pair.scoreB===undefined){
+    pair.result=null;
+  } else {
+    const a=Number(pair.scoreA);
+    const b=Number(pair.scoreB);
+    pair.result = a>b ? 'a' : b>a ? 'b' : 'draw';
+  }
 
-      saveSwissRounds();
-      renderTrackModal(id);
-    }
+  saveSwissRounds();
+  await saveTournamentPlayToServer(id);
+  renderTrackModal(id);
+}
     function previousSwissRound(id){
       const data=swissRoundsData[String(id)];
       if(!data) return;
@@ -7981,7 +7981,7 @@ showAlert("Окно матча сохранено.");
       saveSwissRounds();
       renderTrackModal(id);
     }
-    function nextSwissRound(id){
+    async function nextSwissRound(id){
       const t=tournaments.find(item=>String(item.id)===String(id));
       if(!t) return;
       const players=swissPlayersForTournament(t,id);
@@ -7989,10 +7989,14 @@ showAlert("Окно матча сохранено.");
       const maxRounds=Math.min(10, Math.max(1, Number(t.swissRounds || 3)));
 
       // Если мы уже смотрим созданный прошлый раунд — просто листаем историю вперёд.
-      if(data.current < data.rounds.length-1){ data.current++; saveSwissRounds(); renderTrackModal(id); return; }
+      if(data.current < data.rounds.length-1){ data.current++; saveSwissRounds();
+await saveTournamentPlayToServer(id);
+renderTrackModal(id); return; }
 
       // Если швейцарка завершена, следующий экран — плей-офф сетка.
-      if(data.current >= maxRounds){ data.current=maxRounds; saveSwissRounds(); renderTrackModal(id); return; }
+      if(data.current >= maxRounds){ data.current=maxRounds; saveSwissRounds();
+await saveTournamentPlayToServer(id);
+renderTrackModal(id); return; }
 
       const current=data.rounds[data.current];
       const unfinished=(current.pairings||[]).some(p=>p.result===null);
@@ -8001,14 +8005,16 @@ showAlert("Окно матча сохранено.");
       if(data.rounds.length>=maxRounds){
         data.current=maxRounds; // условный следующий раунд: старт сетки
         saveSwissRounds();
-        renderTrackModal(id);
+await saveTournamentPlayToServer(id);
+renderTrackModal(id);
         return;
       }
 
       data.rounds.push({number:data.rounds.length+1,pairings:makeSwissPairings(players,data.rounds,id)});
-      data.current=data.rounds.length-1;
-      saveSwissRounds();
-      renderTrackModal(id);
+data.current=data.rounds.length-1;
+saveSwissRounds();
+await saveTournamentPlayToServer(id);
+renderTrackModal(id);
     }
     function swissStatControl(id,player,type,value){
       const safe=encodeURIComponent(player);
