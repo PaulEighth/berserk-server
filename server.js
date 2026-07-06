@@ -2917,19 +2917,52 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
 
         swissData.matchRooms = swissData.matchRooms || {};
 
-    const oldRoom = swissData.matchRooms[roomKey] || null;
+let oldRoom = swissData.matchRooms[roomKey] || null;
 
-    const isStaffUser = isStaff(req.user);
-    const isOrganizer =
-      Number(tournament.organizer_id) === Number(req.user.id) ||
-      isTournamentCoOrganizer(req, tournament);
+const isStaffUser = isStaff(req.user);
+const isOrganizer =
+  Number(tournament.organizer_id) === Number(req.user.id) ||
+  isTournamentCoOrganizer(req, tournament);
 
-    if(!oldRoom && !isStaffUser && !isOrganizer){
-      return res.status(403).json({
-        ok:false,
-        error:"Игрок не может создавать или подменять комнату матча"
-      });
-    }
+if(!oldRoom){
+  const parts = String(roomKey || "").split("::");
+  const groupFromKey = parts[1];
+  const sideFromKey = parts[2] || "main";
+  const roundFromKey = Number(parts[3] || 1);
+  const matchIndexFromKey = Number(parts[4] || 0);
+
+  const pair = groupFromKey === "swiss"
+    ? swissData.swissRoundsState?.rounds?.[roundFromKey - 1]?.pairings?.[matchIndexFromKey]
+    : null;
+
+  if(pair){
+    oldRoom = {
+      id: tournamentId,
+      group: "swiss",
+      side: sideFromKey,
+      round: roundFromKey,
+      matchIndex: matchIndexFromKey,
+      playerA: pair.a || "",
+      playerB: pair.b || "",
+      scoreA: String(pair.scoreA ?? ""),
+      scoreB: String(pair.scoreB ?? ""),
+      bannedA: [],
+      bannedB: [],
+      selfBannedA: [],
+      selfBannedB: [],
+      chat: []
+    };
+
+    swissData.matchRooms[roomKey] = oldRoom;
+  }
+}
+
+if(!oldRoom && !isStaffUser && !isOrganizer){
+  return res.status(403).json({
+    ok:false,
+    error:"Игрок не может создавать или подменять комнату матча"
+  });
+}
 
     const sourceRoom = isStaffUser || isOrganizer
       ? {
