@@ -3694,11 +3694,11 @@ let approvedTournaments = [];
     let tournamentWinners = JSON.parse(localStorage.getItem(TOURNAMENT_WINNERS_KEY) || '{}');
     let tournamentManualCells = JSON.parse(localStorage.getItem(TOURNAMENT_CELLS_KEY) || '{}');
     let tournamentManualScores = JSON.parse(localStorage.getItem(TOURNAMENT_SCORES_KEY) || '{}');
-    let swissRoundsData = JSON.parse(localStorage.getItem(SWISS_ROUNDS_KEY) || '{}');
-    let swissManualStats = JSON.parse(localStorage.getItem(SWISS_MANUAL_STATS_KEY) || '{}');
-    let deletedTournamentIds = JSON.parse(localStorage.getItem(DELETED_TOURNAMENTS_KEY) || '[]');
-    let tournamentDeckSubmits = JSON.parse(localStorage.getItem(TOURNAMENT_DECKS_KEY) || '{}');
-    let matchRooms = JSON.parse(localStorage.getItem(MATCH_ROOMS_KEY) || '{}');
+    let swissRoundsData = {};
+let swissManualStats = {};
+let deletedTournamentIds = JSON.parse(localStorage.getItem(DELETED_TOURNAMENTS_KEY) || '[]');
+let tournamentDeckSubmits = JSON.parse(localStorage.getItem(TOURNAMENT_DECKS_KEY) || '{}');
+let matchRooms = {};
     tournaments = tournaments.concat(approvedTournaments).filter(t => !deletedTournamentIds.includes(String(t.id)));
 
     tournaments = tournaments.map(t => {
@@ -3833,7 +3833,14 @@ if(Array.isArray(parsedSwissData.coOrganizers)){
   ? parsedSwissData.outPlayers
   : [];
 
-  if (parsedSwissData.matchRooms && typeof parsedSwissData.matchRooms === "object") {
+  Object.keys(matchRooms).forEach(roomKey => {
+  const room = matchRooms[roomKey];
+  if(String(room?.id || room?.tournamentId) === tid){
+    delete matchRooms[roomKey];
+  }
+});
+
+if(parsedSwissData.matchRooms && typeof parsedSwissData.matchRooms === "object"){
   Object.assign(matchRooms, parsedSwissData.matchRooms);
 }
 
@@ -8059,9 +8066,14 @@ showAlert("Окно матча сохранено.");
       return stats;
     }
     function sortedSwissTable(players,rounds,id){
-      const stats=calcSwissStats(players,rounds,id);
-      return Object.values(stats).sort((a,b)=>b.points-a.points || b.diff-a.diff || b.wins-a.wins || a.player.localeCompare(b.player,'ru'));
-    }
+  const stats=calcSwissStats(players,rounds,id);
+  return Object.values(stats).sort((a,b)=>
+    b.points-a.points ||
+    b.diff-a.diff ||
+    b.wins-a.wins ||
+    String(a.player).toLowerCase().localeCompare(String(b.player).toLowerCase(),"ru")
+  );
+}
     function swissPlayedPairs(rounds){
       const set=new Set();
       rounds.forEach(round=>(round.pairings||[]).forEach(p=>{ if(p.a && p.b) set.add([p.a,p.b].sort().join('||')); }));
