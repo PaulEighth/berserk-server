@@ -2790,38 +2790,38 @@ const result = await pool.query(`
 // Сохранить сетку / счёт турнира
 app.patch("/api/tournaments/:id/play", verifyToken, async (req, res) => {
   try {
-    const access = await canEditTournamentPlay(req, req.params.id);
+    const access = await canManageTournament(req, req.params.id);
 
     if(!access.ok){
       return res.status(access.status).json({
-        ok: false,
-        error: access.error
+        ok:false,
+        error:"Только организатор, соорганизатор или админ может менять турнирную сетку"
       });
     }
 
     const { bracket, swiss_data } = req.body;
 
-const oldSwissData = parseTournamentJson(access.tournament.swiss_data);
-const incomingSwissData = swiss_data && typeof swiss_data === "object" ? swiss_data : {};
+    const oldSwissData = parseTournamentJson(access.tournament.swiss_data);
+    const incomingSwissData = swiss_data && typeof swiss_data === "object" ? swiss_data : {};
 
-const mergedSwissData = {
-  ...oldSwissData,
-  ...incomingSwissData,
-  matchRooms: oldSwissData.matchRooms || {}
-};
+    const mergedSwissData = {
+      ...oldSwissData,
+      ...incomingSwissData,
+      matchRooms: oldSwissData.matchRooms || {}
+    };
 
-const result = await pool.query(`
-  UPDATE tournaments
-  SET
-    bracket = $1,
-    swiss_data = $2
-  WHERE id = $3
-  RETURNING *
-`, [
-  JSON.stringify(bracket || []),
-  JSON.stringify(mergedSwissData),
-  req.params.id
-]);
+    const result = await pool.query(`
+      UPDATE tournaments
+      SET
+        bracket = $1,
+        swiss_data = $2
+      WHERE id = $3
+      RETURNING *
+    `, [
+      JSON.stringify(bracket || []),
+      JSON.stringify(mergedSwissData),
+      req.params.id
+    ]);
 
     res.json({
       ok: true,
@@ -2911,25 +2911,38 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
       swissData = {};
     }
 
-    swissData.matchRooms = swissData.matchRooms || {};
+        swissData.matchRooms = swissData.matchRooms || {};
 
-    const oldRoom = swissData.matchRooms[roomKey] || {};
-    const sourceRoom = {
-      ...oldRoom,
-      ...room,
-      chat: Array.isArray(oldRoom.chat) ? oldRoom.chat : (Array.isArray(room.chat) ? room.chat : [])
-    };
+    const oldRoom = swissData.matchRooms[roomKey] || null;
 
     const isStaffUser = isStaff(req.user);
     const isOrganizer =
       Number(tournament.organizer_id) === Number(req.user.id) ||
       isTournamentCoOrganizer(req, tournament);
 
+    if(!oldRoom && !isStaffUser && !isOrganizer){
+      return res.status(403).json({
+        ok:false,
+        error:"Игрок не может создавать или подменять комнату матча"
+      });
+    }
+
+    const sourceRoom = isStaffUser || isOrganizer
+      ? {
+          ...(oldRoom || {}),
+          ...room,
+          chat: Array.isArray(oldRoom?.chat) ? oldRoom.chat : []
+        }
+      : {
+          ...oldRoom,
+          chat: Array.isArray(oldRoom.chat) ? oldRoom.chat : []
+        };
+
     const requestNick = normalizeTournamentNick(req.user.username);
 
-const isPlayerA = requestNick === normalizeTournamentNick(sourceRoom.playerA);
-const isPlayerB = requestNick === normalizeTournamentNick(sourceRoom.playerB);
-const isMatchPlayer = isPlayerA || isPlayerB;
+    const isPlayerA = requestNick === normalizeTournamentNick(sourceRoom.playerA);
+    const isPlayerB = requestNick === normalizeTournamentNick(sourceRoom.playerB);
+    const isMatchPlayer = isPlayerA || isPlayerB;
 
     if(!isStaffUser && !isOrganizer && !isMatchPlayer){
       return res.status(403).json({
@@ -2938,7 +2951,7 @@ const isMatchPlayer = isPlayerA || isPlayerB;
       });
     }
 
-        const isFinal =
+    const isFinal =
       String(sourceRoom.side) === "final" ||
       String(sourceRoom.side) === "third" ||
       String(sourceRoom.round) === "final" ||
@@ -2984,18 +2997,18 @@ const isMatchPlayer = isPlayerA || isPlayerB;
         selfBannedB: cleanSelfBanArray(room.selfBannedB),
         chat: Array.isArray(oldRoom.chat) ? oldRoom.chat : []
       };
-    }else{
+        }else{
       nextRoom = {
         ...oldRoom,
-        id: sourceRoom.id,
-        group: sourceRoom.group,
-        side: sourceRoom.side,
-        round: sourceRoom.round,
-        matchIndex: sourceRoom.matchIndex,
-        playerA: sourceRoom.playerA,
-        playerB: sourceRoom.playerB,
-        scoreA: String(room.scoreA ?? oldRoom.scoreA ?? ""),
-        scoreB: String(room.scoreB ?? oldRoom.scoreB ?? ""),
+        id: oldRoom.id,
+        group: oldRoom.group,
+        side: oldRoom.side,
+        round: oldRoom.round,
+        matchIndex: oldRoom.matchIndex,
+        playerA: oldRoom.playerA,
+        playerB: oldRoom.playerB,
+        scoreA: String(oldRoom.scoreA ?? ""),
+        scoreB: String(oldRoom.scoreB ?? ""),
         bannedA: cleanBanArray(oldRoom.bannedA),
         bannedB: cleanBanArray(oldRoom.bannedB),
         selfBannedA: cleanSelfBanArray(oldRoom.selfBannedA),
