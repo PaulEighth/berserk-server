@@ -2807,10 +2807,12 @@ app.patch("/api/tournaments/:id/play", verifyToken, async (req, res) => {
     const incomingSwissData = swiss_data && typeof swiss_data === "object" ? swiss_data : {};
 
     const mergedSwissData = {
-      ...oldSwissData,
-      ...incomingSwissData,
-      matchRooms: oldSwissData.matchRooms || {}
-    };
+  ...oldSwissData,
+  ...incomingSwissData,
+  matchRooms: incomingSwissData.matchRooms && typeof incomingSwissData.matchRooms === "object"
+    ? incomingSwissData.matchRooms
+    : (oldSwissData.matchRooms || {})
+};
 
     const result = await pool.query(`
       UPDATE tournaments
@@ -3189,14 +3191,47 @@ app.post("/api/tournaments/:id/match-room-chat", verifyToken, async (req, res) =
     }
 
     swissData.matchRooms = swissData.matchRooms || {};
-    const room = swissData.matchRooms[roomKey];
+let room = swissData.matchRooms[roomKey];
 
-    if (!room) {
-      return res.status(404).json({
-        ok: false,
-        error: "Комната матча не найдена"
-      });
+if(!room){
+  const parts = String(roomKey || "").split("::");
+  const group = parts[1];
+  const side = parts[2] || "main";
+  const round = Number(parts[3] || 1);
+  const matchIndex = Number(parts[4] || 0);
+
+  if(group === "swiss"){
+    const pair = swissData.swissRoundsState?.rounds?.[round - 1]?.pairings?.[matchIndex];
+
+    if(pair){
+      room = {
+        id: tournamentId,
+        group: "swiss",
+        side,
+        round,
+        matchIndex,
+        playerA: pair.a || "",
+        playerB: pair.b || "",
+        scoreA: String(pair.scoreA ?? ""),
+        scoreB: String(pair.scoreB ?? ""),
+        bannedA: [],
+        bannedB: [],
+        selfBannedA: [],
+        selfBannedB: [],
+        chat: []
+      };
+
+      swissData.matchRooms[roomKey] = room;
     }
+  }
+}
+
+if(!room){
+  return res.status(404).json({
+    ok: false,
+    error: "Комната матча не найдена"
+  });
+}
 
     const isStaffUser = isStaff(req.user);
 const isOrganizer = Number(result.rows[0].organizer_id) === Number(req.user.id);
