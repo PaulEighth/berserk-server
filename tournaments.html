@@ -7510,9 +7510,19 @@ async function toggleMatchDeckSelfBan(side, deckIndex){
   await loadTournamentCardDatabase();
 
   const t = tournaments.find(item => String(item.id) === String(id));
-  if(!t) return;
+if(!t) return;
 
-  const key = String(group) === "swiss"
+if(String(group) === "swiss"){
+  const data = swissRoundsData[String(id)];
+  const pair = data?.rounds?.[Number(round) - 1]?.pairings?.[Number(matchIndex)];
+
+  if(pair){
+    a = pair.a || a || "";
+    b = pair.b || b || "";
+  }
+}
+
+const key = String(group) === "swiss"
   ? matchRoomKey(id, group, side, round, `${matchIndex}::${normalizeMatchNick(a)}::${normalizeMatchNick(b)}`)
   : matchRoomKey(id, group, side, round, matchIndex);
   const serverRoom = await loadMatchRoomFromServer(id, key);
