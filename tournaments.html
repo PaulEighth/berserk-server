@@ -3835,7 +3835,7 @@ if(playerDecks.length){
 
   }catch(error){
     console.error(error);
-    showCustomAlert("Не удалось загрузить турниры с сервера");
+        showAlert("Не удалось загрузить турниры с сервера");
   }
 }
     function saveRegistrations(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(registrations)); }
@@ -5985,6 +5985,24 @@ async function saveTournamentPlayToServer(id){
     console.error("SAVE TOURNAMENT PLAY ERROR:", error);
   }
 }
+window.forceUploadSwissToServer = async function(id){
+  id = String(id || currentTrackTournamentId || "");
+  if(!id){
+    alert("Открой турнир и повтори команду.");
+    return;
+  }
+
+  const allSwiss = JSON.parse(localStorage.getItem("bhoSwissRoundsV4") || "{}");
+  swissRoundsData[id] = allSwiss[id] || swissRoundsData[id];
+
+  if(!swissRoundsData[id]){
+    alert("В этом браузере нет Swiss-таблицы для турнира " + id);
+    return;
+  }
+
+  await saveTournamentPlayToServer(id);
+  alert("Swiss-таблица турнира " + id + " загружена на сервер.");
+};
     function getManualScore(id,group,side,round,slot){
       const data=tournamentManualScores[String(id)] || {};
       return data[cellKey(group,side,round,slot)] ?? null;

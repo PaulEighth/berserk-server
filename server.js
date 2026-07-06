@@ -1790,17 +1790,11 @@ LEFT JOIN users u ON u.id = p.user_id
 ORDER BY p.joined_at ASC
     `);
 
-    const matchesResult = await pool.query(`
-      SELECT *
-      FROM tournament_matches
-      ORDER BY round ASC, match_index ASC
-    `);
-
-    res.json({
+        res.json({
       ok: true,
       tournaments: tournamentsResult.rows,
       participants: participantsResult.rows,
-      matches: matchesResult.rows
+      matches: []
     });
 
   } catch (error) {
@@ -2417,17 +2411,11 @@ LEFT JOIN users u ON u.id = p.user_id
 ORDER BY p.joined_at ASC
     `);
 
-    const matchesResult = await pool.query(`
-      SELECT *
-      FROM tournament_matches
-      ORDER BY round ASC, match_index ASC
-    `);
-
-    res.json({
+        res.json({
       ok: true,
       tournaments: tournamentsResult.rows,
       participants: participantsResult.rows,
-      matches: matchesResult.rows
+      matches: []
     });
 
   } catch (error) {
