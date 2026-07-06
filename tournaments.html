@@ -3725,8 +3725,12 @@ if(Array.isArray(parsedSwissData.coOrganizers)){
   : [];
 
   if (parsedSwissData.matchRooms) {
-    Object.assign(matchRooms, parsedSwissData.matchRooms);
-  }
+  Object.assign(matchRooms, parsedSwissData.matchRooms);
+}
+
+if (parsedSwissData.swissRounds) {
+  swissRoundsData[tid] = parsedSwissData.swissRounds;
+}
 
   return {
     id: String(t.id),
@@ -5939,12 +5943,16 @@ async function saveTournamentPlayToServer(id){
       body: JSON.stringify({
         bracket: getTournamentBracketSize(t),
         swiss_data: {
-          ...(t.swissData || {}),
-          manualCells: tournamentManualCells[String(id)] || {},
-          manualScores: tournamentManualScores[String(id)] || {},
-          winners: tournamentWinners[String(id)] || {},
-          outPlayers: getOutPlayers(id)
-        }
+  ...(t.swissData || {}),
+  swissRounds: swissRoundsData[String(id)] || null,
+  manualCells: tournamentManualCells[String(id)] || {},
+  manualScores: tournamentManualScores[String(id)] || {},
+  winners: tournamentWinners[String(id)] || {},
+  outPlayers: getOutPlayers(id),
+  matchRooms: Object.fromEntries(
+    Object.entries(matchRooms).filter(([key, room]) => String(room.id) === String(id))
+  )
+}
       })
     });
 
@@ -7752,11 +7760,41 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
   }
 
   room.scoreA = $("matchRoomScoreA") ? $("matchRoomScoreA").value : "";
-  room.scoreB = $("matchRoomScoreB") ? $("matchRoomScoreB").value : "";
+room.scoreB = $("matchRoomScoreB") ? $("matchRoomScoreB").value : "";
 
-  saveMatchRooms();
-  await saveMatchRoomToServer(currentMatchRoomKey);
-  showAlert("Окно матча сохранено.");
+saveMatchRooms();
+await saveMatchRoomToServer(currentMatchRoomKey);
+
+if(String(room.group) === "swiss"){
+  const data = swissRoundsData[String(room.id)];
+  const roundIndex = Number(room.round) - 1;
+  const pairIndex = Number(room.matchIndex);
+
+  if(data?.rounds?.[roundIndex]?.pairings?.[pairIndex]){
+    const pair = data.rounds[roundIndex].pairings[pairIndex];
+
+    if(
+      normalizeMatchNick(pair.a) === normalizeMatchNick(room.playerA) &&
+      normalizeMatchNick(pair.b) === normalizeMatchNick(room.playerB)
+    ){
+      pair.scoreA = String(room.scoreA || "");
+      pair.scoreB = String(room.scoreB || "");
+
+      if(pair.scoreA === "" || pair.scoreB === ""){
+        pair.result = null;
+      }else{
+        const a = Number(pair.scoreA);
+        const b = Number(pair.scoreB);
+        pair.result = a > b ? "a" : b > a ? "b" : "draw";
+      }
+
+      saveSwissRounds();
+      await saveTournamentPlayToServer(room.id);
+    }
+  }
+}
+
+showAlert("Окно матча сохранено.");
 
     }
 
