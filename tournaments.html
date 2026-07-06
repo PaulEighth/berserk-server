@@ -5898,18 +5898,6 @@ if($('requestIsPrivate')) $('requestIsPrivate').value='0';
   }catch(e){
     console.error("Ошибка открытия отслеживания:", e);
   }
-
-  tournamentRefreshTimer = setInterval(async () => {
-    if(!$('trackModal')?.classList.contains('show')) return;
-    if(!currentTrackTournamentId) return;
-
-    try{
-      await loadTournamentsFromServer();
-      renderTrackModal(currentTrackTournamentId);
-    }catch(e){
-      console.error("Ошибка автообновления турнира:", e);
-    }
-  }, 5000);
 }
 
 function closeTrackModal(){

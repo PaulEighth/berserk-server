@@ -1768,26 +1768,26 @@ app.get("/api/tournaments", async (req, res) => {
   try {
     const tournamentsResult = await pool.query(`
       SELECT
-  t.*,
-  COALESCE(u.medals, '{}'::jsonb) AS organizer_medals,
-  COALESCE(u.role, t.organizer_role, 'user') AS organizer_role,
-  COALESCE(u.is_partner, t.organizer_is_partner, false) AS organizer_is_partner,
-COALESCE(u.status, 'none') AS organizer_status
-FROM tournaments t
-LEFT JOIN users u ON u.id = t.organizer_id
-ORDER BY t.created_at DESC
+        t.*,
+        COALESCE(u.medals, '{}'::jsonb) AS organizer_medals,
+        COALESCE(u.role, 'user') AS organizer_role,
+        COALESCE(u.is_partner, false) AS organizer_is_partner,
+        COALESCE(u.status, 'none') AS organizer_status
+      FROM tournaments t
+      LEFT JOIN users u ON u.id = t.organizer_id
+      ORDER BY t.created_at DESC
     `);
 
     const participantsResult = await pool.query(`
       SELECT
-  p.*,
-  COALESCE(u.medals, '{}'::jsonb) AS medals,
-  COALESCE(u.role, p.role, 'user') AS role,
-  COALESCE(u.is_partner, p.is_partner, false) AS is_partner,
-COALESCE(u.status, 'none') AS status
-FROM tournament_participants p
-LEFT JOIN users u ON u.id = p.user_id
-ORDER BY p.joined_at ASC
+        p.*,
+        COALESCE(u.medals, '{}'::jsonb) AS medals,
+        COALESCE(u.role, 'user') AS role,
+        COALESCE(u.is_partner, false) AS is_partner,
+        COALESCE(u.status, 'none') AS status
+      FROM tournament_participants p
+      LEFT JOIN users u ON u.id = p.user_id
+      ORDER BY p.joined_at ASC
     `);
 
         res.json({
@@ -2389,26 +2389,26 @@ app.get("/api/tournaments", async (req, res) => {
   try {
     const tournamentsResult = await pool.query(`
       SELECT
-  t.*,
-  COALESCE(u.medals, '{}'::jsonb) AS organizer_medals,
-  COALESCE(u.role, t.organizer_role, 'user') AS organizer_role,
-  COALESCE(u.is_partner, t.organizer_is_partner, false) AS organizer_is_partner,
-COALESCE(u.status, 'none') AS organizer_status
-FROM tournaments t
-LEFT JOIN users u ON u.id = t.organizer_id
-ORDER BY t.created_at DESC
+        t.*,
+        COALESCE(u.medals, '{}'::jsonb) AS organizer_medals,
+        COALESCE(u.role, 'user') AS organizer_role,
+        COALESCE(u.is_partner, false) AS organizer_is_partner,
+        COALESCE(u.status, 'none') AS organizer_status
+      FROM tournaments t
+      LEFT JOIN users u ON u.id = t.organizer_id
+      ORDER BY t.created_at DESC
     `);
 
     const participantsResult = await pool.query(`
       SELECT
-  p.*,
-  COALESCE(u.medals, '{}'::jsonb) AS medals,
-  COALESCE(u.role, p.role, 'user') AS role,
-  COALESCE(u.is_partner, p.is_partner, false) AS is_partner,
-COALESCE(u.status, 'none') AS status
-FROM tournament_participants p
-LEFT JOIN users u ON u.id = p.user_id
-ORDER BY p.joined_at ASC
+        p.*,
+        COALESCE(u.medals, '{}'::jsonb) AS medals,
+        COALESCE(u.role, 'user') AS role,
+        COALESCE(u.is_partner, false) AS is_partner,
+        COALESCE(u.status, 'none') AS status
+      FROM tournament_participants p
+      LEFT JOIN users u ON u.id = p.user_id
+      ORDER BY p.joined_at ASC
     `);
 
         res.json({
