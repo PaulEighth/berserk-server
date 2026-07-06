@@ -8032,7 +8032,10 @@ showAlert("Окно матча сохранено.");
       $('winnerModal').setAttribute('aria-hidden','true');
     }
 
-    function saveSwissRounds(){ localStorage.setItem(SWISS_ROUNDS_KEY, JSON.stringify(swissRoundsData)); }
+    function saveSwissRounds(){
+  // Swiss больше не сохраняем как источник правды в localStorage.
+  // Источник правды — только сервер.
+}
     function saveSwissManualStats(){ localStorage.setItem(SWISS_MANUAL_STATS_KEY, JSON.stringify(swissManualStats)); }
     function swissPlayersForTournament(t,id){
   return getPlayers(id).slice(0, Number(t.places) || 1000);
@@ -8112,17 +8115,17 @@ showAlert("Окно матча сохранено.");
     data.rounds = [];
   }
 
-  const currentPlayersKey = players.slice().sort().join("||");
-
-  // ВАЖНО:
-  // Если раунды уже есть — НИКОГДА не пересоздаём пары автоматически.
-  // Иначе Swiss у разных людей снова будет перемешиваться.
   if(!data.rounds.length){
+    if(!canRandomizeTournamentClient(t)){
+      return data;
+    }
+
     data.current = 0;
     data.rounds.push({
       number: 1,
       pairings: makeSwissPairings(players,[],id)
     });
+    data.playersKey = players.slice().sort().join("||");
   }
 
   data.playersKey = data.playersKey || currentPlayersKey;
