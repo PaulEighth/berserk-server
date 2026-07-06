@@ -2993,10 +2993,10 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
     if(isStaffUser || isOrganizer){
   nextRoom = {
     ...sourceRoom,
-    bannedA: cleanBanArray(room.bannedA),
-    bannedB: cleanBanArray(room.bannedB),
-    selfBannedA: cleanSelfBanArray(room.selfBannedA),
-    selfBannedB: cleanSelfBanArray(room.selfBannedB),
+    bannedA: cleanBanArray(Array.isArray(room.bannedA) ? room.bannedA : oldRoom?.bannedA),
+    bannedB: cleanBanArray(Array.isArray(room.bannedB) ? room.bannedB : oldRoom?.bannedB),
+    selfBannedA: cleanSelfBanArray(Array.isArray(room.selfBannedA) ? room.selfBannedA : oldRoom?.selfBannedA),
+    selfBannedB: cleanSelfBanArray(Array.isArray(room.selfBannedB) ? room.selfBannedB : oldRoom?.selfBannedB),
     chat: Array.isArray(oldRoom?.chat) ? oldRoom.chat : []
   };
         }else{
