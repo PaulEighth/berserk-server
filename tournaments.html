@@ -7934,29 +7934,43 @@ showAlert("Окно матча сохранено.");
       return pairings;
     }
     function ensureSwissData(t,id){
-  const key=String(id);
-  const players=swissPlayersForTournament(t,id);
-  const maxRounds=Math.min(10, Math.max(1, Number(t.swissRounds || 3)));
+  const key = String(id);
+  const players = swissPlayersForTournament(t,id);
+  const maxRounds = Math.min(10, Math.max(1, Number(t.swissRounds || 3)));
 
-  if(!swissRoundsData[key]) swissRoundsData[key]={current:0,rounds:[]};
-
-  const data=swissRoundsData[key];
-
-  const currentPlayersKey = players.slice().sort().join('||');
-  const savedPlayersKey = data.playersKey || '';
-
-  if(savedPlayersKey !== currentPlayersKey){
-    data.current = 0;
-    data.rounds = [{number:1,pairings:makeSwissPairings(players,[],id)}];
-    data.playersKey = currentPlayersKey;
+  if(!swissRoundsData[key]){
+    swissRoundsData[key] = {
+      current: 0,
+      rounds: [],
+      playersKey: players.slice().sort().join("||")
+    };
   }
 
+  const data = swissRoundsData[key];
+
+  if(!Array.isArray(data.rounds)){
+    data.rounds = [];
+  }
+
+  const currentPlayersKey = players.slice().sort().join("||");
+
+  // ВАЖНО:
+  // Если раунды уже есть — НИКОГДА не пересоздаём пары автоматически.
+  // Иначе Swiss у разных людей снова будет перемешиваться.
   if(!data.rounds.length){
-    data.rounds.push({number:1,pairings:makeSwissPairings(players,[],id)});
-    data.playersKey = currentPlayersKey;
+    data.current = 0;
+    data.rounds.push({
+      number: 1,
+      pairings: makeSwissPairings(players,[],id)
+    });
   }
 
-  data.current=Math.min(Math.max(Number(data.current)||0,0), Math.min(maxRounds, data.rounds.length));
+  data.playersKey = data.playersKey || currentPlayersKey;
+  data.current = Math.min(
+    Math.max(Number(data.current) || 0, 0),
+    Math.min(maxRounds, data.rounds.length)
+  );
+
   saveSwissRounds();
   return data;
 }
