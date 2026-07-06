@@ -2758,7 +2758,9 @@ const incomingSwissData = swiss_data && typeof swiss_data === "object" ? swiss_d
 const mergedSwissData = {
   ...oldSwissData,
   ...incomingSwissData,
-  matchRooms: oldSwissData.matchRooms || {}
+  matchRooms: incomingSwissData.matchRooms && typeof incomingSwissData.matchRooms === "object"
+    ? incomingSwissData.matchRooms
+    : (oldSwissData.matchRooms || {})
 };
 
 const result = await pool.query(`

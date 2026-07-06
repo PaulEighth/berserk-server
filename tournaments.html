@@ -3170,6 +3170,86 @@ html body .bracket-cell.alive{
   cursor:pointer !important;
   pointer-events:auto !important;
 }
+.swiss-replace-btn{
+  grid-column:1/-1;
+  justify-self:center;
+  margin-top:4px;
+  padding:9px 14px !important;
+  font-size:12px !important;
+}
+
+.swiss-replace-modal{
+  position:fixed;
+  inset:0;
+  z-index:120001;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(12px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.swiss-replace-modal.show{
+  display:flex;
+}
+
+.swiss-replace-box{
+  width:min(860px,100%);
+  max-height:90vh;
+  overflow:auto;
+  padding:24px;
+  border-radius:28px;
+  background:linear-gradient(180deg,rgba(17,22,34,.98),rgba(9,12,19,.98));
+  border:1px solid rgba(232,194,112,.24);
+  box-shadow:0 35px 110px rgba(0,0,0,.62);
+}
+
+.swiss-replace-box h2{
+  margin:10px 0 6px;
+  font-size:32px;
+  letter-spacing:-.04em;
+  background:linear-gradient(135deg,#fff 15%,#f0d28b 58%,#b16b2c);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.swiss-replace-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-top:14px;
+}
+
+.swiss-replace-side{
+  padding:14px;
+  border-radius:20px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(232,194,112,.14);
+}
+
+.swiss-replace-list{
+  display:grid;
+  gap:7px;
+  max-height:320px;
+  overflow:auto;
+  margin-top:10px;
+}
+
+.swiss-replace-list button{
+  width:100%;
+  justify-content:flex-start;
+}
+
+.swiss-replace-list button.active{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#171008;
+}
+
+@media(max-width:760px){
+  .swiss-replace-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -3435,7 +3515,36 @@ html body .bracket-cell.alive{
     </div>
   </div>
 
+<div class="swiss-replace-modal" id="swissReplaceModal" aria-hidden="true">
+  <div class="swiss-replace-box">
+    <span class="eyebrow">✦ Швейцарка</span>
+    <h2>Заменить игроков пары</h2>
+    <p class="small-note">Выбери нового игрока слева и справа. Кнопка доступна только организатору, соорганизатору или админу.</p>
 
+    <div class="swiss-replace-grid">
+      <div class="swiss-replace-side">
+        <label>
+          <span class="label">Игрок слева</span>
+          <input class="field" id="swissReplaceSearchA" type="text" placeholder="Поиск по нику или #">
+        </label>
+        <div class="swiss-replace-list" id="swissReplaceListA"></div>
+      </div>
+
+      <div class="swiss-replace-side">
+        <label>
+          <span class="label">Игрок справа</span>
+          <input class="field" id="swissReplaceSearchB" type="text" placeholder="Поиск по нику или #">
+        </label>
+        <div class="swiss-replace-list" id="swissReplaceListB"></div>
+      </div>
+    </div>
+
+    <div class="join-actions">
+      <button type="button" class="btn gold" onclick="saveSwissReplacePlayers()">Сохранить замену</button>
+      <button type="button" class="btn ghost" onclick="closeSwissReplaceModal()">Отмена</button>
+    </div>
+  </div>
+</div>
   <div class="score-modal" id="scoreModal" aria-hidden="true">
     <div class="score-box">
       <span class="eyebrow">✦ Счёт игрока</span>
@@ -5949,7 +6058,10 @@ async function saveTournamentPlayToServer(id){
   manualCells: tournamentManualCells[String(id)] || {},
   manualScores: tournamentManualScores[String(id)] || {},
   winners: tournamentWinners[String(id)] || {},
-  outPlayers: getOutPlayers(id)
+  outPlayers: getOutPlayers(id),
+  matchRooms: Object.fromEntries(
+    Object.entries(matchRooms).filter(([key, room]) => String(room.id) === String(id))
+  )
 }
       })
     });
@@ -6532,15 +6644,51 @@ async function randomizeTournamentStartOrder(id){
     }
 
     swissRoundsData[key] = {
-      current: 0,
-      rounds: [
-        {
-          number: 1,
-          pairings
-        }
-      ],
-      playersKey: players.slice().sort().join("||")
-    };
+  current: 0,
+  rounds: [
+    {
+      number: 1,
+      pairings
+    }
+  ],
+  playersKey: players.slice().sort().join("||")
+};
+
+Object.keys(matchRooms).forEach(roomKey => {
+  const room = matchRooms[roomKey];
+  if(String(room?.id) === key && String(room?.group) === "swiss"){
+    delete matchRooms[roomKey];
+  }
+});
+
+pairings.forEach((pair, index) => {
+  const roomKey = matchRoomKey(
+    id,
+    "swiss",
+    "main",
+    1,
+    `${index}::${normalizeMatchNick(pair.a)}::${normalizeMatchNick(pair.b)}`
+  );
+
+  matchRooms[roomKey] = {
+    id,
+    group: "swiss",
+    side: "main",
+    round: 1,
+    matchIndex: index,
+    playerA: pair.a || "",
+    playerB: pair.b || "",
+    scoreA: "",
+    scoreB: "",
+    bannedA: [],
+    bannedB: [],
+    selfBannedA: [],
+    selfBannedB: [],
+    chat: []
+  };
+});
+
+saveMatchRooms();
 
     saveSwissRounds();
 await saveTournamentPlayToServer(id);
@@ -8072,6 +8220,180 @@ renderTrackModal(id);
       const rows=sortedSwissTable(players,rounds,id);
       return `<div class="swiss-table-box"><table class="swiss-table"><thead><tr><th>Место</th><th>Игрок</th><th>Победы</th><th>Ничьи</th><th>Поражения</th><th>Очки</th><th>Разница</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${roleNickHtml(r.player)}</td><td>${r.wins}</td><td>${r.draws}</td><td>${r.losses}</td><td>${r.points}</td><td>${r.diff>0?'+':''}${r.diff}</td></tr>`).join('')}</tbody></table></div>`;
     }
+    let swissReplaceState = null;
+
+function openSwissReplaceModal(id, roundIndex, pairIndex){
+  const t = tournaments.find(x => String(x.id) === String(id));
+  if(!t || !canRandomizeTournamentClient(t)){
+    showAlert("Заменять игроков может только организатор, соорганизатор или админ.");
+    return;
+  }
+
+  const pair = swissRoundsData[String(id)]?.rounds?.[roundIndex]?.pairings?.[pairIndex];
+  if(!pair){
+    showAlert("Пара не найдена.");
+    return;
+  }
+
+  swissReplaceState = {
+    id:String(id),
+    roundIndex:Number(roundIndex),
+    pairIndex:Number(pairIndex),
+    selectedA:pair.a || "",
+    selectedB:pair.b || ""
+  };
+
+  const modal = $("swissReplaceModal");
+  if(!modal) return;
+
+  $("swissReplaceSearchA").value = "";
+  $("swissReplaceSearchB").value = "";
+
+  renderSwissReplaceLists();
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden","false");
+}
+
+function closeSwissReplaceModal(){
+  const modal = $("swissReplaceModal");
+  if(modal){
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden","true");
+  }
+}
+
+function renderSwissReplaceLists(){
+  if(!swissReplaceState) return;
+
+  const players = getPlayers(swissReplaceState.id)
+    .map(p => typeof p === "object" ? (p.username || p.name || "") : p)
+    .filter(Boolean);
+
+  renderSwissReplaceList("A", players);
+  renderSwissReplaceList("B", players);
+}
+
+function renderSwissReplaceList(side, players){
+  const searchEl = $("swissReplaceSearch" + side);
+  const listEl = $("swissReplaceList" + side);
+  if(!searchEl || !listEl || !swissReplaceState) return;
+
+  const query = String(searchEl.value || "").trim().toLowerCase();
+  const selected = side === "A" ? swissReplaceState.selectedA : swissReplaceState.selectedB;
+
+  listEl.innerHTML = players
+    .filter(name => !query || String(name).toLowerCase().includes(query))
+    .map(name => `
+      <button type="button"
+        class="btn ghost ${String(name) === String(selected) ? "active" : ""}"
+        onclick="selectSwissReplacePlayer('${side}','${escapeHtml(name)}')">
+        ${roleNickHtml(name)}
+      </button>
+    `).join("");
+}
+
+function selectSwissReplacePlayer(side, nick){
+  if(!swissReplaceState) return;
+
+  if(side === "A"){
+    swissReplaceState.selectedA = nick;
+  }else{
+    swissReplaceState.selectedB = nick;
+  }
+
+  renderSwissReplaceLists();
+}
+
+async function saveSwissReplacePlayers(){
+  if(!swissReplaceState) return;
+
+  const id = swissReplaceState.id;
+  const roundIndex = swissReplaceState.roundIndex;
+  const pairIndex = swissReplaceState.pairIndex;
+
+  const data = swissRoundsData[id];
+  const pair = data?.rounds?.[roundIndex]?.pairings?.[pairIndex];
+
+  if(!pair){
+    showAlert("Пара не найдена.");
+    return;
+  }
+
+  const newA = String(swissReplaceState.selectedA || "").trim();
+  const newB = String(swissReplaceState.selectedB || "").trim();
+
+  if(!newA || !newB){
+    showAlert("Выбери двух игроков.");
+    return;
+  }
+
+  if(newA.toLowerCase() === newB.toLowerCase()){
+    showAlert("Нельзя поставить одного игрока против самого себя.");
+    return;
+  }
+
+  pair.a = newA;
+  pair.b = newB;
+  pair.scoreA = "";
+  pair.scoreB = "";
+  pair.result = null;
+
+  Object.keys(matchRooms).forEach(roomKey => {
+    const room = matchRooms[roomKey];
+    if(
+      String(room?.id) === id &&
+      String(room?.group) === "swiss" &&
+      Number(room?.round) === roundIndex + 1 &&
+      Number(room?.matchIndex) === pairIndex
+    ){
+      delete matchRooms[roomKey];
+    }
+  });
+
+  const roomKey = matchRoomKey(
+    id,
+    "swiss",
+    "main",
+    roundIndex + 1,
+    `${pairIndex}::${normalizeMatchNick(newA)}::${normalizeMatchNick(newB)}`
+  );
+
+  matchRooms[roomKey] = {
+    id,
+    group:"swiss",
+    side:"main",
+    round:roundIndex + 1,
+    matchIndex:pairIndex,
+    playerA:newA,
+    playerB:newB,
+    scoreA:"",
+    scoreB:"",
+    bannedA:[],
+    bannedB:[],
+    selfBannedA:[],
+    selfBannedB:[],
+    chat:[]
+  };
+
+  saveMatchRooms();
+  saveSwissRounds();
+  await saveTournamentPlayToServer(id);
+
+  closeSwissReplaceModal();
+  renderTrackModal(id);
+  showAlert("Игроки пары заменены.");
+}
+
+window.openSwissReplaceModal = openSwissReplaceModal;
+window.closeSwissReplaceModal = closeSwissReplaceModal;
+window.saveSwissReplacePlayers = saveSwissReplacePlayers;
+window.selectSwissReplacePlayer = selectSwissReplacePlayer;
+
+document.addEventListener("input", function(e){
+  if(e.target?.id === "swissReplaceSearchA" || e.target?.id === "swissReplaceSearchB"){
+    renderSwissReplaceLists();
+  }
+});
     function renderSwissPairings(id,data,roundIndex){
       const round=data.rounds[roundIndex] || {pairings:[]};
       return `<div class="track-description-box"><b style="color:var(--gold2)">Пары раунда ${roundIndex+1}</b><div class="swiss-pairings" style="margin-top:12px">${(round.pairings||[]).map((p,i)=>{
@@ -8083,6 +8405,11 @@ renderTrackModal(id);
         const scoreBInput=isBye
           ? `<div class="swiss-score-box"><div class="swiss-score-input" style="display:grid;place-items:center;opacity:.75;pointer-events:none">BYE</div></div>`
           : `<div class="swiss-score-box"><input class="swiss-score-input" type="number" min="0" step="1" value="${scoreB}" placeholder="0" oninput="setSwissPairScore(${id},${roundIndex},${i},'b',this.value)"></div>`;
+                const t = tournaments.find(x => String(x.id) === String(id));
+        const replaceBtn = t && canRandomizeTournamentClient(t)
+          ? `<button type="button" class="btn ghost swiss-replace-btn" onclick="openSwissReplaceModal(${id},${roundIndex},${i})">🔁 Заменить игроков</button>`
+          : "";
+
         return `<div class="swiss-pair">
   <button type="button"
     class="match-swords-btn"
@@ -8099,6 +8426,7 @@ renderTrackModal(id);
   <div class="swiss-vs">vs</div>
   <div class="swiss-player">${p.b === 'BYE' ? 'BYE' : roleNickHtml(p.b)}${getPlayerContact(id,p.b) ? `<div class="small-note">${escapeHtml(getPlayerContact(id,p.b))}</div>` : ""}${scoreBInput}</div>
   <div class="swiss-result-label">${resultText}</div>
+  ${replaceBtn}
 </div>`;
       }).join('')}</div></div>`;
     }
