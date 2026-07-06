@@ -2752,18 +2752,27 @@ app.patch("/api/tournaments/:id/random-play", verifyToken, async (req, res) => {
 
     const { bracket, swiss_data } = req.body;
 
-    const result = await pool.query(`
-      UPDATE tournaments
-      SET
-        bracket = $1,
-        swiss_data = $2
-      WHERE id = $3
-      RETURNING *
-    `, [
-      JSON.stringify(bracket || []),
-      JSON.stringify(swiss_data || {}),
-      req.params.id
-    ]);
+const oldSwissData = parseTournamentJson(access.tournament.swiss_data);
+const incomingSwissData = swiss_data && typeof swiss_data === "object" ? swiss_data : {};
+
+const mergedSwissData = {
+  ...oldSwissData,
+  ...incomingSwissData,
+  matchRooms: oldSwissData.matchRooms || {}
+};
+
+const result = await pool.query(`
+  UPDATE tournaments
+  SET
+    bracket = $1,
+    swiss_data = $2
+  WHERE id = $3
+  RETURNING *
+`, [
+  JSON.stringify(bracket || []),
+  JSON.stringify(mergedSwissData),
+  req.params.id
+]);
 
     res.json({
       ok: true,
@@ -2792,18 +2801,27 @@ app.patch("/api/tournaments/:id/play", verifyToken, async (req, res) => {
 
     const { bracket, swiss_data } = req.body;
 
-    const result = await pool.query(`
-      UPDATE tournaments
-      SET
-        bracket = $1,
-        swiss_data = $2
-      WHERE id = $3
-      RETURNING *
-    `, [
-      JSON.stringify(bracket || []),
-      JSON.stringify(swiss_data || {}),
-      req.params.id
-    ]);
+const oldSwissData = parseTournamentJson(access.tournament.swiss_data);
+const incomingSwissData = swiss_data && typeof swiss_data === "object" ? swiss_data : {};
+
+const mergedSwissData = {
+  ...oldSwissData,
+  ...incomingSwissData,
+  matchRooms: oldSwissData.matchRooms || {}
+};
+
+const result = await pool.query(`
+  UPDATE tournaments
+  SET
+    bracket = $1,
+    swiss_data = $2
+  WHERE id = $3
+  RETURNING *
+`, [
+  JSON.stringify(bracket || []),
+  JSON.stringify(mergedSwissData),
+  req.params.id
+]);
 
     res.json({
       ok: true,

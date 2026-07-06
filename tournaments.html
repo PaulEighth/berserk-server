@@ -3724,12 +3724,14 @@ if(Array.isArray(parsedSwissData.coOrganizers)){
   ? parsedSwissData.outPlayers
   : [];
 
-  if (parsedSwissData.matchRooms) {
+  if (parsedSwissData.matchRooms && typeof parsedSwissData.matchRooms === "object") {
   Object.assign(matchRooms, parsedSwissData.matchRooms);
 }
 
 if (parsedSwissData.swissRoundsState && typeof parsedSwissData.swissRoundsState === "object") {
   swissRoundsData[tid] = parsedSwissData.swissRoundsState;
+} else if (String(t.format) === "swiss") {
+  delete swissRoundsData[tid];
 }
 
   return {
@@ -5948,10 +5950,7 @@ async function saveTournamentPlayToServer(id){
   manualCells: tournamentManualCells[String(id)] || {},
   manualScores: tournamentManualScores[String(id)] || {},
   winners: tournamentWinners[String(id)] || {},
-  outPlayers: getOutPlayers(id),
-  matchRooms: Object.fromEntries(
-    Object.entries(matchRooms).filter(([key, room]) => String(room.id) === String(id))
-  )
+  outPlayers: getOutPlayers(id)
 }
       })
     });
