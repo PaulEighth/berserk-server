@@ -7278,8 +7278,9 @@ function canSeeMatchDecksNow(t, playerNick){
   if(!t) return false;
 
   const isClosedForReveal =
-    t.status === "closed" ||
-    t.status === "finished";
+  t.status === "closed" ||
+  t.status === "finished" ||
+  t.registrationOpen === false;
 
   const currentNick = normalizeMatchNick(getCurrentUserNick());
   const targetNick = normalizeMatchNick(playerNick);
