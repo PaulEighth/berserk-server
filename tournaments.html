@@ -7571,7 +7571,7 @@ async function toggleMatchDeckSelfBan(side, deckIndex){
     room.selfBannedB = [];
     room.chat = [];
     saveMatchRooms();
-    saveMatchRoomToServer(key);
+    await saveMatchRoomToServer(key);
   }
 
     room.bannedA = Array.isArray(room.bannedA) ? room.bannedA : [];

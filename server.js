@@ -2919,9 +2919,11 @@ app.patch("/api/tournaments/:id/match-room", verifyToken, async (req, res) => {
       Number(tournament.organizer_id) === Number(req.user.id) ||
       isTournamentCoOrganizer(req, tournament);
 
-    const isPlayerA = String(req.user.username || "") === String(sourceRoom.playerA || "");
-    const isPlayerB = String(req.user.username || "") === String(sourceRoom.playerB || "");
-    const isMatchPlayer = isPlayerA || isPlayerB;
+    const requestNick = normalizeTournamentNick(req.user.username);
+
+const isPlayerA = requestNick === normalizeTournamentNick(sourceRoom.playerA);
+const isPlayerB = requestNick === normalizeTournamentNick(sourceRoom.playerB);
+const isMatchPlayer = isPlayerA || isPlayerB;
 
     if(!isStaffUser && !isOrganizer && !isMatchPlayer){
       return res.status(403).json({
