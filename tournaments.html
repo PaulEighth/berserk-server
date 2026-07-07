@@ -3738,7 +3738,7 @@ let matchRooms = {};
     throw new Error("Нет токена");
   }
 
-  const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${tournamentId}/match-room`, {
+  const response = await fetch(`/api/tournaments/${tournamentId}/match-room`, {
     method: "PATCH",
     headers: authHeaders(),
     body: JSON.stringify({
@@ -3763,7 +3763,7 @@ let matchRooms = {};
 }
 
 async function loadMatchRoomFromServer(tournamentId, roomKey){
-  const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${tournamentId}/match-room?roomKey=${encodeURIComponent(roomKey)}`);
+  const response = await fetch(`/api/tournaments/${tournamentId}/match-room?roomKey=${encodeURIComponent(roomKey)}`);
 
   const data = await response.json();
 
@@ -3783,7 +3783,7 @@ function getMoneyPrizeValue(text){
 }
     async function loadTournamentsFromServer(silent = false){
   try{
-    const response = await fetch("https://berserk-server.onrender.com/api/tournaments");
+    const response = await fetch("/api/tournaments");
     const data = await response.json();
 
     if(!data.ok){
@@ -4476,7 +4476,7 @@ function isTournamentCoOrganizer(t,nick){
       if(!current || current.username !== ADMIN_USERNAME) return;
 
       try{
-        const response = await fetch("https://berserk-server.onrender.com/admin/users", {
+        const response = await fetch("/admin/users", {
           headers: {"x-admin-username": current.username}
         });
         if(!response.ok) return;
@@ -4974,7 +4974,7 @@ async function saveMyTournamentDecks(id, modal){
   }
 
   try{
-    const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${id}/my-decks`, {
+    const response = await fetch(`/api/tournaments/${id}/my-decks`, {
       method:"PATCH",
       headers:authHeaders(),
       body:JSON.stringify({decks:selectedDecks})
@@ -6081,7 +6081,7 @@ async function saveTournamentPlayToServer(id){
     const t = tournaments.find(x => String(x.id) === String(id));
     if(!t) return;
 
-    const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${id}/play`, {
+    const response = await fetch(`/api/tournaments/${id}/play`, {
       method: "PATCH",
       headers: authHeaders(),
       body: JSON.stringify({
@@ -6599,7 +6599,7 @@ async function saveTournamentRandomPlayToServer(id){
     const t = tournaments.find(x => String(x.id) === String(id));
     if(!t) return false;
 
-    const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${id}/random-play`, {
+    const response = await fetch(`/api/tournaments/${id}/random-play`, {
       method: "PATCH",
       headers: authHeaders(),
       body: JSON.stringify({
@@ -7883,7 +7883,7 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
       }
 
       try{
-        const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${room.id}/match-room-chat?roomKey=${encodeURIComponent(roomKey)}`);
+        const response = await fetch(`/api/tournaments/${room.id}/match-room-chat?roomKey=${encodeURIComponent(roomKey)}`);
 
         const data = await response.json();
 
@@ -7925,7 +7925,7 @@ ${renderMatchPlayerDecks(t, room, room.playerB, "b")}
   const authorNick = normalizeNick(getCurrentUserNick()) || 'Игрок';
 
   try{
-    const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${room.id}/match-room-chat`, {
+    const response = await fetch(`/api/tournaments/${room.id}/match-room-chat`, {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({
@@ -8566,7 +8566,7 @@ function openTournamentStatusModal(id){
   modal.classList.add("show");
 }
 async function updateTournamentStatus(id, status){
-  const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${id}/status`, {
+  const response = await fetch(`/api/tournaments/${id}/status`, {
     method:"PATCH",
     headers:authHeaders(),
     body:JSON.stringify({status})
@@ -8588,7 +8588,7 @@ async function toggleTournamentRegistration(id){
   const t = tournaments.find(x => String(x.id) === String(id));
   if(!t) return;
 
-  const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${id}/registration`, {
+  const response = await fetch(`/api/tournaments/${id}/registration`, {
     method:"PATCH",
     headers:authHeaders(),
     body:JSON.stringify({registrationOpen: !t.registrationOpen})
@@ -8727,7 +8727,7 @@ if(!ok){
 }
 
   try{
-    const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${id}/leave`, {
+    const response = await fetch(`/api/tournaments/${id}/leave`, {
       method: "DELETE",
       headers: authHeaders()
     });
@@ -8881,7 +8881,7 @@ return !!nick && isTournamentCoOrganizer(t,nick);
   const key = String(id);
 
   try{
-    const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${key}`, {
+    const response = await fetch(`/api/tournaments/${key}`, {
       method: "DELETE",
       headers: authHeaders()
     });
@@ -8976,7 +8976,7 @@ async function confirmRemoveTournamentPlayer(){
     const id = pendingRemovePlayerTournamentId;
     const nick = pendingRemovePlayerNick;
 
-    const response = await fetch(`https://berserk-server.onrender.com/api/tournaments/${id}/participants/${encodeURIComponent(nick)}`, {
+    const response = await fetch(`/api/tournaments/${id}/participants/${encodeURIComponent(nick)}`, {
       method:"DELETE",
       headers:authHeaders()
     });
