@@ -3907,6 +3907,7 @@ bansFinal: Number(t.bansfinal || t.bansFinal || 0),
 grid: Number(t.bracket_size || t.bracketSize || t.bracket || t.grid || t.max_players) || 8,
 bracket: Number(t.bracket_size || t.bracketSize || t.bracket || t.grid || t.max_players) || 8,
 swissRounds: Number(t.swissRounds || parsedSwissData.roundsCount || parsedSwissData.swissRounds || 3),
+editRights: t.players_can_edit === true || t.players_can_edit === "true" ? "participants" : "organizer",
 bracketData: Array.isArray(t.bracket) ? t.bracket : [],
 
     swissData: parsedSwissData
@@ -5841,7 +5842,8 @@ bansBeforeFinal: request.bansBeforeFinal || 0,
 decksFinal: request.decksFinal || 1,
 bansFinal: request.bansFinal || 0,
 isPrivate: !!request.isPrivate,
-privatePassword: request.isPrivate ? (request.privatePassword || "") : ""
+privatePassword: request.isPrivate ? (request.privatePassword || "") : "",
+players_can_edit: request.editRights === "participants"
     })
   });
 

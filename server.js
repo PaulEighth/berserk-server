@@ -300,6 +300,10 @@ async function ensurePartnerColumn() {
   ADD COLUMN IF NOT EXISTS medals JSONB DEFAULT '{}'
 `);
 await pool.query(`
+  ALTER TABLE tournaments
+  ADD COLUMN IF NOT EXISTS players_can_edit BOOLEAN DEFAULT false
+`);
+await pool.query(`
   ALTER TABLE users
   ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'none'
 `);
@@ -1869,7 +1873,8 @@ bracket,
   decksFinal,
   bansFinal,
 isPrivate,
-privatePassword
+privatePassword,
+players_can_edit
 } = req.body;
 
     if (!title) {
@@ -1904,9 +1909,11 @@ bansBeforeFinal,
 decksFinal,
 bansFinal,
 is_private,
-private_password
+private_password,
+players_can_edit
       )
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25)
+)
       RETURNING *
     `, [
       title,
@@ -1933,7 +1940,8 @@ Number(bansBeforeFinal) || 0,
 Number(decksFinal) || 1,
 Number(bansFinal) || 0,
 !!isPrivate,
-isPrivate ? (privatePassword || "") : ""
+isPrivate ? (privatePassword || "") : "",
+!!players_can_edit
     ]);
 
     res.json({
@@ -2322,7 +2330,8 @@ app.patch("/api/tournaments/:id", verifyToken, async (req, res) => {
   decksFinal,
   bansFinal,
   isPrivate,
-  privatePassword
+  privatePassword,
+players_can_edit
 } = req.body;
 
 const oldSwissData = parseTournamentJson(access.tournament.swiss_data);
@@ -2353,8 +2362,9 @@ deckMode = $12,
         is_private = $17,
 private_password = $18,
 bracket = $19,
-swiss_data = $20
-WHERE id = $21
+swiss_data = $20,
+players_can_edit = $21
+WHERE id = $22
       RETURNING *
     `, [
       title || "",
@@ -2377,6 +2387,7 @@ deckMode || "none",
       isPrivate ? (privatePassword || "") : "",
 Number(bracket) || Number(max_players) || 16,
 JSON.stringify(nextSwissData),
+!!players_can_edit,
 req.params.id
     ]);
 
@@ -2862,7 +2873,7 @@ const result = await pool.query(`
 // Сохранить сетку / счёт турнира
 app.patch("/api/tournaments/:id/play", verifyToken, async (req, res) => {
   try {
-    const access = await canManageTournament(req, req.params.id);
+    const access = await canEditTournamentPlay(req, req.params.id);
 
     if(!access.ok){
       return res.status(access.status).json({
