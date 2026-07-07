@@ -1777,15 +1777,17 @@ app.get("/api/tournaments", async (req, res) => {
   try {
     const now = Date.now();
 
-    if(
+    if (
       tournamentsListCache.payload &&
-      now - tournamentsListCache.at < TOURNAMENTS_LIST_CACHE_MS
-    ){
+      now - tournamentsListCache.at < 15000
+    ) {
       return res.json(tournamentsListCache.payload);
     }
 
-    const [tournamentsResult, participantsResult] = await Promise.all([
-      pool.query(`
+    const client = await pool.connect();
+
+    try {
+      const tournamentsResult = await client.query(`
         SELECT
           t.*,
           COALESCE(u.medals, '{}'::jsonb) AS organizer_medals,
@@ -1795,8 +1797,9 @@ app.get("/api/tournaments", async (req, res) => {
         FROM tournaments t
         LEFT JOIN users u ON u.id = t.organizer_id
         ORDER BY t.created_at DESC
-      `),
-      pool.query(`
+      `);
+
+      const participantsResult = await client.query(`
         SELECT
           p.*,
           COALESCE(u.medals, '{}'::jsonb) AS medals,
@@ -1806,27 +1809,30 @@ app.get("/api/tournaments", async (req, res) => {
         FROM tournament_participants p
         LEFT JOIN users u ON u.id = p.user_id
         ORDER BY p.joined_at ASC
-      `)
-    ]);
+      `);
 
-    const payload = {
-      ok: true,
-      tournaments: tournamentsResult.rows,
-      participants: participantsResult.rows,
-      matches: []
-    };
+      const payload = {
+        ok: true,
+        tournaments: tournamentsResult.rows,
+        participants: participantsResult.rows,
+        matches: []
+      };
 
-    tournamentsListCache = {
-      at: now,
-      payload
-    };
+      tournamentsListCache = {
+        at: now,
+        payload
+      };
 
-    res.json(payload);
+      res.json(payload);
+
+    } finally {
+      client.release();
+    }
 
   } catch (error) {
     console.error("GET /api/tournaments ERROR:", error);
 
-    if(tournamentsListCache.payload){
+    if (tournamentsListCache.payload) {
       return res.json({
         ...tournamentsListCache.payload,
         stale: true
