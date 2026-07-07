@@ -5987,7 +5987,7 @@ if($('requestIsPrivate')) $('requestIsPrivate').value='0';
       applyFilters();
     }
 
-    function openTrackModal(id){
+    async function openTrackModal(id){
   currentTrackTournamentId = id;
 
   const modal = $('trackModal');
@@ -6005,6 +6005,7 @@ if($('requestIsPrivate')) $('requestIsPrivate').value='0';
   }
 
   try{
+    await loadTournamentsFromServer();
     renderTrackModal(id);
 
     if(typeof drawBracketLines === "function"){
@@ -6015,6 +6016,22 @@ if($('requestIsPrivate')) $('requestIsPrivate').value='0';
   }catch(e){
     console.error("Ошибка открытия отслеживания:", e);
   }
+
+  tournamentRefreshTimer = setInterval(async () => {
+    if(!$('trackModal')?.classList.contains('show')) return;
+    if(!currentTrackTournamentId) return;
+
+    try{
+      await loadTournamentsFromServer();
+      renderTrackModal(currentTrackTournamentId);
+
+      if(typeof drawBracketLines === "function"){
+        setTimeout(drawBracketLines, 100);
+      }
+    }catch(e){
+      console.error("Ошибка автообновления турнира:", e);
+    }
+  }, 3000);
 }
 
 function closeTrackModal(){
