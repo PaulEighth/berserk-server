@@ -1764,40 +1764,73 @@ app.post("/api/community/vote", verifyToken, async (req, res) => {
 // =========================
 
 // Получить все турниры
+let tournamentsListCache = {
+  at: 0,
+  payload: null
+};
+
+const TOURNAMENTS_LIST_CACHE_MS = 2500;
+
 app.get("/api/tournaments", async (req, res) => {
   try {
-    const tournamentsResult = await pool.query(`
-      SELECT
-        t.*,
-        COALESCE(u.medals, '{}'::jsonb) AS organizer_medals,
-        COALESCE(u.role, 'user') AS organizer_role,
-        COALESCE(u.is_partner, false) AS organizer_is_partner,
-        COALESCE(u.status, 'none') AS organizer_status
-      FROM tournaments t
-      LEFT JOIN users u ON u.id = t.organizer_id
-      ORDER BY t.created_at DESC
-    `);
+    const now = Date.now();
 
-    const participantsResult = await pool.query(`
-      SELECT
-        p.*,
-        COALESCE(u.medals, '{}'::jsonb) AS medals,
-        COALESCE(u.role, 'user') AS role,
-        COALESCE(u.is_partner, false) AS is_partner,
-        COALESCE(u.status, 'none') AS status
-      FROM tournament_participants p
-      LEFT JOIN users u ON u.id = p.user_id
-      ORDER BY p.joined_at ASC
-    `);
+    if(
+      tournamentsListCache.payload &&
+      now - tournamentsListCache.at < TOURNAMENTS_LIST_CACHE_MS
+    ){
+      return res.json(tournamentsListCache.payload);
+    }
 
-        res.json({
+    const [tournamentsResult, participantsResult] = await Promise.all([
+      pool.query(`
+        SELECT
+          t.*,
+          COALESCE(u.medals, '{}'::jsonb) AS organizer_medals,
+          COALESCE(u.role, 'user') AS organizer_role,
+          COALESCE(u.is_partner, false) AS organizer_is_partner,
+          COALESCE(u.status, 'none') AS organizer_status
+        FROM tournaments t
+        LEFT JOIN users u ON u.id = t.organizer_id
+        ORDER BY t.created_at DESC
+      `),
+      pool.query(`
+        SELECT
+          p.*,
+          COALESCE(u.medals, '{}'::jsonb) AS medals,
+          COALESCE(u.role, 'user') AS role,
+          COALESCE(u.is_partner, false) AS is_partner,
+          COALESCE(u.status, 'none') AS status
+        FROM tournament_participants p
+        LEFT JOIN users u ON u.id = p.user_id
+        ORDER BY p.joined_at ASC
+      `)
+    ]);
+
+    const payload = {
       ok: true,
       tournaments: tournamentsResult.rows,
       participants: participantsResult.rows,
       matches: []
-    });
+    };
+
+    tournamentsListCache = {
+      at: now,
+      payload
+    };
+
+    res.json(payload);
 
   } catch (error) {
+    console.error("GET /api/tournaments ERROR:", error);
+
+    if(tournamentsListCache.payload){
+      return res.json({
+        ...tournamentsListCache.payload,
+        stale: true
+      });
+    }
+
     res.status(500).json({
       ok: false,
       error: error.message
@@ -2385,40 +2418,73 @@ if(!access.ok){
 // =========================
 
 // Получить все турниры
+let tournamentsListCache = {
+  at: 0,
+  payload: null
+};
+
+const TOURNAMENTS_LIST_CACHE_MS = 2500;
+
 app.get("/api/tournaments", async (req, res) => {
   try {
-    const tournamentsResult = await pool.query(`
-      SELECT
-        t.*,
-        COALESCE(u.medals, '{}'::jsonb) AS organizer_medals,
-        COALESCE(u.role, 'user') AS organizer_role,
-        COALESCE(u.is_partner, false) AS organizer_is_partner,
-        COALESCE(u.status, 'none') AS organizer_status
-      FROM tournaments t
-      LEFT JOIN users u ON u.id = t.organizer_id
-      ORDER BY t.created_at DESC
-    `);
+    const now = Date.now();
 
-    const participantsResult = await pool.query(`
-      SELECT
-        p.*,
-        COALESCE(u.medals, '{}'::jsonb) AS medals,
-        COALESCE(u.role, 'user') AS role,
-        COALESCE(u.is_partner, false) AS is_partner,
-        COALESCE(u.status, 'none') AS status
-      FROM tournament_participants p
-      LEFT JOIN users u ON u.id = p.user_id
-      ORDER BY p.joined_at ASC
-    `);
+    if(
+      tournamentsListCache.payload &&
+      now - tournamentsListCache.at < TOURNAMENTS_LIST_CACHE_MS
+    ){
+      return res.json(tournamentsListCache.payload);
+    }
 
-        res.json({
+    const [tournamentsResult, participantsResult] = await Promise.all([
+      pool.query(`
+        SELECT
+          t.*,
+          COALESCE(u.medals, '{}'::jsonb) AS organizer_medals,
+          COALESCE(u.role, 'user') AS organizer_role,
+          COALESCE(u.is_partner, false) AS organizer_is_partner,
+          COALESCE(u.status, 'none') AS organizer_status
+        FROM tournaments t
+        LEFT JOIN users u ON u.id = t.organizer_id
+        ORDER BY t.created_at DESC
+      `),
+      pool.query(`
+        SELECT
+          p.*,
+          COALESCE(u.medals, '{}'::jsonb) AS medals,
+          COALESCE(u.role, 'user') AS role,
+          COALESCE(u.is_partner, false) AS is_partner,
+          COALESCE(u.status, 'none') AS status
+        FROM tournament_participants p
+        LEFT JOIN users u ON u.id = p.user_id
+        ORDER BY p.joined_at ASC
+      `)
+    ]);
+
+    const payload = {
       ok: true,
       tournaments: tournamentsResult.rows,
       participants: participantsResult.rows,
       matches: []
-    });
+    };
+
+    tournamentsListCache = {
+      at: now,
+      payload
+    };
+
+    res.json(payload);
 
   } catch (error) {
+    console.error("GET /api/tournaments ERROR:", error);
+
+    if(tournamentsListCache.payload){
+      return res.json({
+        ...tournamentsListCache.payload,
+        stale: true
+      });
+    }
+
     res.status(500).json({
       ok: false,
       error: error.message
