@@ -2049,6 +2049,80 @@ String(contactInfo || "").trim()
     });
   }
 });
+// Вернуть участника в регистрацию турнира
+app.post("/api/tournaments/:id/restore-participant", verifyToken, async (req, res) => {
+  try{
+    const tournamentId = req.params.id;
+    const username = String(req.body.username || "").trim();
+
+    if(!username){
+      return res.status(400).json({
+        ok:false,
+        error:"Ник не указан"
+      });
+    }
+
+    const access = await canManageTournament(req, tournamentId);
+
+    if(!access.ok){
+      return res.status(access.status).json({
+        ok:false,
+        error:access.error
+      });
+    }
+
+    const userResult = await pool.query(`
+      SELECT id, username, role, is_partner
+      FROM users
+      WHERE LOWER(username) = LOWER($1)
+      LIMIT 1
+    `, [username]);
+
+    if(userResult.rows.length === 0){
+      return res.status(404).json({
+        ok:false,
+        error:"Пользователь не найден на сайте"
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    const result = await pool.query(`
+      INSERT INTO tournament_participants (
+        tournament_id,
+        user_id,
+        username,
+        role,
+        is_partner,
+        decks,
+        contact_info
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7)
+      ON CONFLICT DO NOTHING
+      RETURNING *
+    `, [
+      tournamentId,
+      user.id,
+      user.username,
+      user.role || "user",
+      !!user.is_partner,
+      JSON.stringify([]),
+      ""
+    ]);
+
+    return res.json({
+      ok:true,
+      restored: result.rows[0] || null
+    });
+
+  }catch(error){
+    console.error("RESTORE PARTICIPANT ERROR:", error);
+    res.status(500).json({
+      ok:false,
+      error:error.message
+    });
+  }
+});
 // Покинуть турнир
 app.delete("/api/tournaments/:id/leave", verifyToken, async (req, res) => {
   try {
