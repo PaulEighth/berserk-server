@@ -974,7 +974,9 @@ app.delete("/admin/users/:id", requireAdmin, async (req, res) => {
     res.status(500).json({ error: "Ошибка удаления пользователя" });
   }
 });
-ensurePartnerColumn().then(() => {
+ensurePartnerColumn().catch((err) => {
+  console.error("DB INIT ERROR:", err);
+});
   // =========================
 // НОВОСТИ
 // =========================
@@ -4006,6 +4008,4 @@ app.patch("/api/decks/:id/vote", verifyToken, async (req, res) => {
 app.listen(PORT, () => {
   
   console.log(`Сервер запущен на порту ${PORT}`);
-});
-
 });
