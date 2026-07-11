@@ -3750,9 +3750,22 @@ let matchRooms = {};
   const data = await response.json();
 
   if(!response.ok || !data.ok){
-    showAlert(data.error || "Не удалось сохранить окно матча");
-    throw new Error(data.error || "Не удалось сохранить окно матча");
+
+  if(response.status === 401 || data.error === "Неверный токен"){
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    showAlert(
+      "Сессия устарела. Выйдите из аккаунта и войдите снова."
+    );
+
+    throw new Error("Неверный токен");
   }
+
+  showAlert(data.error || "Не удалось сохранить окно матча");
+  throw new Error(data.error || "Не удалось сохранить окно матча");
+}
 
   if(data.room){
     matchRooms[roomKey] = data.room;
