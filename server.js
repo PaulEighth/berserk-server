@@ -3177,7 +3177,7 @@ function isTournamentChatStaff(user){
 async function canUseTournamentChat(req, tournamentId){
 
   const tournamentResult = await pool.query(
-  "SELECT * FROM tournaments WHERE id = $1",
+  "SELECT id, swiss_data FROM tournaments WHERE id = $1",
   [tournamentId]
 );
 

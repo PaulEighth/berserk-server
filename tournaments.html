@@ -3762,16 +3762,49 @@ let matchRooms = {};
   return data;
 }
 
-async function loadMatchRoomFromServer(tournamentId, roomKey){
-  const response = await fetch(`/api/tournaments/${tournamentId}/match-room?roomKey=${encodeURIComponent(roomKey)}`);
+async function loadMatchRoomFromServer(tournamentId, roomKey) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-  const data = await response.json();
+  try {
+    const response = await fetch(
+      `/api/tournaments/${tournamentId}/match-room?roomKey=${encodeURIComponent(roomKey)}`,
+      {
+        signal: controller.signal,
+        cache: "no-store"
+      }
+    );
 
-  if(!response.ok || !data.ok){
+    if (!response.ok) {
+      console.error(
+        "MATCH ROOM HTTP ERROR:",
+        response.status,
+        await response.text()
+      );
+      return null;
+    }
+
+    const data = await response.json();
+
+    if (!data.ok) {
+      console.error("MATCH ROOM API ERROR:", data.error);
+      return null;
+    }
+
+    return data.room || null;
+
+  } catch (error) {
+    if (error.name === "AbortError") {
+      console.error("Сервер комнаты матча не ответил за 15 секунд");
+    } else {
+      console.error("Ошибка загрузки комнаты матча:", error);
+    }
+
     return null;
-  }
 
-  return data.room || null;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 function getMoneyPrizeValue(text){
   const value = String(text || "");
@@ -7726,7 +7759,13 @@ if(String(group) === "swiss"){
 const key = String(group) === "swiss"
   ? matchRoomKey(id, group, side, round, `${matchIndex}::${normalizeMatchNick(a)}::${normalizeMatchNick(b)}`)
   : matchRoomKey(id, group, side, round, matchIndex);
-  const serverRoom = await loadMatchRoomFromServer(id, key);
+  let serverRoom = null;
+
+try {
+  serverRoom = await loadMatchRoomFromServer(id, key);
+} catch (error) {
+  console.error("Не удалось загрузить комнату с сервера:", error);
+}
 
   let isNewMatchRoom = false;
 
