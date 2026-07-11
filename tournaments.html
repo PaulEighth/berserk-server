@@ -8128,13 +8128,20 @@ showAlert("Окно матча сохранено.");
     function ensureSwissData(t,id){
   const key = String(id);
   const players = swissPlayersForTournament(t,id);
-  const maxRounds = Math.min(10, Math.max(1, Number(t.swissRounds || 3)));
+  const currentPlayersKey = players.slice().sort().join("||");
+
+  const maxRounds = Math.min(
+    10,
+    Math.max(1, Number(t.swissRounds || 3))
+  );
 
   if(!swissRoundsData[key]){
     swissRoundsData[key] = {
       current: 0,
       rounds: [],
-      playersKey: players.slice().sort().join("||")
+      playersKey: currentPlayersKey,
+      playoffSize: 8,
+      playoffPlayers: null
     };
   }
 
@@ -8144,26 +8151,38 @@ showAlert("Окно матча сохранено.");
     data.rounds = [];
   }
 
+  // Для старых турниров по умолчанию будет Топ-8.
+  data.playoffSize = Number(data.playoffSize) === 16 ? 16 : 8;
+
+  // Здесь будет храниться перемешанный порядок игроков плей-офф.
+  if(!Array.isArray(data.playoffPlayers)){
+    data.playoffPlayers = null;
+  }
+
   if(!data.rounds.length){
     if(!canRandomizeTournamentClient(t)){
       return data;
     }
 
     data.current = 0;
+
     data.rounds.push({
       number: 1,
       pairings: makeSwissPairings(players,[],id)
     });
-    data.playersKey = players.slice().sort().join("||");
+
+    data.playersKey = currentPlayersKey;
   }
 
   data.playersKey = data.playersKey || currentPlayersKey;
+
   data.current = Math.min(
     Math.max(Number(data.current) || 0, 0),
     Math.min(maxRounds, data.rounds.length)
   );
 
   saveSwissRounds();
+
   return data;
 }
     function setSwissResult(id,roundIndex,pairIndex,result){
@@ -8474,22 +8493,307 @@ document.addEventListener("input", function(e){
 </div>`;
       }).join('')}</div></div>`;
     }
+    function clearSwissPlayoffResults(id){
+  const key = String(id);
+
+  // Очищаем ячейки старой плей-офф сетки.
+  tournamentManualCells[key] = {};
+
+  // Очищаем результаты старой плей-офф сетки.
+  tournamentManualScores[key] = {};
+
+  // Очищаем победителей старой сетки.
+  tournamentWinners[key] = [];
+
+  // Возвращаем исключённых игроков.
+  tournamentOutPlayers[key] = [];
+
+  // Удаляем комнаты только плей-офф матчей.
+  // Комнаты швейцарских раундов не удаляются.
+  Object.keys(matchRooms).forEach(roomKey => {
+    const room = matchRooms[roomKey];
+
+    if(
+      String(room?.id) === key &&
+      String(room?.group) !== "swiss"
+    ){
+      delete matchRooms[roomKey];
+    }
+  });
+
+  saveManualCells();
+  saveManualScores();
+  saveTournamentWinners();
+  saveTournamentOutPlayers();
+  saveMatchRooms();
+}
+
+async function setSwissPlayoffSize(id,size){
+  const t = tournaments.find(item =>
+    String(item.id) === String(id)
+  );
+
+  if(!t){
+    return;
+  }
+
+  if(!canRandomizeTournamentClient(t)){
+    showAlert(
+      "Менять размер сетки может только организатор, соорганизатор или админ."
+    );
+
+    return;
+  }
+
+  const data = ensureSwissData(t,id);
+  const nextSize = Number(size) === 16 ? 16 : 8;
+
+  if(Number(data.playoffSize) === nextSize){
+    return;
+  }
+
+  data.playoffSize = nextSize;
+
+  // После изменения размера возвращаем порядок по таблице.
+  data.playoffPlayers = null;
+
+  clearSwissPlayoffResults(id);
+
+  saveSwissRounds();
+
+  await saveTournamentPlayToServer(id);
+
+  renderTrackModal(id);
+  applyFilters();
+}
+
+async function randomizeSwissPlayoff(id){
+  const t = tournaments.find(item =>
+    String(item.id) === String(id)
+  );
+
+  if(!t){
+    return;
+  }
+
+  if(!canRandomizeTournamentClient(t)){
+    showAlert(
+      "Перемешивать сетку может только организатор, соорганизатор или админ."
+    );
+
+    return;
+  }
+
+  const data = ensureSwissData(t,id);
+
+  const maxRounds = Math.min(
+    10,
+    Math.max(1, Number(t.swissRounds || 3))
+  );
+
+  if(Number(data.current) < maxRounds){
+    showAlert(
+      "Сначала нужно закончить все швейцарские раунды."
+    );
+
+    return;
+  }
+
+  const players = swissPlayersForTournament(t,id);
+
+  const completedRounds = data.rounds.slice(
+    0,
+    maxRounds
+  );
+
+  const standingsPlayers = sortedSwissTable(
+    players,
+    completedRounds,
+    id
+  ).map(item => item.player);
+
+  const playoffSize =
+    Number(data.playoffSize) === 16 ? 16 : 8;
+
+  const qualifiedPlayers = standingsPlayers.slice(
+    0,
+    playoffSize
+  );
+
+  if(qualifiedPlayers.length < 2){
+    showAlert(
+      "Недостаточно игроков для перемешивания."
+    );
+
+    return;
+  }
+
+  // Перемешиваем только тех, кто попал в Топ-8 или Топ-16.
+  data.playoffPlayers = shuffleArrayCopy(
+    qualifiedPlayers
+  );
+
+  clearSwissPlayoffResults(id);
+
+  saveSwissRounds();
+
+  await saveTournamentPlayToServer(id);
+
+  renderTrackModal(id);
+  applyFilters();
+
+  showAlert(
+    `Участники Топ-${playoffSize} перемешаны.`
+  );
+}
+
+window.setSwissPlayoffSize = setSwissPlayoffSize;
+window.randomizeSwissPlayoff = randomizeSwissPlayoff;
     function renderSwissMode(t,id,players){
-      const data=ensureSwissData(t,id);
-      const idx=Number(data.current)||0;
-      const maxRounds=Math.min(10,Math.max(1,Number(t.swissRounds || 3)));
+      const data = ensureSwissData(t,id);
+      const idx = Number(data.current) || 0;
+
+      const maxRounds = Math.min(
+        10,
+        Math.max(1, Number(t.swissRounds || 3))
+      );
+
       const isPlayoffStage = idx >= maxRounds;
-      const visibleRounds = isPlayoffStage ? data.rounds.slice(0,maxRounds) : data.rounds.slice(0,idx+1);
-      const size = Number(t.bracketSize || t.bracket || t.grid || t.maxPlayers || t.places || 8);
-      const standingsPlayers = sortedSwissTable(players,visibleRounds,id).map(x=>x.player);
+
+      const visibleRounds = isPlayoffStage
+        ? data.rounds.slice(0,maxRounds)
+        : data.rounds.slice(0,idx + 1);
+
+      const standingsPlayers = sortedSwissTable(
+        players,
+        visibleRounds,
+        id
+      ).map(item => item.player);
+
+      const playoffSize =
+        Number(data.playoffSize) === 16 ? 16 : 8;
+
+      // Игроки, которые реально прошли по таблице.
+      const qualifiedPlayers = standingsPlayers.slice(
+        0,
+        playoffSize
+      );
+
+      const qualifiedNames = new Set(
+        qualifiedPlayers.map(player =>
+          String(player || "").trim().toLowerCase()
+        )
+      );
+
+      // Проверяем ранее сохранённый рандом.
+      const savedPlayoffPlayers =
+        Array.isArray(data.playoffPlayers)
+          ? data.playoffPlayers.filter(player =>
+              qualifiedNames.has(
+                String(player || "").trim().toLowerCase()
+              )
+            )
+          : [];
+
+      // Если сохранённый список правильный — используем его.
+      // Иначе используем обычный порядок таблицы.
+      const playoffPlayers =
+        savedPlayoffPlayers.length === qualifiedPlayers.length
+          ? savedPlayoffPlayers
+          : qualifiedPlayers;
+
+      const canChangePlayoff =
+        canRandomizeTournamentClient(t);
 
       if(isPlayoffStage){
-        return `<div class="swiss-wrap">
-          <div class="swiss-controls"><button class="btn ghost" onclick="previousSwissRound(${id})">← Назад</button><div class="swiss-round-title">Раунд ${maxRounds+1}: сетка после швейцарки</div><button class="btn gold" onclick="nextSwissRound(${id})">Следующий раунд →</button></div>
-          ${renderSwissStandingsTable(id,players,visibleRounds)}
-          <div class="track-note">Швейцарка завершена: таблица зафиксировала места автоматически по очкам и разнице. Ниже начинается сетка по итоговому рейтингу.</div>
-          <div class="swiss-bracket-after"><div class="bracket-size-row" style="display:flex"><span>Сетка после швейцарки: топ 8 игроков.</span></div>${renderFullBracket(id, standingsPlayers.slice(0,8), 8)}</div>
-        </div>`;
+        return `
+          <div class="swiss-wrap">
+
+            <div class="swiss-controls">
+              <button
+                class="btn ghost"
+                onclick="previousSwissRound(${id})"
+              >
+                ← Назад
+              </button>
+
+              <div class="swiss-round-title">
+                Раунд ${maxRounds + 1}: сетка после швейцарки
+              </div>
+
+              <button
+                class="btn gold"
+                onclick="nextSwissRound(${id})"
+              >
+                Следующий раунд →
+              </button>
+            </div>
+
+            ${renderSwissStandingsTable(
+              id,
+              players,
+              visibleRounds
+            )}
+
+            <div class="track-note">
+              Швейцарка завершена. Выбери размер плей-офф.
+              Кнопка рандома перемешивает только игроков,
+              которые уже попали в выбранный Топ.
+            </div>
+
+            <div class="swiss-bracket-after">
+
+              <div
+                class="bracket-size-row"
+                style="display:flex"
+              >
+                <span>
+                  Сетка после швейцарки:
+                </span>
+
+                <button
+                  type="button"
+                  class="bracket-size-btn ${playoffSize === 8 ? "active" : ""}"
+                  onclick="setSwissPlayoffSize(${id},8)"
+                  ${canChangePlayoff ? "" : "disabled"}
+                >
+                  Топ-8
+                </button>
+
+                <button
+                  type="button"
+                  class="bracket-size-btn ${playoffSize === 16 ? "active" : ""}"
+                  onclick="setSwissPlayoffSize(${id},16)"
+                  ${canChangePlayoff ? "" : "disabled"}
+                >
+                  Топ-16
+                </button>
+
+                ${
+                  canChangePlayoff
+                    ? `
+                      <button
+                        type="button"
+                        class="btn ghost"
+                        style="width:auto;padding:9px 16px"
+                        onclick="randomizeSwissPlayoff(${id})"
+                      >
+                        🎲 Перемешать участников
+                      </button>
+                    `
+                    : ""
+                }
+              </div>
+
+              ${renderFullBracket(
+                id,
+                playoffPlayers,
+                playoffSize
+              )}
+
+            </div>
+          </div>
+        `;
       }
 
       return `<div class="swiss-wrap">
