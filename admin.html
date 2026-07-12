@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ru">
 <head>
+  <link rel="stylesheet" href="effects.css">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Berserk Heroes Online — Админ-панель</title>
@@ -1018,18 +1019,25 @@ if(search){
     </div>
 
     <div class="bottom-actions">
-      ${user.username === ADMIN_USERNAME ? "" : `
-        <button class="btn gold" onclick="changeRole(${user.id})">Сохранить роль</button>
+  ${user.username === ADMIN_USERNAME ? "" : `
+    <button class="btn gold" onclick="changeRole(${user.id})">Сохранить роль</button>
 
-        <button class="btn ghost" onclick="togglePartner(${user.id}, ${user.is_partner ? "false" : "true"})">
-          ${user.is_partner ? "Убрать ⭐" : "Дать ⭐"}
-        </button>
+    <button class="btn ghost" onclick="togglePartner(${user.id}, ${user.is_partner ? "false" : "true"})">
+      ${user.is_partner ? "Убрать ⭐" : "Дать ⭐"}
+    </button>
 
-        <button class="btn ghost" onclick="quickBan(${user.id})">Бан</button>
+    <button
+      class="btn ghost"
+      onclick="changeUserPassword(${user.id}, '${String(user.username).replace(/\\/g, "\\\\").replace(/'/g, "\\'")}')"
+    >
+      Сменить пароль
+    </button>
 
-        <button class="btn red" onclick="deleteUser(${user.id}, '${String(user.username).replace(/'/g, "\\'")}')">Удалить</button>
-      `}
-    </div>
+    <button class="btn ghost" onclick="quickBan(${user.id})">Бан</button>
+
+    <button class="btn red" onclick="deleteUser(${user.id}, '${String(user.username).replace(/'/g, "\\'")}')">Удалить</button>
+  `}
+</div>
 
   </div>
 </td>
@@ -1309,7 +1317,88 @@ if(data.username === currentUser.username){
       document.getElementById(`role-${userId}`).value = "banned";
       await changeRole(userId);
     }
+async function changeUserPassword(userId, username){
+  if(!checkAdmin()) return;
 
+  const newPassword = prompt(
+    `Введите новый временный пароль для игрока ${username}.\n\nМинимум 6 символов.`
+  );
+
+  if(newPassword === null){
+    return;
+  }
+
+  if(newPassword.length < 6){
+    showInfo(
+      "Ошибка",
+      "Пароль должен содержать минимум 6 символов."
+    );
+    return;
+  }
+
+  if(newPassword.length > 100){
+    showInfo(
+      "Ошибка",
+      "Пароль слишком длинный."
+    );
+    return;
+  }
+
+  const repeatPassword = prompt(
+    `Повторите новый пароль для игрока ${username}.`
+  );
+
+  if(repeatPassword === null){
+    return;
+  }
+
+  if(newPassword !== repeatPassword){
+    showInfo(
+      "Ошибка",
+      "Введённые пароли не совпадают."
+    );
+    return;
+  }
+
+  try{
+    const response = await fetch(
+      `${API_URL}/admin/users/${userId}/password`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-username": currentUser.username
+        },
+        body: JSON.stringify({
+          password: newPassword
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+      showInfo(
+        "Ошибка",
+        data.error || "Не удалось изменить пароль."
+      );
+      return;
+    }
+
+    showInfo(
+      "Пароль изменён",
+      `Новый пароль для игрока ${username}: ${newPassword}`
+    );
+
+  }catch(error){
+    console.error(error);
+
+    showInfo(
+      "Сервер не отвечает",
+      "Не удалось связаться с сервером."
+    );
+  }
+}
     let deleteTargetUserId = null;
 let deleteTargetUsername = "";
 

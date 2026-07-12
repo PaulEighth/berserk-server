@@ -758,7 +758,58 @@ app.get("/admin/users", requireAdmin, async (req, res) => {
     res.status(500).json({ error: "Ошибка получения пользователей" });
   }
 });
+app.patch("/admin/users/:id/password", requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const newPassword = String(req.body.password || "");
 
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        error: "Пароль должен содержать минимум 6 символов"
+      });
+    }
+
+    if (newPassword.length > 100) {
+      return res.status(400).json({
+        error: "Пароль слишком длинный"
+      });
+    }
+
+    const targetUser = await pool.query(
+      "SELECT id, username FROM users WHERE id = $1",
+      [id]
+    );
+
+    if (targetUser.rows.length === 0) {
+      return res.status(404).json({
+        error: "Пользователь не найден"
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await pool.query(
+      "UPDATE users SET password = $1 WHERE id = $2",
+      [hashedPassword, id]
+    );
+
+    res.json({
+      ok: true,
+      message: "Пароль успешно изменён",
+      user: {
+        id: targetUser.rows[0].id,
+        username: targetUser.rows[0].username
+      }
+    });
+
+  } catch (error) {
+    console.error("ADMIN PASSWORD CHANGE ERROR:", error);
+
+    res.status(500).json({
+      error: "Ошибка изменения пароля"
+    });
+  }
+});
 app.patch("/admin/users/:id/role", requireAdmin, async (req, res) => {
   
   try {
