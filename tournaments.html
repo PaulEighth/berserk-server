@@ -3250,6 +3250,91 @@ html body .bracket-cell.alive{
 @media(max-width:760px){
   .swiss-replace-grid{grid-template-columns:1fr}
 }
+/* ===== Журнал изменений турнира: только для главного администратора ===== */
+.audit-modal{
+  position:fixed;
+  inset:0;
+  z-index:140000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.84);
+  backdrop-filter:blur(12px);
+}
+
+.audit-modal.show{
+  display:flex;
+}
+
+.audit-box{
+  position:relative;
+  width:min(1050px,100%);
+  max-height:92vh;
+  overflow:auto;
+  padding:26px;
+  border-radius:28px;
+  background:linear-gradient(
+    180deg,
+    rgba(17,22,34,.99),
+    rgba(9,12,19,.99)
+  );
+  border:1px solid rgba(232,194,112,.24);
+  box-shadow:0 35px 110px rgba(0,0,0,.62);
+}
+
+.audit-box h2{
+  margin:0 0 8px;
+  color:var(--gold2);
+}
+
+.audit-subtitle{
+  margin:0 0 18px;
+  color:var(--muted);
+}
+
+.audit-log-list{
+  display:grid;
+  gap:10px;
+}
+
+.audit-log-item{
+  padding:14px;
+  border-radius:18px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(232,194,112,.15);
+}
+
+.audit-log-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:8px;
+}
+
+.audit-log-user{
+  color:var(--gold2);
+  font-weight:950;
+}
+
+.audit-log-time{
+  color:var(--muted);
+  font-size:13px;
+  text-align:right;
+}
+
+.audit-log-action{
+  color:var(--text);
+  line-height:1.5;
+  overflow-wrap:anywhere;
+}
+
+.audit-log-meta{
+  margin-top:8px;
+  color:var(--muted);
+  font-size:12px;
+  overflow-wrap:anywhere;
+}
 </style>
 </head>
 <body>
@@ -3576,7 +3661,32 @@ html body .bracket-cell.alive{
     </div></main><footer class="footer"><div class="wrap"><div>Данный сайт является неофициальным фанатским проектом и не имеет никакого отношения к правообладателю игры Берсерк Герои Онлайн, ее лицензиатам или официальным партнерам.
 Все права на игру Берсерк Герои Онлайн, включая название, торговые марки, графические элементы и другие объекты интеллектуальной собственности, принадлежат их законным правообладателям</div></div>
   </footer>
+<div
+  class="audit-modal"
+  id="auditModal"
+  aria-hidden="true"
+>
+  <div class="audit-box">
+    <button
+      type="button"
+      class="modal-close"
+      onclick="closeTournamentAuditLog()"
+    >
+      ×
+    </button>
 
+    <h2>История изменений турнира</h2>
+
+    <p class="audit-subtitle">
+      Кто, когда и что изменил в сетке.
+    </p>
+
+    <div
+      id="auditLogList"
+      class="audit-log-list"
+    ></div>
+  </div>
+</div>
   <script>
     let tournaments = [];
 
@@ -4086,9 +4196,150 @@ function authHeaders(extra = {}){
 
     const ADMIN_USERNAME = "Eighth#2020";
 
-    function isAdmin(){
+        function isAdmin(){
       const user = getLoggedUser();
       return !!user && user.username === ADMIN_USERNAME;
+    }
+
+    let currentAuditTournamentId = null;
+
+    function formatTournamentAuditDate(value){
+      if(!value){
+        return "Неизвестное время";
+      }
+
+      return new Intl.DateTimeFormat("ru-RU", {
+        dateStyle:"medium",
+        timeStyle:"medium"
+      }).format(new Date(value));
+    }
+
+    async function openTournamentAuditLog(tournamentId){
+      if(!isAdmin()){
+        return;
+      }
+
+      currentAuditTournamentId = String(tournamentId);
+
+      const modal =
+        document.getElementById("auditModal");
+
+      const list =
+        document.getElementById("auditLogList");
+
+      modal.classList.add("show");
+      modal.setAttribute(
+        "aria-hidden",
+        "false"
+      );
+
+      list.innerHTML = `
+        <div class="audit-log-item">
+          Загрузка истории...
+        </div>
+      `;
+
+      try{
+        const response = await fetch(
+          `/api/tournaments/${
+            encodeURIComponent(
+              currentAuditTournamentId
+            )
+          }/audit-log`,
+          {
+            headers:authHeaders()
+          }
+        );
+
+        const data = await response.json();
+
+        if(!response.ok || !data.ok){
+          throw new Error(
+            data.error ||
+            "Не удалось загрузить историю"
+          );
+        }
+
+        if(
+          !Array.isArray(data.logs) ||
+          data.logs.length === 0
+        ){
+          list.innerHTML = `
+            <div class="audit-log-item">
+              История изменений пока пуста.
+            </div>
+          `;
+
+          return;
+        }
+
+        list.innerHTML = data.logs
+          .map(log => `
+            <div class="audit-log-item">
+              <div class="audit-log-head">
+                <span class="audit-log-user">
+                  ${escapeHtml(
+                    log.username ||
+                    "Неизвестный пользователь"
+                  )}
+                </span>
+
+                <span class="audit-log-time">
+                  ${escapeHtml(
+                    formatTournamentAuditDate(
+                      log.created_at
+                    )
+                  )}
+                </span>
+              </div>
+
+              <div class="audit-log-action">
+                ${escapeHtml(
+                  log.action_text ||
+                  "Изменение турнира"
+                )}
+              </div>
+
+              <div class="audit-log-meta">
+                Роль:
+                ${escapeHtml(
+                  log.user_role || "user"
+                )}
+
+                ${
+                  log.ip_address
+                    ? ` · IP: ${
+                        escapeHtml(
+                          log.ip_address
+                        )
+                      }`
+                    : ""
+                }
+              </div>
+            </div>
+          `)
+          .join("");
+      }catch(error){
+        list.innerHTML = `
+          <div class="audit-log-item">
+            ${escapeHtml(error.message)}
+          </div>
+        `;
+      }
+    }
+
+    function closeTournamentAuditLog(){
+      const modal =
+        document.getElementById("auditModal");
+
+      modal.classList.remove("show");
+
+      modal.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+      currentAuditTournamentId = null;
     }
 
     function getUserRole(){
@@ -9631,6 +9882,7 @@ return '<article class="tournament-card">'
 + '<button type="button" class="btn ghost" onclick="copyTournamentLink(\''+escapeHtml(String(t.id))+'\')">🔗 Ссылка</button>'
 
 + (canManageTournament(t.id) ? '<button type="button" class="btn ghost" onclick="openEditTournament('+t.id+')">Редактировать</button>' : '')
++ (isAdmin() ? '<button type="button" class="btn ghost" onclick="openTournamentAuditLog(\''+escapeHtml(String(t.id))+'\')">🛡 История изменений</button>' : '')
 + '<a class="btn ghost" href="deck-builder_checked.html">Собрать колоду</a>'
 + '</div>'
           + '</article>';

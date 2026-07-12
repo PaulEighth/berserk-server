@@ -354,6 +354,27 @@ await pool.query(`
   ALTER TABLE decks
   ADD COLUMN IF NOT EXISTS update_history JSONB DEFAULT '[]'
 `);
+
+await pool.query(`
+  CREATE TABLE IF NOT EXISTS tournament_audit_log (
+    id BIGSERIAL PRIMARY KEY,
+    tournament_id INTEGER NOT NULL REFERENCES tournaments(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    username TEXT NOT NULL,
+    user_role TEXT DEFAULT 'user',
+    action_type TEXT NOT NULL,
+    action_text TEXT NOT NULL,
+    old_value JSONB,
+    new_value JSONB,
+    ip_address TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )
+`);
+
+await pool.query(`
+  CREATE INDEX IF NOT EXISTS tournament_audit_log_tournament_created_idx
+  ON tournament_audit_log (tournament_id, created_at DESC)
+`);
 }
 
 
@@ -2869,7 +2890,214 @@ app.delete("/api/tournaments/:id/leave", verifyToken, async (req, res) => {
     });
   }
 });
+// =========================
+// Журнал изменений турниров
+// =========================
+function tournamentAuditValue(value){
+  return value === undefined ? null : value;
+}
 
+function collectTournamentAuditChanges(oldValue, newValue, path = ""){
+  const changes = [];
+
+  if(JSON.stringify(oldValue) === JSON.stringify(newValue)){
+    return changes;
+  }
+
+  const oldIsObject =
+    oldValue &&
+    typeof oldValue === "object" &&
+    !Array.isArray(oldValue);
+
+  const newIsObject =
+    newValue &&
+    typeof newValue === "object" &&
+    !Array.isArray(newValue);
+
+  if(oldIsObject || newIsObject){
+    const oldObject = oldIsObject ? oldValue : {};
+    const newObject = newIsObject ? newValue : {};
+
+    const keys = new Set([
+      ...Object.keys(oldObject),
+      ...Object.keys(newObject)
+    ]);
+
+    for(const key of keys){
+      const childPath = path
+        ? `${path}.${key}`
+        : key;
+
+      changes.push(
+        ...collectTournamentAuditChanges(
+          oldObject[key],
+          newObject[key],
+          childPath
+        )
+      );
+    }
+
+    return changes;
+  }
+
+  changes.push({
+    path: path || "data",
+    oldValue: tournamentAuditValue(oldValue),
+    newValue: tournamentAuditValue(newValue)
+  });
+
+  return changes;
+}
+
+function tournamentAuditText(change){
+  const oldText =
+    change.oldValue === null ||
+    change.oldValue === ""
+      ? "пусто"
+      : String(change.oldValue);
+
+  const newText =
+    change.newValue === null ||
+    change.newValue === ""
+      ? "пусто"
+      : String(change.newValue);
+
+  if(change.path.includes("manualCells")){
+    return `Заменил игрока «${oldText}» на «${newText}» (${change.path})`;
+  }
+
+  if(change.path.includes("manualScores")){
+    return `Изменил счёт с «${oldText}» на «${newText}» (${change.path})`;
+  }
+
+  if(change.path.includes("winners")){
+    return `Изменил победителя с «${oldText}» на «${newText}» (${change.path})`;
+  }
+
+  if(change.path.includes("outPlayers")){
+    return `Изменил список выбывших игроков: «${oldText}» → «${newText}» (${change.path})`;
+  }
+
+  if(change.path.includes("swiss")){
+    return `Изменил данные швейцарской системы: «${oldText}» → «${newText}» (${change.path})`;
+  }
+
+  return `Изменил «${change.path}»: «${oldText}» → «${newText}»`;
+}
+
+async function saveTournamentAuditChanges(
+  req,
+  tournamentId,
+  oldData,
+  newData,
+  actionType = "play_change"
+){
+  try{
+    const changes = collectTournamentAuditChanges(
+      oldData,
+      newData
+    );
+
+    for(const change of changes){
+      await pool.query(`
+        INSERT INTO tournament_audit_log (
+          tournament_id,
+          user_id,
+          username,
+          user_role,
+          action_type,
+          action_text,
+          old_value,
+          new_value,
+          ip_address
+        )
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      `, [
+        tournamentId,
+        req.user.id,
+        req.user.username,
+        req.user.role || "user",
+        actionType,
+        tournamentAuditText(change),
+        JSON.stringify({
+          path: change.path,
+          value: change.oldValue
+        }),
+        JSON.stringify({
+          path: change.path,
+          value: change.newValue
+        }),
+        String(
+          req.headers["x-forwarded-for"] ||
+          req.socket.remoteAddress ||
+          ""
+        )
+          .split(",")[0]
+          .trim()
+      ]);
+    }
+  }catch(error){
+    // Ошибка журнала не должна ломать сохранение турнирной сетки.
+    console.error(
+      "TOURNAMENT AUDIT SAVE ERROR:",
+      error
+    );
+  }
+}
+
+function requireTournamentAuditAdmin(req, res, next){
+  if(req.user.username !== ADMIN_USERNAME){
+    return res.status(403).json({
+      ok:false,
+      error:"История изменений доступна только главному администратору"
+    });
+  }
+
+  next();
+}
+
+app.get(
+  "/api/tournaments/:id/audit-log",
+  verifyToken,
+  requireTournamentAuditAdmin,
+  async (req, res) => {
+    try{
+      const result = await pool.query(`
+        SELECT
+          id,
+          username,
+          user_role,
+          action_type,
+          action_text,
+          old_value,
+          new_value,
+          ip_address,
+          created_at
+        FROM tournament_audit_log
+        WHERE tournament_id = $1
+        ORDER BY created_at DESC
+        LIMIT 500
+      `, [
+        req.params.id
+      ]);
+
+      res.json({
+        ok:true,
+        logs:result.rows
+      });
+    }catch(error){
+      console.error(
+        "TOURNAMENT AUDIT READ ERROR:",
+        error
+      );
+
+      res.status(500).json({
+        ok:false,
+        error:"Не удалось загрузить историю изменений"
+      });
+    }
+  }
+);
 // Сохранить стартовый рандом сетки — только организатор, админ, разработчик, модератор
 app.patch("/api/tournaments/:id/random-play", verifyToken, async (req, res) => {
   try {
@@ -2907,6 +3135,22 @@ const result = await pool.query(`
   JSON.stringify(mergedSwissData),
   req.params.id
 ]);
+
+await saveTournamentAuditChanges(
+  req,
+  req.params.id,
+  {
+    bracket: parseTournamentJson(
+      access.tournament.bracket
+    ),
+    swiss_data: oldSwissData
+  },
+  {
+    bracket: bracket || [],
+    swiss_data: mergedSwissData
+  },
+  "random_bracket"
+);
 
     res.json({
       ok: true,
@@ -2946,7 +3190,7 @@ app.patch("/api/tournaments/:id/play", verifyToken, async (req, res) => {
     : (oldSwissData.matchRooms || {})
 };
 
-    const result = await pool.query(`
+        const result = await pool.query(`
       UPDATE tournaments
       SET
         bracket = $1,
@@ -2958,6 +3202,22 @@ app.patch("/api/tournaments/:id/play", verifyToken, async (req, res) => {
       JSON.stringify(mergedSwissData),
       req.params.id
     ]);
+
+    await saveTournamentAuditChanges(
+      req,
+      req.params.id,
+      {
+        bracket: parseTournamentJson(
+          access.tournament.bracket
+        ),
+        swiss_data: oldSwissData
+      },
+      {
+        bracket: bracket || [],
+        swiss_data: mergedSwissData
+      },
+      "play_change"
+    );
 
     res.json({
       ok: true,
