@@ -3282,7 +3282,14 @@ html body .bracket-cell.alive{
   border:1px solid rgba(232,194,112,.24);
   box-shadow:0 35px 110px rgba(0,0,0,.62);
 }
-
+.audit-close-button{
+  position:sticky;
+  top:0;
+  float:right;
+  z-index:10;
+  pointer-events:auto;
+  flex-shrink:0;
+}
 .audit-box h2{
   margin:0 0 8px;
   color:var(--gold2);
@@ -3666,14 +3673,13 @@ html body .bracket-cell.alive{
   id="auditModal"
   aria-hidden="true"
 >
-  <div class="audit-box">
-    <button
-      type="button"
-      class="modal-close"
-      onclick="closeTournamentAuditLog()"
-    >
-      ×
-    </button>
+  <button
+  type="button"
+  class="modal-close audit-close-button"
+  id="closeAuditModalButton"
+>
+  ×
+</button>
 
     <h2>История изменений турнира</h2>
 
@@ -4329,18 +4335,58 @@ function authHeaders(extra = {}){
     }
 
     function closeTournamentAuditLog(){
-      const modal =
-        document.getElementById("auditModal");
+  const modal =
+    document.getElementById("auditModal");
 
-      modal.classList.remove("show");
+  if(!modal){
+    return;
+  }
 
-      modal.setAttribute(
-        "aria-hidden",
-        "true"
-      );
+  modal.classList.remove("show");
 
-      currentAuditTournamentId = null;
-    }
+  modal.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+  currentAuditTournamentId = null;
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  const closeButton =
+    document.getElementById("closeAuditModalButton");
+
+  const modal =
+    document.getElementById("auditModal");
+
+  if(closeButton){
+    closeButton.addEventListener(
+      "click",
+      function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        closeTournamentAuditLog();
+      }
+    );
+  }
+
+  if(modal){
+    modal.addEventListener(
+      "click",
+      function(event){
+        if(event.target === modal){
+          closeTournamentAuditLog();
+        }
+      }
+    );
+  }
+});
+
+document.addEventListener("keydown", function(event){
+  if(event.key === "Escape"){
+    closeTournamentAuditLog();
+  }
+});
 
     function getUserRole(){
       const user = getLoggedUser();
