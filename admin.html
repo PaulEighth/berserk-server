@@ -1029,74 +1029,72 @@ if(search){
 <td>
   <div class="actions">
 
+    ${user.username === ADMIN_USERNAME ? `
+      <span class="role-pill" style="color:#6f3cff">
+        🔒 Аккаунт владельца защищён
+      </span>
+    ` : `
+
     <div class="top-actions">
-  <button class="btn ghost" onclick="changeStatus(${user.id})">Сохранить статус</button>
+      <button class="btn ghost" onclick="changeStatus(${user.id})">Сохранить статус</button>
+      <button class="btn ghost" onclick="changeUsername(${user.id})">Сменить ник</button>
+    </div>
 
-  ${user.username === ADMIN_USERNAME ? "" : `
-    <button
-      class="btn ghost"
-      onclick="changeUsername(${user.id})"
-    >
-      Сменить ник
-    </button>
-  `}
-</div>
+    <div class="bottom-actions">
 
-   <div class="bottom-actions">
-  ${user.username === ADMIN_USERNAME ? "" : `
+      ${currentUser?.role === "admin" ? `
+        <button
+          class="btn gold"
+          onclick="changeRole(${user.id})"
+        >
+          Сохранить роль
+        </button>
 
-    ${currentUser?.role === "admin" ? `
+        <button
+          class="btn ghost"
+          onclick="togglePartner(
+            ${user.id},
+            ${user.is_partner ? "false" : "true"}
+          )"
+        >
+          ${user.is_partner ? "Убрать ⭐" : "Дать ⭐"}
+        </button>
+      ` : ""}
+
       <button
-        class="btn gold"
-        onclick="changeRole(${user.id})"
+        class="btn ghost"
+        onclick="changeUserPassword(
+          ${user.id},
+          '${String(user.username)
+            .replace(/\\/g, "\\\\")
+            .replace(/'/g, "\\'")}'
+        )"
       >
-        Сохранить роль
+        Сменить пароль
       </button>
 
       <button
         class="btn ghost"
-        onclick="togglePartner(
-          ${user.id},
-          ${user.is_partner ? "false" : "true"}
-        )"
+        onclick="quickBan(${user.id})"
       >
-        ${user.is_partner ? "Убрать ⭐" : "Дать ⭐"}
+        Бан
       </button>
-    ` : ""}
 
-    <button
-      class="btn ghost"
-      onclick="changeUserPassword(
-        ${user.id},
-        '${String(user.username)
-          .replace(/\\/g, "\\\\")
-          .replace(/'/g, "\\'")}'
-      )"
-    >
-      Сменить пароль
-    </button>
+      ${currentUser?.role === "admin" ? `
+        <button
+          class="btn red"
+          onclick="deleteUser(
+            ${user.id},
+            '${String(user.username).replace(/'/g, "\\'")}'
+          )"
+        >
+          Удалить
+        </button>
+      ` : ""}
 
-    <button
-  class="btn ghost"
-  onclick="quickBan(${user.id})"
->
-  Бан
-</button>
+    </div>
 
-    ${currentUser?.role === "admin" ? `
-      <button
-        class="btn red"
-        onclick="deleteUser(
-          ${user.id},
-          '${String(user.username).replace(/'/g, "\\'")}'
-        )"
-      >
-        Удалить
-      </button>
-    ` : ""}
-
-  `}
-</div>
+    `}
 
   </div>
 </td>
