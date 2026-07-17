@@ -771,18 +771,25 @@ function getNickColor(user){
     }
 
     function checkAdmin(){
-      if(!currentUser || currentUser.username !== ADMIN_USERNAME){
-        showInfo("Недостаточно прав", "Эта страница доступна только администратору Eighth#2020.");
-        document.getElementById("usersBody").innerHTML = `
-          <tr>
-            <td colspan="7" class="muted">Недостаточно прав.</td>
-          </tr>
-        `;
-        return false;
-      }
+  const allowedRoles = ["admin", "developer", "moderator"];
 
-      return true;
-    }
+  if(!currentUser || !allowedRoles.includes(currentUser.role)){
+    showInfo(
+      "Недостаточно прав",
+      "Эта страница доступна только администратору, разработчику и модератору."
+    );
+
+    document.getElementById("usersBody").innerHTML = `
+      <tr>
+        <td colspan="7" class="muted">Недостаточно прав.</td>
+      </tr>
+    `;
+
+    return false;
+  }
+
+  return true;
+}
 function renderStatusSelect(user){
   return `
     <select class="select" id="status-${user.id}">
@@ -1050,10 +1057,10 @@ if(search){
 
       try{
         const response = await fetch(`${API_URL}/admin/users`, {
-          headers: {
-            "x-admin-username": currentUser.username
-          }
-        });
+  headers: {
+    "Authorization": `Bearer ${localStorage.getItem("token")}`
+  }
+});
 
         const data = await response.json();
 

@@ -767,18 +767,25 @@ ORDER BY username ASC
 // СТАРТ СЕРВЕРА
 // =========================
 
-app.get("/admin/users", requireAdmin, async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT id, username, email, role, status, is_partner, medals, created_at FROM users ORDER BY id"
-    );
+app.get(
+  "/admin/users",
+  verifyToken,
+  requireRoles("admin", "developer", "moderator"),
+  async (req, res) => {
+    try {
+      const result = await pool.query(
+        "SELECT id, username, email, role, status, is_partner, medals, created_at FROM users ORDER BY id"
+      );
 
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Ошибка получения пользователей" });
+      res.json(result.rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        error: "Ошибка получения пользователей"
+      });
+    }
   }
-});
+);
 app.patch("/admin/users/:id/password", requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
