@@ -838,7 +838,11 @@ app.patch("/admin/users/:id/password", requireAdmin, async (req, res) => {
     });
   }
 });
-app.patch("/admin/users/:id/role", requireAdmin, async (req, res) => {
+app.patch(
+  "/admin/users/:id/role",
+  verifyToken,
+  requireRoles("admin"),
+  async (req, res) => {
   
   try {
     const { role } = req.body;
@@ -904,11 +908,12 @@ await pool.query(
     }
 
     res.json(result.rows[0]);
-  } catch (err) {
+    } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Ошибка смены роли" });
   }
-});
+  }
+);
 
 app.patch("/admin/users/:id/username", requireAdmin, async (req, res) => {
   try {
@@ -996,7 +1001,11 @@ app.patch("/admin/users/:id/status", requireAdmin, async (req, res) => {
     res.status(500).json({ error: "Ошибка смены статуса" });
   }
 });
-app.patch("/admin/users/:id/partner", requireAdmin, async (req, res) => {
+app.patch(
+  "/admin/users/:id/partner",
+  verifyToken,
+  requireRoles("admin"),
+  async (req, res) => {
   try {
     const { is_partner } = req.body;
     const { id } = req.params;
@@ -1011,11 +1020,12 @@ app.patch("/admin/users/:id/partner", requireAdmin, async (req, res) => {
     }
 
     res.json(result.rows[0]);
-  } catch (err) {
+    } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Ошибка смены партнёрской звезды" });
   }
-});
+  }
+);
 app.patch("/admin/users/:id/medals", requireAdmin, async (req, res) => {
   try {
     const { medals } = req.body;
@@ -1038,7 +1048,11 @@ app.patch("/admin/users/:id/medals", requireAdmin, async (req, res) => {
     res.status(500).json({ error: "Ошибка изменения медалей" });
   }
 });
-app.delete("/admin/users/:id", requireAdmin, async (req, res) => {
+app.delete(
+  "/admin/users/:id",
+  verifyToken,
+  requireRoles("admin"),
+  async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -1052,11 +1066,12 @@ app.delete("/admin/users/:id", requireAdmin, async (req, res) => {
     }
 
     res.json({ message: "Пользователь удалён", user: result.rows[0] });
-  } catch (err) {
+      } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Ошибка удаления пользователя" });
   }
-});
+  }
+);
 ensurePartnerColumn().catch((err) => {
   console.error("DB INIT ERROR:", err);
 });

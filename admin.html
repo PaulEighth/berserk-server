@@ -1002,7 +1002,16 @@ if(search){
 
     ${user.username === ADMIN_USERNAME
       ? `<span class="role-pill" style="color:${roleColors.admin}">admin навсегда</span>`
-      : renderRoleSelect(user)
+      : currentUser?.role === "admin"
+        ? renderRoleSelect(user)
+        : `
+          <span
+            class="role-pill"
+            style="color:${roleColors[user.role] || "#ffffff"}"
+          >
+            ${user.role || "user"}
+          </span>
+        `
     }
   </div>
 </td>
@@ -1025,24 +1034,61 @@ if(search){
       <button class="btn ghost" onclick="changeUsername(${user.id})">Сменить ник</button>
     </div>
 
-    <div class="bottom-actions">
+   <div class="bottom-actions">
   ${user.username === ADMIN_USERNAME ? "" : `
-    <button class="btn gold" onclick="changeRole(${user.id})">Сохранить роль</button>
 
-    <button class="btn ghost" onclick="togglePartner(${user.id}, ${user.is_partner ? "false" : "true"})">
-      ${user.is_partner ? "Убрать ⭐" : "Дать ⭐"}
-    </button>
+    ${currentUser?.role === "admin" ? `
+      <button
+        class="btn gold"
+        onclick="changeRole(${user.id})"
+      >
+        Сохранить роль
+      </button>
+
+      <button
+        class="btn ghost"
+        onclick="togglePartner(
+          ${user.id},
+          ${user.is_partner ? "false" : "true"}
+        )"
+      >
+        ${user.is_partner ? "Убрать ⭐" : "Дать ⭐"}
+      </button>
+    ` : ""}
 
     <button
       class="btn ghost"
-      onclick="changeUserPassword(${user.id}, '${String(user.username).replace(/\\/g, "\\\\").replace(/'/g, "\\'")}')"
+      onclick="changeUserPassword(
+        ${user.id},
+        '${String(user.username)
+          .replace(/\\/g, "\\\\")
+          .replace(/'/g, "\\'")}'
+      )"
     >
       Сменить пароль
     </button>
 
-    <button class="btn ghost" onclick="quickBan(${user.id})">Бан</button>
+    ${currentUser?.role === "admin" ? `
+  <button
+    class="btn ghost"
+    onclick="quickBan(${user.id})"
+  >
+    Бан
+  </button>
+` : ""}
 
-    <button class="btn red" onclick="deleteUser(${user.id}, '${String(user.username).replace(/'/g, "\\'")}')">Удалить</button>
+    ${currentUser?.role === "admin" ? `
+      <button
+        class="btn red"
+        onclick="deleteUser(
+          ${user.id},
+          '${String(user.username).replace(/'/g, "\\'")}'
+        )"
+      >
+        Удалить
+      </button>
+    ` : ""}
+
   `}
 </div>
 
@@ -1080,7 +1126,15 @@ renderUsers(allUsers);
     }
 
     async function changeRole(userId){
-      if(!checkAdmin()) return;
+  if(!checkAdmin()) return;
+
+  if(currentUser?.role !== "admin"){
+    showInfo(
+      "Недостаточно прав",
+      "Менять роли может только администратор."
+    );
+    return;
+  }
 const protectedUser = allUsers.find(u => Number(u.id) === Number(userId));
 
 if(protectedUser?.username === ADMIN_USERNAME){
@@ -1091,13 +1145,13 @@ if(protectedUser?.username === ADMIN_USERNAME){
 
       try{
         const response = await fetch(`${API_URL}/admin/users/${userId}/role`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            "x-admin-username": currentUser.username
-          },
-          body: JSON.stringify({ role })
-        });
+  method: "PATCH",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${localStorage.getItem("token")}`
+  },
+  body: JSON.stringify({ role })
+});
 
         const data = await response.json();
 
@@ -1250,15 +1304,23 @@ if(protectedUser?.username === ADMIN_USERNAME){
 async function togglePartner(userId, isPartner){
   if(!checkAdmin()) return;
 
+  if(currentUser?.role !== "admin"){
+    showInfo(
+      "Недостаточно прав",
+      "Выдавать и снимать партнёрскую звезду может только администратор."
+    );
+    return;
+  }
+
   try{
     const response = await fetch(`${API_URL}/admin/users/${userId}/partner`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "x-admin-username": currentUser.username
-      },
-      body: JSON.stringify({ is_partner: !!isPartner })
-    });
+  method: "PATCH",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${localStorage.getItem("token")}`
+  },
+  body: JSON.stringify({ is_partner: !!isPartner })
+});
 
     const data = await response.json();
 
@@ -1321,9 +1383,29 @@ if(data.username === currentUser.username){
   }
 }
     async function quickBan(userId){
-      document.getElementById(`role-${userId}`).value = "banned";
-      await changeRole(userId);
-    }
+  if(!checkAdmin()) return;
+
+  if(currentUser?.role !== "admin"){
+    showInfo(
+      "Недостаточно прав",
+      "Блокировать пользователей может только администратор."
+    );
+    return;
+  }
+
+  const roleSelect = document.getElementById(`role-${userId}`);
+
+  if(!roleSelect){
+    showInfo(
+      "Ошибка",
+      "Не найден список ролей пользователя."
+    );
+    return;
+  }
+
+  roleSelect.value = "banned";
+  await changeRole(userId);
+}
 async function changeUserPassword(userId, username){
   if(!checkAdmin()) return;
 
@@ -1418,6 +1500,14 @@ function closeDeleteModal(){
 async function deleteUser(userId, username){
   if(!checkAdmin()) return;
 
+  if(currentUser?.role !== "admin"){
+    showInfo(
+      "Недостаточно прав",
+      "Удалять пользователей может только администратор."
+    );
+    return;
+  }
+
   deleteTargetUserId = userId;
   deleteTargetUsername = username;
 
@@ -1435,11 +1525,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       try{
         const response = await fetch(`${API_URL}/admin/users/${deleteTargetUserId}`, {
-          method: "DELETE",
-          headers: {
-            "x-admin-username": currentUser.username
-          }
-        });
+  method: "DELETE",
+  headers: {
+    "Authorization": `Bearer ${localStorage.getItem("token")}`
+  }
+});
 
         const data = await response.json();
 
