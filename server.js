@@ -11,6 +11,19 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 const ADMIN_USERNAME = "Eighth#2020";
 
+function getClientIp(req){
+  const forwardedIp = String(
+    req.headers["x-forwarded-for"] || ""
+  )
+    .split(",")[0]
+    .trim();
+
+  return forwardedIp ||
+    req.socket?.remoteAddress ||
+    req.ip ||
+    "";
+}
+
 function requireAdmin(req, res, next) {
   const adminUsername = req.headers["x-admin-username"];
 
@@ -299,6 +312,11 @@ async function ensurePartnerColumn() {
   ALTER TABLE users
   ADD COLUMN IF NOT EXISTS medals JSONB DEFAULT '{}'
 `);
+
+await pool.query(`
+  ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS last_ip TEXT DEFAULT ''
+`);
 await pool.query(`
   ALTER TABLE tournaments
   ADD COLUMN IF NOT EXISTS players_can_edit BOOLEAN DEFAULT false
@@ -555,6 +573,15 @@ const existingUser = await pool.query(
 
 const user = result.rows[0];
 
+const currentIp = getClientIp(req);
+
+if(currentIp){
+  await pool.query(
+    "UPDATE users SET last_ip = $1 WHERE id = $2",
+    [currentIp, user.id]
+  );
+}
+
 const token = jwt.sign(
   {
     id: user.id,
@@ -774,7 +801,7 @@ app.get(
   async (req, res) => {
     try {
       const result = await pool.query(
-        "SELECT id, username, email, role, status, is_partner, medals, created_at FROM users ORDER BY id"
+        "SELECT id, username, email, role, status, is_partner, medals, last_ip, created_at FROM users ORDER BY id"
       );
 
       res.json(result.rows);

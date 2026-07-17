@@ -993,7 +993,25 @@ if(search){
         <tr>
           <td>${index + 1}</td>
                     <td style="color:${getNickColor(user)}">${userStarHtml(user)}${userStatusHtml(user)}${medalsHtml(user)}${user.username}</td>
-          <td class="muted">${user.email || "—"}</td>
+          <td class="muted">
+  <div>${user.email || "—"}</div>
+
+  <div
+    style="
+      margin-top:5px;
+      max-width:190px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:11px;
+      color:#8f98a8;
+      font-weight:650;
+    "
+    title="${user.last_ip || "IP ещё не сохранён"}"
+  >
+    IP: ${user.last_ip || "—"}
+  </div>
+</td>
           <td>
   <div style="display:grid;gap:8px;min-width:140px">
     <span class="role-pill" style="color:${roleColors[user.role] || "#ffffff"}">
