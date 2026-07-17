@@ -6343,48 +6343,164 @@ if($('requestIsPrivate')) $('requestIsPrivate').value='0';
   currentTrackTournamentId = id;
 
   const modal = $('trackModal');
+
   if(!modal){
     console.error("trackModal не найден");
     return;
   }
 
-  modal.classList.add('show');
-  modal.setAttribute('aria-hidden','false');
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
 
   if(tournamentRefreshTimer){
     clearInterval(tournamentRefreshTimer);
     tournamentRefreshTimer = null;
   }
 
-  try{
-    await loadTournamentsFromServer();
+  async function loadOpenedTournament(){
+    const response = await fetch(
+      `/api/tournaments/${encodeURIComponent(id)}/full`,
+      { cache: "no-store" }
+    );
+
+    const data = await response.json();
+
+    if(!response.ok || !data.ok){
+      throw new Error(data.error || "Не удалось загрузить турнир");
+    }
+
+    const raw = data.tournament;
+
+    let swissData = {};
+
+    try{
+      swissData =
+        typeof raw.swiss_data === "object"
+          ? (raw.swiss_data || {})
+          : JSON.parse(raw.swiss_data || "{}");
+    }catch(error){
+      swissData = {};
+    }
+
+    const tournament = tournaments.find(
+      item => String(item.id) === String(id)
+    );
+
+    if(!tournament){
+      throw new Error("Турнир отсутствует в списке");
+    }
+
+    tournament.swissData = swissData;
+    tournament.coOrganizers = Array.isArray(swissData.coOrganizers)
+      ? swissData.coOrganizers
+      : [];
+
+    tournament.privatePassword = raw.private_password || "";
+    tournament.deckVisibility =
+      swissData.deckVisibility ||
+      raw.deckVisibility ||
+      "visible";
+
+    tournamentManualCells[String(id)] =
+      swissData.manualCells || {};
+
+    tournamentManualScores[String(id)] =
+      swissData.manualScores || {};
+
+    tournamentWinners[String(id)] =
+      swissData.winners || {};
+
+    tournamentOutPlayers[String(id)] =
+      Array.isArray(swissData.outPlayers)
+        ? swissData.outPlayers
+        : [];
+
+    swissRoundsData[String(id)] =
+      swissData.swissRoundsState || {};
+
+    Object.keys(matchRooms).forEach(roomKey => {
+      const room = matchRooms[roomKey];
+
+      if(
+        String(room?.id || room?.tournamentId) === String(id)
+      ){
+        delete matchRooms[roomKey];
+      }
+    });
+
+    if(
+      swissData.matchRooms &&
+      typeof swissData.matchRooms === "object"
+    ){
+      Object.assign(matchRooms, swissData.matchRooms);
+    }
+
+    registrations[String(id)] = [];
+    tournamentDeckSubmits[String(id)] = {};
+
+    data.participants.forEach(p => {
+      let decks = [];
+
+      try{
+        decks = Array.isArray(p.decks)
+          ? p.decks
+          : JSON.parse(p.decks || "[]");
+      }catch(error){
+        decks = [];
+      }
+
+      registrations[String(id)].push({
+        id: p.user_id,
+        name: p.username,
+        username: p.username,
+        role: p.role || "user",
+        is_partner: !!p.is_partner,
+        contactInfo: p.contact_info || "",
+        decks
+      });
+
+      if(decks.length){
+        tournamentDeckSubmits[String(id)][p.username] = {
+          player: p.username,
+          submittedAt: p.joined_at || new Date().toISOString(),
+          decks
+        };
+      }
+    });
+
+    tournament.free = Math.max(
+      0,
+      Number(tournament.maxPlayers || 0) -
+      data.participants.length
+    );
+
     renderTrackModal(id);
+  }
+
+  try{
+    await loadOpenedTournament();
 
     if(typeof drawBracketLines === "function"){
       setTimeout(drawBracketLines, 100);
       setTimeout(drawBracketLines, 400);
-      setTimeout(drawBracketLines, 900);
     }
-  }catch(e){
-    console.error("Ошибка открытия отслеживания:", e);
+  }catch(error){
+    console.error("Ошибка открытия отслеживания:", error);
+    showAlert(error.message);
   }
 
-    tournamentRefreshTimer = setInterval(async () => {
-    if(!$('trackModal')?.classList.contains('show')) return;
+  tournamentRefreshTimer = setInterval(async () => {
+    if(!$("trackModal")?.classList.contains("show")) return;
     if(!currentTrackTournamentId) return;
 
     try{
-      const ok = await loadTournamentsFromServer(true);
+      await loadOpenedTournament();
 
-      if(ok){
-        renderTrackModal(currentTrackTournamentId);
-
-        if(typeof drawBracketLines === "function"){
-          setTimeout(drawBracketLines, 100);
-        }
+      if(typeof drawBracketLines === "function"){
+        setTimeout(drawBracketLines, 100);
       }
-    }catch(e){
-      console.error("Ошибка автообновления турнира:", e);
+    }catch(error){
+      console.error("Ошибка обновления турнира:", error);
     }
   }, 12000);
 }
