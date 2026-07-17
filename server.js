@@ -914,7 +914,58 @@ await pool.query(
   }
   }
 );
+app.patch(
+  "/admin/users/:id/ban",
+  verifyToken,
+  requireRoles("admin", "developer", "moderator"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
 
+      const targetResult = await pool.query(
+        "SELECT id, username FROM users WHERE id = $1",
+        [id]
+      );
+
+      if (targetResult.rows.length === 0) {
+        return res.status(404).json({
+          ok: false,
+          error: "Пользователь не найден"
+        });
+      }
+
+      if (targetResult.rows[0].username === ADMIN_USERNAME) {
+        return res.status(403).json({
+          ok: false,
+          error: "Администратора Eighth#2020 нельзя заблокировать"
+        });
+      }
+
+      const result = await pool.query(
+        `
+        UPDATE users
+        SET role = 'banned'
+        WHERE id = $1
+        RETURNING id, username, email, role
+        `,
+        [id]
+      );
+
+      res.json({
+        ok: true,
+        user: result.rows[0]
+      });
+
+    } catch (error) {
+      console.error("ADMIN BAN ERROR:", error);
+
+      res.status(500).json({
+        ok: false,
+        error: "Ошибка блокировки пользователя"
+      });
+    }
+  }
+);
 app.patch("/admin/users/:id/username", requireAdmin, async (req, res) => {
   try {
     const { username } = req.body;
@@ -968,39 +1019,65 @@ app.patch("/admin/users/:id/username", requireAdmin, async (req, res) => {
     res.status(500).json({ error: "Ошибка смены ника" });
   }
 });
-app.patch("/admin/users/:id/status", requireAdmin, async (req, res) => {
-  try {
-    const { status } = req.body;
-    const { id } = req.params;
+app.patch(
+  "/admin/users/:id/status",
+  verifyToken,
+  requireRoles("admin", "developer", "moderator"),
+  async (req, res) => {
+    try {
+      const { status } = req.body;
+      const { id } = req.params;
 
-    const allowedStatuses = [
-      "none",
-      "vip",
-      "premium",
-      "elite",
-      "royal",
-      "legend"
-    ];
+      const allowedStatuses = [
+        "none",
+        "vip",
+        "premium",
+        "elite",
+        "royal",
+        "legend"
+      ];
 
-    if (!allowedStatuses.includes(status)) {
-      return res.status(400).json({ error: "Такого статуса не существует" });
+      if (!allowedStatuses.includes(status)) {
+        return res.status(400).json({
+          error: "Такого статуса не существует"
+        });
+      }
+
+      const targetResult = await pool.query(
+        "SELECT username FROM users WHERE id = $1",
+        [id]
+      );
+
+      if (targetResult.rows.length === 0) {
+        return res.status(404).json({
+          error: "Пользователь не найден"
+        });
+      }
+
+      if (
+        targetResult.rows[0].username === ADMIN_USERNAME &&
+        req.user.username !== ADMIN_USERNAME
+      ) {
+        return res.status(403).json({
+          error: "Статус Eighth#2020 менять нельзя"
+        });
+      }
+
+      const result = await pool.query(
+        "UPDATE users SET status = $1 WHERE id = $2 RETURNING id, username, email, role, status, is_partner, medals",
+        [status, id]
+      );
+
+      res.json(result.rows[0]);
+
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        error: "Ошибка смены статуса"
+      });
     }
-
-    const result = await pool.query(
-      "UPDATE users SET status = $1 WHERE id = $2 RETURNING id, username, email, role, status, is_partner, medals",
-      [status, id]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Пользователь не найден" });
-    }
-
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Ошибка смены статуса" });
   }
-});
+);
 app.patch(
   "/admin/users/:id/partner",
   verifyToken,

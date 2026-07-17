@@ -1068,14 +1068,12 @@ if(search){
       Сменить пароль
     </button>
 
-    ${currentUser?.role === "admin" ? `
-  <button
-    class="btn ghost"
-    onclick="quickBan(${user.id})"
-  >
-    Бан
-  </button>
-` : ""}
+    <button
+  class="btn ghost"
+  onclick="quickBan(${user.id})"
+>
+  Бан
+</button>
 
     ${currentUser?.role === "admin" ? `
       <button
@@ -1300,6 +1298,64 @@ if(protectedUser?.username === ADMIN_USERNAME){
     console.error(error);
     showInfo("Сервер не отвечает", "Запусти node server.js и попробуй снова.");
   }
+}async function changeStatus(userId){
+  if(!checkAdmin()) return;
+
+  const targetUser = allUsers.find(
+    user => Number(user.id) === Number(userId)
+  );
+
+  if(
+    targetUser?.username === ADMIN_USERNAME &&
+    currentUser?.username !== ADMIN_USERNAME
+  ){
+    showInfo(
+      "Запрещено",
+      "Статус Eighth#2020 менять нельзя."
+    );
+    return;
+  }
+
+  const statusSelect = document.getElementById(`status-${userId}`);
+
+  if(!statusSelect){
+    showInfo("Ошибка", "Не найден список статусов.");
+    return;
+  }
+
+  const status = statusSelect.value;
+
+  try{
+    const response = await fetch(`${API_URL}/admin/users/${userId}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      },
+      body: JSON.stringify({ status })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      showInfo("Ошибка", data.error || "Не удалось изменить статус.");
+      return;
+    }
+
+    showInfo(
+      "Готово",
+      `Статус игрока ${data.username} изменён на ${data.status}.`
+    );
+
+    loadUsers();
+
+  }catch(error){
+    console.error(error);
+    showInfo(
+      "Сервер не отвечает",
+      "Запусти node server.js и попробуй снова."
+    );
+  }
 }
 async function togglePartner(userId, isPartner){
   if(!checkAdmin()) return;
@@ -1385,26 +1441,62 @@ if(data.username === currentUser.username){
     async function quickBan(userId){
   if(!checkAdmin()) return;
 
-  if(currentUser?.role !== "admin"){
-    showInfo(
-      "Недостаточно прав",
-      "Блокировать пользователей может только администратор."
-    );
-    return;
-  }
+  const targetUser = allUsers.find(
+    user => Number(user.id) === Number(userId)
+  );
 
-  const roleSelect = document.getElementById(`role-${userId}`);
-
-  if(!roleSelect){
+  if(!targetUser){
     showInfo(
       "Ошибка",
-      "Не найден список ролей пользователя."
+      "Пользователь не найден."
     );
     return;
   }
 
-  roleSelect.value = "banned";
-  await changeRole(userId);
+  if(targetUser.username === ADMIN_USERNAME){
+    showInfo(
+      "Запрещено",
+      "Администратора Eighth#2020 нельзя заблокировать."
+    );
+    return;
+  }
+
+  try{
+    const response = await fetch(
+      `${API_URL}/admin/users/${userId}/ban`,
+      {
+        method: "PATCH",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if(!response.ok){
+      showInfo(
+        "Ошибка",
+        data.error || "Не удалось заблокировать пользователя."
+      );
+      return;
+    }
+
+    showInfo(
+      "Готово",
+      `Пользователь ${data.user.username} заблокирован.`
+    );
+
+    loadUsers();
+
+  }catch(error){
+    console.error(error);
+
+    showInfo(
+      "Сервер не отвечает",
+      "Не удалось заблокировать пользователя."
+    );
+  }
 }
 async function changeUserPassword(userId, username){
   if(!checkAdmin()) return;
