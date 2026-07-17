@@ -1340,7 +1340,7 @@ const adminLink = document.getElementById("adminPanelLink");
 
 if (
   currentUser &&
-  currentUser.username === "Eighth#2020" &&
+  ["admin", "developer", "moderator"].includes(currentUser.role) &&
   adminLink
 ) {
   adminLink.style.display = "inline-flex";

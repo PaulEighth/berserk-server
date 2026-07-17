@@ -10928,9 +10928,10 @@ const adminLinks = document.querySelectorAll("#adminPanelLink");
 const userForAdmin = JSON.parse(localStorage.getItem("user") || "null");
 
 adminLinks.forEach(link => {
-  const adminName = String(userForAdmin?.username || "").trim().toLowerCase();
-
-  if(adminName === "eighth#2020"){
+  if(
+    userForAdmin &&
+    ["admin", "developer", "moderator"].includes(userForAdmin.role)
+  ){
     link.style.display = "inline-flex";
   }else{
     link.style.display = "none";

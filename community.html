@@ -962,9 +962,14 @@ async function refreshCurrentUser(){
     }
 
     const adminLink = document.getElementById("adminPanelLink");
-    if(currentUser && currentUser.username === "Eighth#2020" && adminLink){
-      adminLink.style.display = "inline-flex";
-    }
+
+if(
+  currentUser &&
+  ["admin", "developer", "moderator"].includes(currentUser.role) &&
+  adminLink
+){
+  adminLink.style.display = "inline-flex";
+}
 
     function userStarHtml(user){
       if(!user) return "";

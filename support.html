@@ -1043,9 +1043,10 @@ const authLink = document.getElementById("authLink");
 const adminLinks = document.querySelectorAll("#adminPanelLink");
 
 adminLinks.forEach(link => {
-  const adminName = String(user?.username || "").trim().toLowerCase();
-
-  if(adminName === "eighth#2020"){
+  if(
+    user &&
+    ["admin", "developer", "moderator"].includes(user.role)
+  ){
     link.style.display = "inline-flex";
   }else{
     link.style.display = "none";
