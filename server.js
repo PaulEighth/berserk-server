@@ -307,6 +307,43 @@ async function canEditTournamentPlay(req, tournamentId){
 
   return { ok: true, tournament };
 }
+async function writeAdminLog(
+  req,
+  targetUser,
+  action,
+  details = ""
+){
+  try{
+
+    await pool.query(
+      `
+      INSERT INTO admin_action_logs
+      (
+        admin_id,
+        admin_username,
+        target_user_id,
+        target_username,
+        action,
+        details,
+        ip_address
+      )
+      VALUES($1,$2,$3,$4,$5,$6,$7)
+      `,
+      [
+        req.user?.id || null,
+        req.user?.username || "Unknown",
+        targetUser?.id || null,
+        targetUser?.username || "Unknown",
+        action,
+        details,
+        getClientIp(req)
+      ]
+    );
+
+  }catch(err){
+    console.error("ADMIN LOG ERROR:",err);
+  }
+}
 async function ensurePartnerColumn() {
   await pool.query(`
   ALTER TABLE users
@@ -392,6 +429,25 @@ await pool.query(`
 await pool.query(`
   CREATE INDEX IF NOT EXISTS tournament_audit_log_tournament_created_idx
   ON tournament_audit_log (tournament_id, created_at DESC)
+`);
+
+await pool.query(`
+CREATE TABLE IF NOT EXISTS admin_action_logs(
+    id BIGSERIAL PRIMARY KEY,
+    admin_id INTEGER,
+    admin_username TEXT,
+    target_user_id INTEGER,
+    target_username TEXT,
+    action TEXT NOT NULL,
+    details TEXT DEFAULT '',
+    ip_address TEXT DEFAULT '',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+)
+`);
+
+await pool.query(`
+CREATE INDEX IF NOT EXISTS admin_action_logs_created_idx
+ON admin_action_logs(created_at DESC)
 `);
 }
 
@@ -850,19 +906,26 @@ app.patch("/admin/users/:id/password", requireAdmin, async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    await pool.query(
-      "UPDATE users SET password = $1 WHERE id = $2",
-      [hashedPassword, id]
-    );
+await pool.query(
+  "UPDATE users SET password = $1 WHERE id = $2",
+  [hashedPassword, id]
+);
 
-    res.json({
-      ok: true,
-      message: "Пароль успешно изменён",
-      user: {
-        id: targetUser.rows[0].id,
-        username: targetUser.rows[0].username
-      }
-    });
+await writeAdminLog(
+  req,
+  targetUser.rows[0],
+  "CHANGE_PASSWORD",
+  "Пароль пользователя изменён"
+);
+
+res.json({
+  ok: true,
+  message: "Пароль успешно изменён",
+  user: {
+    id: targetUser.rows[0].id,
+    username: targetUser.rows[0].username
+  }
+});
 
   } catch (error) {
     console.error("ADMIN PASSWORD CHANGE ERROR:", error);
@@ -882,7 +945,7 @@ app.patch(
     const { role } = req.body;
     const { id } = req.params;
 const targetUser = await pool.query(
-  "SELECT username FROM users WHERE id = $1",
+  "SELECT id, username, role FROM users WHERE id = $1",
   [id]
 );
 
@@ -909,10 +972,19 @@ if (targetUser.rows[0].username === ADMIN_USERNAME) {
       return res.status(400).json({ error: "Такой роли не существует" });
     }
 
-    const result = await pool.query(
-      "UPDATE users SET role = $1 WHERE id = $2 RETURNING id, username, email, role",
-      [role, id]
-    );
+    const oldRole = targetUser.rows[0].role || "user";
+
+const result = await pool.query(
+  "UPDATE users SET role = $1 WHERE id = $2 RETURNING id, username, email, role",
+  [role, id]
+);
+
+await writeAdminLog(
+  req,
+  result.rows[0],
+  "CHANGE_ROLE",
+  `Роль изменена: ${oldRole} → ${role}`
+);
 await pool.query(
   "UPDATE news SET author_role = $1 WHERE author_id = $2",
   [role, id]
@@ -957,9 +1029,9 @@ app.patch(
       const { id } = req.params;
 
       const targetResult = await pool.query(
-        "SELECT id, username FROM users WHERE id = $1",
-        [id]
-      );
+  "SELECT id, username, role FROM users WHERE id = $1",
+  [id]
+);
 
       if (targetResult.rows.length === 0) {
         return res.status(404).json({
@@ -975,15 +1047,24 @@ app.patch(
         });
       }
 
-      const result = await pool.query(
-        `
-        UPDATE users
-        SET role = 'banned'
-        WHERE id = $1
-        RETURNING id, username, email, role
-        `,
-        [id]
-      );
+      const oldRole = targetResult.rows[0].role;
+
+const result = await pool.query(
+  `
+  UPDATE users
+  SET role = 'banned'
+  WHERE id = $1
+  RETURNING id, username, email, role
+  `,
+  [id]
+);
+
+await writeAdminLog(
+  req,
+  result.rows[0],
+  "BAN_USER",
+  `Роль изменена: ${oldRole} → banned`
+);
 
       res.json({
         ok: true,
@@ -1042,10 +1123,19 @@ app.patch("/admin/users/:id/username", requireAdmin, async (req, res) => {
       return res.status(400).json({ error: "Такой ник или номер после # уже занят" });
     }
 
-    const result = await pool.query(
-      "UPDATE users SET username = $1 WHERE id = $2 RETURNING id, username, email, role, status, is_partner, medals",
-      [newUsername, id]
-    );
+    const oldUsername = targetUser.rows[0].username;
+
+const result = await pool.query(
+  "UPDATE users SET username = $1 WHERE id = $2 RETURNING id, username, email, role, status, is_partner, medals",
+  [newUsername, id]
+);
+
+await writeAdminLog(
+  req,
+  result.rows[0],
+  "CHANGE_USERNAME",
+  `Ник изменён: ${oldUsername} → ${newUsername}`
+);
 
     res.json(result.rows[0]);
   } catch (err) {
@@ -1078,9 +1168,9 @@ app.patch(
       }
 
       const targetResult = await pool.query(
-        "SELECT username FROM users WHERE id = $1",
-        [id]
-      );
+  "SELECT id, username, status FROM users WHERE id = $1",
+  [id]
+);
 
       if (targetResult.rows.length === 0) {
         return res.status(404).json({
@@ -1097,10 +1187,19 @@ app.patch(
         });
       }
 
-      const result = await pool.query(
-        "UPDATE users SET status = $1 WHERE id = $2 RETURNING id, username, email, role, status, is_partner, medals",
-        [status, id]
-      );
+      const oldStatus = targetResult.rows[0].status || "none";
+
+const result = await pool.query(
+  "UPDATE users SET status = $1 WHERE id = $2 RETURNING id, username, email, role, status, is_partner, medals",
+  [status, id]
+);
+
+await writeAdminLog(
+  req,
+  result.rows[0],
+  "CHANGE_STATUS",
+  `Статус изменён: ${oldStatus} → ${status}`
+);
 
       res.json(result.rows[0]);
 
@@ -1121,10 +1220,24 @@ app.patch(
     const { is_partner } = req.body;
     const { id } = req.params;
 
-    const result = await pool.query(
-      "UPDATE users SET is_partner = $1 WHERE id = $2 RETURNING id, username, email, role, is_partner",
-      [!!is_partner, id]
-    );
+    const targetUser = await pool.query(
+  "SELECT id, username, is_partner FROM users WHERE id = $1",
+  [id]
+);
+
+const oldPartner = !!targetUser.rows[0].is_partner;
+
+const result = await pool.query(
+  "UPDATE users SET is_partner = $1 WHERE id = $2 RETURNING id, username, email, role, is_partner",
+  [!!is_partner, id]
+);
+
+await writeAdminLog(
+  req,
+  result.rows[0],
+  "CHANGE_PARTNER",
+  `Партнёрская звезда: ${oldPartner ? "Да" : "Нет"} → ${!!is_partner ? "Да" : "Нет"}`
+);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Пользователь не найден" });
@@ -1144,16 +1257,28 @@ app.patch("/admin/users/:id/medals", requireAdmin, async (req, res) => {
 
     const safeMedals = medals && typeof medals === "object" ? medals : {};
 
-    const result = await pool.query(
-      "UPDATE users SET medals = $1 WHERE id = $2 RETURNING id, username, email, role, is_partner, medals",
-      [JSON.stringify(safeMedals), id]
-    );
+const targetUser = await pool.query(
+  "SELECT id, username, medals FROM users WHERE id = $1",
+  [id]
+);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Пользователь не найден" });
-    }
+if (targetUser.rows.length === 0) {
+  return res.status(404).json({ error: "Пользователь не найден" });
+}
 
-    res.json(result.rows[0]);
+const result = await pool.query(
+  "UPDATE users SET medals = $1 WHERE id = $2 RETURNING id, username, email, role, is_partner, medals",
+  [JSON.stringify(safeMedals), id]
+);
+
+await writeAdminLog(
+  req,
+  result.rows[0],
+  "CHANGE_MEDALS",
+  "Изменён набор медалей пользователя"
+);
+
+res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Ошибка изменения медалей" });
@@ -1167,20 +1292,75 @@ app.delete(
   try {
     const { id } = req.params;
 
-    const result = await pool.query(
-      "DELETE FROM users WHERE id = $1 RETURNING id, username",
-      [id]
-    );
+    const targetUser = await pool.query(
+  "SELECT id, username FROM users WHERE id = $1",
+  [id]
+);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Пользователь не найден" });
-    }
+if (targetUser.rows.length === 0) {
+  return res.status(404).json({ error: "Пользователь не найден" });
+}
 
-    res.json({ message: "Пользователь удалён", user: result.rows[0] });
+const result = await pool.query(
+  "DELETE FROM users WHERE id = $1 RETURNING id, username",
+  [id]
+);
+
+await writeAdminLog(
+  req,
+  targetUser.rows[0],
+  "DELETE_USER",
+  "Пользователь удалён"
+);
+
+res.json({
+  message: "Пользователь удалён",
+  user: result.rows[0]
+});
       } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Ошибка удаления пользователя" });
   }
+  }
+);
+app.get(
+  "/admin/logs",
+  verifyToken,
+  requireRoles("admin", "developer", "moderator"),
+  async (req, res) => {
+    try {
+
+      const result = await pool.query(`
+        SELECT
+          id,
+          admin_id,
+          admin_username,
+          target_user_id,
+          target_username,
+          action,
+          details,
+          ip_address,
+          created_at
+        FROM admin_action_logs
+        ORDER BY created_at DESC
+        LIMIT 500
+      `);
+
+      res.json({
+        ok: true,
+        logs: result.rows
+      });
+
+    } catch (err) {
+
+      console.error("ADMIN LOGS ERROR:", err);
+
+      res.status(500).json({
+        ok: false,
+        error: "Ошибка получения журнала"
+      });
+
+    }
   }
 );
 ensurePartnerColumn().catch((err) => {
