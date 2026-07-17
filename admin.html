@@ -580,7 +580,9 @@ table{
         <h2>Игроки</h2>
 <div style="display:flex;gap:10px;flex-wrap:wrap">
   <input id="userSearchInput" class="search-field" placeholder="Поиск по нику или #">
-  <button class="btn gold" onclick="loadUsers()">Обновить список</button>
+  <button class="btn gold" onclick="loadUsers();loadAdminLogs();">
+  Обновить список
+</button>
 </div>
 
       <div class="table-wrap">
@@ -607,6 +609,38 @@ table{
       <div class="notice">
         Если поставить роль <b>banned</b>, аккаунт считается заблокированным. Позже добавим запрет входа для banned прямо в server.js.
       </div>
+      <section class="panel">
+  <div class="topline">
+    <h2>Журнал действий администрации</h2>
+
+    <button class="btn gold" onclick="loadAdminLogs()">
+      Обновить журнал
+    </button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Дата</th>
+          <th>Администратор</th>
+          <th>Пользователь</th>
+          <th>Действие</th>
+          <th>Описание</th>
+          <th>IP</th>
+        </tr>
+      </thead>
+
+      <tbody id="adminLogsBody">
+        <tr>
+          <td colspan="6" class="muted">
+            Журнал ещё не загружен.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
     </section>
   </main>
 
@@ -633,7 +667,93 @@ table{
 
   <script>
     const API_URL = "https://berserk-server.onrender.com";
-    const ADMIN_USERNAME = "Eighth#2020";
+const ADMIN_USERNAME = "Eighth#2020";
+
+async function loadAdminLogs(){
+
+  const tbody = document.getElementById("adminLogsBody");
+
+  if(!tbody){
+    return;
+  }
+
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="6" class="muted">
+        Загрузка...
+      </td>
+    </tr>
+  `;
+
+  try{
+
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+      API_URL + "/admin/logs",
+      {
+        headers:{
+          Authorization:"Bearer " + token
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if(!response.ok || !data.ok){
+      throw new Error(data.error || "Ошибка");
+    }
+
+    if(data.logs.length === 0){
+
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="muted">
+            Журнал пуст.
+          </td>
+        </tr>
+      `;
+
+      return;
+    }
+
+    const actionNames = {
+  CHANGE_ROLE: "Смена роли",
+  CHANGE_STATUS: "Смена статуса",
+  CHANGE_USERNAME: "Смена ника",
+  CHANGE_PASSWORD: "Смена пароля",
+  CHANGE_PARTNER: "Партнёрская звезда",
+  CHANGE_MEDALS: "Изменение медалей",
+  BAN_USER: "Блокировка",
+  DELETE_USER: "Удаление пользователя"
+};
+
+tbody.innerHTML = data.logs.map(log=>`
+  <tr>
+    <td>${new Date(log.created_at).toLocaleString()}</td>
+    <td>${log.admin_username || "-"}</td>
+    <td>${log.target_username || "-"}</td>
+    <td>${actionNames[log.action] || log.action}</td>
+    <td>${log.details || ""}</td>
+    <td>${log.ip_address || ""}</td>
+  </tr>
+`).join("");
+
+  }catch(err){
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="muted">
+          Ошибка загрузки журнала.
+        </td>
+      </tr>
+    `;
+
+    console.error(err);
+
+  }
+
+}
 
     const roleColors = {
   user: "#ffffff",
@@ -1705,8 +1825,10 @@ authBtn.style.color = nameColor;
     }
 
     setupAuthButton();
-    loadUsers();
-    document.addEventListener("input", e => {
+loadUsers();
+loadAdminLogs();
+
+document.addEventListener("input", e => {
   if(e.target?.id === "userSearchInput"){
     renderUsers(allUsers);
   }

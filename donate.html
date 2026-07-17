@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Berserk Heroes Online — Поддержка</title>
+  <meta name="description" content="Поддержка фанатского проекта Berserk Heroes Online.">
+  <meta name="theme-color" content="#07090f">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2307090f'/%3E%3Ctext x='50' y='66' text-anchor='middle' font-size='56'%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E">
+  <style>
+    :root{
+      --bg:#07090f;
+      --bg2:#0b0f18;
+      --panel:#111622;
+      --panel2:#151b2a;
+      --text:#f4efe6;
+      --muted:#b8ae9f;
+      --gold:#d6a84f;
+      --gold2:#f0d28b;
+      --ember:#e07830;
+      --violet:#7c6cff;
+      --red:#ff6b6b;
+      --green:#7bd88f;
+      --line:rgba(232,194,112,.18);
+      --r:28px;
+      --shadow:0 30px 90px rgba(0,0,0,.46);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 82% 7%,rgba(124,108,255,.18),transparent 32%),
+        radial-gradient(circle at 18% 16%,rgba(224,120,48,.18),transparent 30%),
+        linear-gradient(180deg,#05060a,#0a0d15 45%,#07090f);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+    .grain{
+      position:fixed;
+      inset:0;
+      background-image:radial-gradient(rgba(255,255,255,.13) 1px,transparent 1px);
+      background-size:22px 22px;
+      opacity:.14;
+      pointer-events:none;
+    }
+    .wrap{
+      width:min(1440px,calc(100% - 36px));
+      margin:auto;
+      position:relative;
+      z-index:1;
+    }
+    .nav{
+      position:sticky;
+      top:14px;
+      z-index:50;
+      margin:14px auto 0;
+      width:min(1440px,calc(100% - 28px));
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:11px 13px 11px 16px;
+      background:rgba(9,12,19,.76);
+      backdrop-filter:blur(18px);
+      border:1px solid var(--line);
+      border-radius:999px;
+      box-shadow:0 16px 45px rgba(0,0,0,.34);
+    }
+    .brand{
+      display:flex;
+      gap:11px;
+      align-items:center;
+      color:var(--text);
+      text-decoration:none;
+      font-weight:950;
+      white-space:nowrap;
+      letter-spacing:-.03em;
+    }
+    .brand-mark{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg,#23190d,#d6a84f);
+      color:#07090f;
+      overflow:hidden;
+    }
+    .brand-mark img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      border-radius:50%;
+    }
+    .nav-links{
+      display:flex;
+      gap:16px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .nav a{
+      color:var(--text);
+      text-decoration:none;
+      font-size:14px;
+      font-weight:750;
+    }
+    .nav-links a{
+      opacity:.74;
+      padding-bottom:6px;
+      border-bottom:2px solid transparent;
+    }
+    .nav-links a:hover,
+    .nav-links a.active{
+      opacity:1;
+      color:var(--gold2);
+      border-bottom-color:var(--gold2);
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:12px 18px;
+      border-radius:999px;
+      border:1px solid transparent;
+      text-decoration:none;
+      font-weight:900;
+      transition:.25s;
+      cursor:pointer;
+      white-space:nowrap;
+      font-size:14px;
+    }
+    .btn.gold{
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      color:#171008;
+      box-shadow:0 16px 42px rgba(214,168,79,.22);
+    }
+    .btn.ghost{
+      background:rgba(255,255,255,.06);
+      border-color:rgba(255,255,255,.13);
+      color:var(--text);
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .hero{
+      padding:58px 0 22px;
+    }
+    .eyebrow{
+      display:inline-flex;
+      padding:8px 12px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(214,168,79,.08);
+      font-size:13px;
+      font-weight:900;
+      color:var(--gold2);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    h1{
+      font-size:clamp(42px,6vw,82px);
+      line-height:.95;
+      margin:18px 0 16px;
+      letter-spacing:-.07em;
+      background:linear-gradient(135deg,#fff 15%,#f0d28b 58%,#b16b2c);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    .lead{
+      font-size:clamp(17px,2vw,21px);
+      line-height:1.55;
+      color:#d7cec0;
+      max-width:920px;
+      margin:0;
+    }
+
+    .support-grid{
+      display:grid;
+      grid-template-columns:.92fr 1.08fr;
+      gap:18px;
+      align-items:stretch;
+      margin:10px auto 32px;
+    }
+    .support-card{
+      position:relative;
+      overflow:hidden;
+      background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.045));
+      border:1px solid rgba(232,194,112,.15);
+      border-radius:var(--r);
+      box-shadow:0 22px 60px rgba(0,0,0,.22);
+      backdrop-filter:blur(10px);
+      padding:30px;
+      min-height:760px;
+    }
+    .support-card:before{
+      content:"";
+      position:absolute;
+      inset:-35%;
+      background:
+        radial-gradient(circle at 18% 18%,rgba(214,168,79,.10),transparent 28%),
+        radial-gradient(circle at 88% 20%,rgba(124,108,255,.13),transparent 26%),
+        radial-gradient(circle at 50% 75%,rgba(224,120,48,.08),transparent 34%);
+      pointer-events:none;
+    }
+    .support-card>*{position:relative;z-index:1}
+    .about-row{
+      display:grid;
+      grid-template-columns:96px 1fr;
+      gap:24px;
+      align-items:start;
+    }
+    .profile-photo{
+      width:78px;
+      height:168px;
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid rgba(232,194,112,.24);
+      background:rgba(255,255,255,.08);
+      box-shadow:0 20px 60px rgba(0,0,0,.35);
+    }
+    .profile-photo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:center;
+      display:block;
+    }
+    .about h2{
+      margin:0 0 10px;
+      color:var(--gold2);
+      font-size:26px;
+      letter-spacing:-.04em;
+    }
+    .about h3{
+      margin:0 0 22px;
+      color:#e8ddca;
+      font-size:18px;
+      line-height:1.35;
+    }
+    .about p{
+      margin:0 0 22px;
+      color:#d8ccbb;
+      line-height:1.7;
+      font-size:17px;
+      font-weight:650;
+    }
+    .notice{
+      margin-top:20px;
+      padding:18px 20px;
+      border-radius:22px;
+      background:rgba(224,120,48,.08);
+      border:1px solid rgba(224,120,48,.20);
+      color:#e8ddca;
+      line-height:1.55;
+      font-weight:750;
+    }
+
+    .boosty-kicker{
+      color:var(--gold2);
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      font-weight:950;
+      margin-bottom:10px;
+    }
+    .boosty-title{
+      margin:0;
+      font-size:clamp(38px,4.6vw,62px);
+      line-height:.95;
+      letter-spacing:-.065em;
+      color:#fff;
+    }
+    .boosty-title span{
+      color:var(--gold2);
+    }
+    .boosty-subtitle{
+      margin:10px 0 18px;
+      color:#d8ccbb;
+      line-height:1.55;
+      font-size:18px;
+      font-weight:650;
+      max-width:760px;
+    }
+    .roadmap{
+      margin:18px 0 20px;
+      padding:18px;
+      border-radius:24px;
+      background:rgba(255,255,255,.045);
+      border:1px solid rgba(232,194,112,.14);
+    }
+    .roadmap h3{
+      margin:0 0 13px;
+      color:var(--gold2);
+      font-size:22px;
+      letter-spacing:-.04em;
+    }
+    .roadmap-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px 12px;
+    }
+    .roadmap-item{
+      display:flex;
+      gap:9px;
+      align-items:flex-start;
+      padding:10px 11px;
+      border-radius:16px;
+      background:rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.07);
+      color:#e5dacb;
+      line-height:1.35;
+      font-size:14px;
+      font-weight:800;
+    }
+    .check{
+      color:#8ff5a4;
+      text-shadow:0 0 14px rgba(123,216,143,.24);
+      flex:0 0 auto;
+    }
+    .support-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:22px;
+    }
+    .levels{
+      margin:6px auto 42px;
+    }
+    .levels-head{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:18px;
+      margin:0 0 16px;
+    }
+    .levels-head h2{
+      margin:0;
+      color:var(--gold2);
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      font-size:14px;
+    }
+    .level-grid{
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      gap:12px;
+    }
+    .level-card{
+      background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.045));
+      border:1px solid rgba(232,194,112,.15);
+      border-radius:22px;
+      padding:14px;
+      box-shadow:0 22px 60px rgba(0,0,0,.22);
+      min-height:112px;
+    }
+    .level-card b{
+      display:block;
+      font-size:17px;
+      line-height:1.25;
+      color:#fff;
+      margin-bottom:8px;
+    }
+    .level-card span{
+      color:var(--gold2);
+      font-weight:950;
+      font-size:20px;
+    }
+    .level-card p{
+      margin:9px 0 0;
+      color:var(--muted);
+      line-height:1.45;
+      font-size:13px;
+    }
+
+    .footer{
+      border-top:1px solid rgba(232,194,112,.14);
+      padding:26px 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+    .footer-inner{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .footer a{color:var(--gold2);text-decoration:none}
+    .music-toggle{
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      z-index:9999;
+      padding:12px 18px;
+      border-radius:999px;
+      border:1px solid rgba(232,194,112,.2);
+      background:rgba(7,9,15,.8);
+      color:#f0d28b;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    @media(max-width:1120px){
+      .nav-links{display:none}
+      .support-grid{grid-template-columns:1fr}
+      .support-card{min-height:auto}
+      .level-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:680px){
+      .wrap{width:min(100% - 24px,1440px)}
+      .nav{border-radius:24px;align-items:flex-start}
+      .brand{white-space:normal}
+      .hero{padding-top:42px}
+      .about-row{grid-template-columns:1fr}
+      .profile-photo{width:170px;height:170px;border-radius:32px}
+      .roadmap-grid{grid-template-columns:1fr}
+      .level-grid{grid-template-columns:1fr}
+      .btn{width:100%}
+      .music-toggle{left:20px;right:auto}
+    }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <nav class="nav">
+    <a class="brand" href="BerserHeroesOnline.html">
+      <span class="brand-mark"><img src="Logo.png" alt="BHO"></span>
+      <span>Berserk Heroes Online</span>
+    </a>
+
+    <div class="nav-links">
+      <a href="BerserHeroesOnline.html">О сайте</a>
+      <a href="deck-builder_checked.html">База карт</a>
+      <a href="decks_select_publish.html#deck">Колоды</a>
+      <a href="meta.html#meta">(Мета тех.работа)</a>
+      <a href="tournaments.html">Турниры</a>
+      <a href="news.html">Новости</a>
+      <a href="chats.html">Чаты</a>
+      <a class="active" href="support.html">Поддержка</a>
+      <a href="BerserHeroesOnline.html#contacts">Контакты</a>
+    </div>
+
+    <div style="display:flex;gap:14px;align-items:center">
+      <a class="btn ghost" href="https://t.me/Paul_Eighth" target="_blank" style="border:1px solid #d6a84f;color:#d6a84f;background:transparent">@Paul_Eighth</a>
+      <a class="btn gold" href="auth.html" id="authLink">Войти</a>
+    </div>
+  </nav>
+
+  <header class="hero wrap">
+    <span class="eyebrow">✦ Поддержка проекта</span>
+    <h1>Поддержать Berserk Heroes Online</h1>
+    <p class="lead">Эта страница для тех, кто хочет помочь развитию сайта, турниров, базы карт и всего сообщества фанатского проекта по Berserk Heroes Online</p>
+  </header>
+
+  <main class="wrap">
+    <section class="support-grid">
+      <article class="support-card">
+        <div class="about-row">
+          <div class="profile-photo">
+            <img src="Owner.jpg" alt="Eighth" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=&quot;display:grid;place-items:center;height:100%;color:#f0d28b;font-weight:950&quot;>Eighth</span>'">
+          </div>
+
+          <div class="about">
+            <h2>Eighth - создатель проекта и сайта</h2>
+            <p>Привет. Меня зовут Павел, я игрок и фанат игры «Берсерк Герои Онлайн». Этот сайт - мой личный неофициальный фанатский проект</p>
+
+            <p>У меня нет команды разработчиков. Весь сайт, все функции, турниры, новости, база карт, колоды, аналитика, чаты и остальные разделы я создаю и поддерживаю самостоятельно</p>
+
+            <p>Когда я начинал работу над проектом, у меня практически не было опыта в коде. Пришлось разбираться с нуля: смотреть обучающие видео, покупать курсы, программы и постоянно изучать новые инструменты.</p>
+
+            <p>Я делаю этот проект по своей любимой настольной игре и хочу внести реальный вклад в развитие сообщества и комьюнити Berserk Heroes Online.</p>
+
+            <div class="notice">
+              <b>Важно:</b> я не являюсь сотрудником, официальным представителем или правообладателем игры. Сайт создан как независимый фанатский проект для игроков.
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="support-card">
+        <div class="boosty-kicker">BOOSTY</div>
+        <h2 class="boosty-title">Поддержка помогает <span>развивать сайт</span></h2>
+        <p class="boosty-subtitle">Средства идут на поддержку работы проекта, новые функции, улучшение разделов сайта, турниры, конкурсы и розыгрыши для игроков.</p>
+
+        <div class="roadmap">
+          <h3>На что идут донаты</h3>
+
+          <div class="roadmap-grid">
+            <div class="roadmap-item"><span class="check">✅</span><span>Оплата сервера и технической инфраструктуры</span></div>
+            <div class="roadmap-item"><span class="check">✅</span><span>Турниры, призы и игровые активности</span></div>
+            <div class="roadmap-item"><span class="check">✅</span><span>Новые функции и улучшение существующих разделов</span></div>
+            <div class="roadmap-item"><span class="check">✅</span><span>Пополнение и развитие базы карт</span></div>
+            <div class="roadmap-item"><span class="check">✅</span><span>Подготовка мобильной версии проекта</span></div>
+            <div class="roadmap-item"><span class="check">✅</span><span>Поиск помощников и будущих членов команды</span></div>
+            <div class="roadmap-item"><span class="check">✅</span><span>Покупка программ, сервисов и обучающих материалов</span></div>
+            <div class="roadmap-item"><span class="check">✅</span><span>Исправление ошибок и повышение стабильности сайта</span></div>
+            <div class="roadmap-item"><span class="check">✅</span><span>Создание новых инструментов для игроков</span></div>
+            <div class="roadmap-item"><span class="check">✅</span><span>Дальнейшее развитие нашего проекта по Berserk Heroes Online</span></div>
+          </div>
+        </div>
+
+        <div class="support-actions">
+          <a class="btn gold" href="https://boosty.to/eighth" target="_blank">💖 Поддержать на Boosty</a>
+          <a class="btn ghost" href="https://t.me/Paul_Eighth" target="_blank">Написать напрямую</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="levels">
+      <div class="levels-head">
+        <h2>Уровни поддержки</h2>
+      </div>
+
+      <div class="level-grid">
+        <div class="level-card">
+          <b>🧭 Путник</b>
+          <span>100 ₽</span>
+          <p>Базовая поддержка проекта и его дальнейшего развития.</p>
+        </div>
+
+        <div class="level-card">
+          <b>🛡️Брат по оружию</b>
+          <span>500 ₽</span>
+          <p>Помощь сайту, турнирам и регулярным улучшениям.</p>
+        </div>
+
+        <div class="level-card">
+          <b>⚔️Чемпион</b>
+          <span>1000 ₽</span>
+          <p>Сильный вклад в развитие функций и инструментов.</p>
+        </div>
+
+        <div class="level-card">
+          <b>⚜️Покровитель</b>
+          <span>5000 ₽</span>
+          <p>Крупная поддержка проекта и будущих обновлений.</p>
+        </div>
+
+        <div class="level-card">
+          <b>👑Император</b>
+          <span>10000 ₽</span>
+          <p>Максимальная поддержка развития проекта.</p>
+        </div>
+
+        <div class="level-card">
+          <b>⭐ Стать партнёром сайта</b>
+          <span>10000 ₽</span>
+          <p>Партнёрский статус и особая поддержка сайта.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span>Данный сайт является неофициальным фанатским проектом и не имеет никакого отношения к правообладателю игры Берсерк Герои Онлайн, ее лицензиатам или официальным партнерам. Все права на игру Берсерк Герои Онлайн, включая название, торговые марки, графические элементы и другие объекты интеллектуальной собственности, принадлежат их законным правообладателям</span>
+      <a href="https://boosty.to/eighth" target="_blank">Поддержать проект</a>
+    </div>
+  </footer>
+
+  <audio id="bgMusic" loop>
+    <source src="BGO.mp3" type="audio/mpeg">
+  </audio>
+  <button id="musicToggle" class="music-toggle">🔇 Звук: ВЫКЛ</button>
+
+<script>
+const user = JSON.parse(localStorage.getItem("user") || "null");
+const authLink = document.getElementById("authLink");
+if(authLink && user){
+  authLink.textContent = "Профиль";
+  authLink.href = "auth.html";
+}
+
+const music = document.getElementById("bgMusic");
+const btn = document.getElementById("musicToggle");
+let savedTime = localStorage.getItem("musicTime");
+
+music.volume = 1;
+music.muted = true;
+btn.textContent = "🔇 Звук: ВЫКЛ";
+
+if(savedTime){
+  music.currentTime = savedTime;
+}
+
+btn.addEventListener("click", () => {
+  if(music.paused){
+    music.play();
+    music.muted = false;
+    btn.textContent = "🔊 Звук: ВКЛ";
+  }else{
+    music.muted = !music.muted;
+    btn.textContent = music.muted ? "🔇 Звук: ВЫКЛ" : "🔊 Звук: ВКЛ";
+  }
+});
+
+setInterval(() => {
+  localStorage.setItem("musicTime", music.currentTime);
+}, 1000);
+</script>
+</body>
+</html>
