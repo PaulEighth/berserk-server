@@ -687,7 +687,14 @@ const isPasswordCorrect = await bcrypt.compare(
 
 
 
-    const token = jwt.sign(
+    const currentIp = getClientIp(req);
+
+await pool.query(
+  "UPDATE users SET last_ip = $1 WHERE id = $2",
+  [currentIp, user.id]
+);
+
+const token = jwt.sign(
       {
         id: user.id,
         username: user.username
