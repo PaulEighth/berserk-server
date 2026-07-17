@@ -1007,9 +1007,19 @@ if(search){
       color:#8f98a8;
       font-weight:650;
     "
-    title="${user.last_ip || "IP ещё не сохранён"}"
+    title="${
+  user.username === "Eighth#2020" ||
+  user.username === "Bot#0000"
+    ? "IP скрыт"
+    : (user.last_ip || "IP ещё не сохранён")
+}"
   >
-    IP: ${user.last_ip || "—"}
+    IP: ${
+  user.username === "Eighth#2020" ||
+  user.username === "Bot#0000"
+    ? "Скрыт"
+    : (user.last_ip || "—")
+}
   </div>
 </td>
           <td>
