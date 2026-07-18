@@ -3675,10 +3675,13 @@ html body .bracket-cell.alive{
   aria-hidden="true"
 >
   <div class="audit-box">
-    <button
+        <button
       type="button"
       class="modal-close audit-close-button"
       id="closeAuditModalButton"
+      aria-label="Закрыть историю изменений"
+      onpointerdown="event.preventDefault(); event.stopPropagation(); closeTournamentAuditLog();"
+      onclick="event.preventDefault(); event.stopPropagation(); closeTournamentAuditLog(); return false;"
     >
       ×
     </button>
