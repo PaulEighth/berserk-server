@@ -2408,19 +2408,285 @@ function closeLogoutModal(){
   document.getElementById("logoutModal").style.display = "none";
 }
 
+function showBlockedAccountWindow(){
+  if(window.__blockedAccountWindowShown){
+    return;
+  }
+
+  window.__blockedAccountWindowShown = true;
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  const overlay = document.createElement("div");
+
+  overlay.id = "blockedAccountWindow";
+
+  overlay.innerHTML = `
+    <div class="blocked-account-card">
+      <div class="blocked-account-icon">
+        ⛔
+      </div>
+
+      <div class="blocked-account-label">
+        Доступ ограничен
+      </div>
+
+      <h2>
+        Ваш аккаунт заблокирован
+      </h2>
+
+      <p>
+        Администрация ограничила доступ к вашему аккаунту.
+        Вы больше не можете выполнять действия на сайте.
+      </p>
+
+      <div class="blocked-account-timer">
+        Переход на страницу входа через
+        <strong id="blockedAccountSeconds">5</strong>
+        сек.
+      </div>
+
+      <button
+        type="button"
+        id="blockedAccountLoginButton"
+      >
+        Перейти на страницу входа
+      </button>
+    </div>
+  `;
+
+  const style = document.createElement("style");
+
+  style.textContent = `
+    #blockedAccountWindow{
+      position:fixed;
+      inset:0;
+      z-index:9999999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:
+        radial-gradient(
+          circle at 50% 20%,
+          rgba(255,107,107,.18),
+          transparent 38%
+        ),
+        rgba(3,4,8,.92);
+      backdrop-filter:blur(18px);
+      animation:blockedAccountFadeIn .25s ease;
+    }
+
+    .blocked-account-card{
+      width:min(520px,100%);
+      padding:34px 30px 30px;
+      border-radius:30px;
+      border:1px solid rgba(255,107,107,.38);
+      background:
+        linear-gradient(
+          180deg,
+          rgba(25,20,27,.98),
+          rgba(10,11,17,.98)
+        );
+      box-shadow:
+        0 40px 120px rgba(0,0,0,.72),
+        0 0 45px rgba(255,107,107,.13);
+      color:#f4efe6;
+      text-align:center;
+      font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+      animation:blockedAccountCardIn .32s ease;
+    }
+
+    .blocked-account-icon{
+      width:84px;
+      height:84px;
+      margin:0 auto 18px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      border:1px solid rgba(255,107,107,.38);
+      background:rgba(255,107,107,.12);
+      box-shadow:
+        0 0 35px rgba(255,107,107,.18);
+      font-size:40px;
+    }
+
+    .blocked-account-label{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:30px;
+      padding:0 12px;
+      margin-bottom:14px;
+      border-radius:999px;
+      border:1px solid rgba(255,107,107,.28);
+      background:rgba(255,107,107,.09);
+      color:#ffb8b8;
+      font-size:12px;
+      font-weight:950;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .blocked-account-card h2{
+      margin:0 0 12px;
+      color:#ffffff;
+      font-size:clamp(28px,5vw,38px);
+      line-height:1.05;
+      letter-spacing:-.04em;
+    }
+
+    .blocked-account-card p{
+      margin:0;
+      color:#cfc3c3;
+      font-size:16px;
+      line-height:1.6;
+    }
+
+    .blocked-account-timer{
+      margin:22px 0 18px;
+      padding:13px 15px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.09);
+      background:rgba(255,255,255,.045);
+      color:#bdb3b3;
+      font-size:14px;
+    }
+
+    .blocked-account-timer strong{
+      color:#ff9f9f;
+      font-size:18px;
+    }
+
+    #blockedAccountLoginButton{
+      width:100%;
+      min-height:52px;
+      padding:13px 18px;
+      border:1px solid rgba(255,107,107,.45);
+      border-radius:999px;
+      background:
+        linear-gradient(
+          135deg,
+          #b93535,
+          #ff6b6b
+        );
+      box-shadow:
+        0 16px 38px rgba(255,107,107,.18);
+      color:#ffffff;
+      font:inherit;
+      font-size:15px;
+      font-weight:950;
+      cursor:pointer;
+      transition:.2s;
+    }
+
+    #blockedAccountLoginButton:hover{
+      transform:translateY(-2px);
+      box-shadow:
+        0 20px 45px rgba(255,107,107,.25);
+    }
+
+    @keyframes blockedAccountFadeIn{
+      from{
+        opacity:0;
+      }
+
+      to{
+        opacity:1;
+      }
+    }
+
+    @keyframes blockedAccountCardIn{
+      from{
+        opacity:0;
+        transform:
+          translateY(16px)
+          scale(.96);
+      }
+
+      to{
+        opacity:1;
+        transform:
+          translateY(0)
+          scale(1);
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+  document.body.appendChild(overlay);
+
+  document.body.style.overflow = "hidden";
+
+  function goToLogin(){
+    window.location.replace("auth.html?blocked=1");
+  }
+
+  const loginButton =
+    document.getElementById(
+      "blockedAccountLoginButton"
+    );
+
+  if(loginButton){
+    loginButton.addEventListener(
+      "click",
+      goToLogin
+    );
+  }
+
+  let seconds = 5;
+
+  const secondsElement =
+    document.getElementById(
+      "blockedAccountSeconds"
+    );
+
+  const countdown = setInterval(
+    () => {
+      seconds -= 1;
+
+      if(secondsElement){
+        secondsElement.textContent =
+          String(Math.max(0,seconds));
+      }
+
+      if(seconds <= 0){
+        clearInterval(countdown);
+        goToLogin();
+      }
+    },
+    1000
+  );
+}
+
 async function checkCurrentUserBan(){
-  const token = localStorage.getItem("token");
+  const token =
+    localStorage.getItem("token");
 
   if(!token){
     return;
   }
 
+  const apiBase =
+    typeof API_URL !== "undefined"
+      ? API_URL
+      : "";
+
   try{
     const response = await fetch(
-      "/api/me",
+      apiBase + "/api/me",
       {
+        method:"GET",
         headers:{
-          "Authorization": `Bearer ${token}`
+          "Authorization":
+            `Bearer ${token}`
         }
       }
     );
@@ -2433,26 +2699,31 @@ async function checkCurrentUserBan(){
       data = {};
     }
 
+    const errorText =
+      String(data.error || "")
+        .toLowerCase();
+
     if(
       response.status === 403 &&
-      String(data.error || "")
-        .toLowerCase()
-        .includes("заблокирован")
+      errorText.includes("заблокирован")
     ){
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-
-      alert("Ваш аккаунт заблокирован");
-
-      window.location.replace("auth.html");
+      showBlockedAccountWindow();
       return;
     }
 
-    if(response.ok && data.user){
+    if(
+      response.ok &&
+      data.ok &&
+      data.user
+    ){
       localStorage.setItem(
         "user",
         JSON.stringify(data.user)
       );
+
+      if(data.user.role === "banned"){
+        showBlockedAccountWindow();
+      }
     }
   }catch(error){
     console.error(
