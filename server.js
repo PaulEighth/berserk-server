@@ -3381,7 +3381,7 @@ function collectTournamentAuditChanges(oldValue, newValue, path = ""){
   return changes;
 }
 
-function tournamentAuditText(change){
+function tournamentAuditText(change, newData){
   const oldText =
     change.oldValue === null ||
     change.oldValue === ""
@@ -3394,27 +3394,130 @@ function tournamentAuditText(change){
       ? "пусто"
       : String(change.newValue);
 
+  const key = String(change.path || "").split(".").pop() || "";
+
+  const match = key.match(/(.+)_r(\d+)_s(\d+)$/);
+
+  const groupKey = match ? match[1] : "";
+  const roundNumber = match ? Number(match[2]) : null;
+  const slotNumber = match ? Number(match[3]) : null;
+  const pairNumber =
+    slotNumber === null
+      ? null
+      : Math.floor(slotNumber / 2) + 1;
+
+  const sideInPair =
+    slotNumber === null
+      ? ""
+      : slotNumber % 2 === 0
+        ? "первый игрок"
+        : "второй игрок";
+
+  const groupNames = {
+    main_left: "Левая часть сетки",
+    main_right: "Правая часть сетки",
+    main_final: "Финал",
+    main_third: "Матч за 3 место",
+    groupA_left: "Группа A, левая часть",
+    groupA_right: "Группа A, правая часть",
+    groupA_final: "Группа A, финал",
+    groupB_left: "Группа B, левая часть",
+    groupB_right: "Группа B, правая часть",
+    groupB_final: "Группа B, финал",
+    groupC_left: "Группа C, левая часть",
+    groupC_right: "Группа C, правая часть",
+    groupC_final: "Группа C, финал",
+    groupD_left: "Группа D, левая часть",
+    groupD_right: "Группа D, правая часть",
+    groupD_final: "Группа D, финал",
+    tournament_final: "Финал турнира",
+    tournament64_left: "Полуфинал турнира, левая пара",
+    tournament64_right: "Полуфинал турнира, правая пара",
+    tournament64_final: "Финал турнира"
+  };
+
+  const sectionName =
+    groupNames[groupKey] ||
+    groupKey ||
+    "Турнирная сетка";
+
+  const manualCells =
+    newData?.swiss_data?.manualCells &&
+    typeof newData.swiss_data.manualCells === "object"
+      ? newData.swiss_data.manualCells
+      : {};
+
+  const playerValue = manualCells[key];
+
+  const playerName =
+    typeof playerValue === "object"
+      ? (
+          playerValue?.nick ||
+          playerValue?.username ||
+          playerValue?.name ||
+          ""
+        )
+      : String(playerValue || "");
+
+  const placeText = [
+    sectionName,
+    roundNumber !== null ? `раунд ${roundNumber}` : "",
+    pairNumber !== null ? `пара №${pairNumber}` : "",
+    sideInPair
+  ].filter(Boolean).join(", ");
+
+  if(
+    change.path === "swiss_data.swissRoundsState.current"
+  ){
+    return `Перевёл турнир с ${oldText}-го на ${newText}-й раунд швейцарской системы`;
+  }
+
   if(change.path.includes("manualCells")){
-    return `Заменил игрока «${oldText}» на «${newText}» (${change.path})`;
+    if(oldText === "пусто"){
+      return `Добавил игрока «${newText}». ${placeText}`;
+    }
+
+    if(newText === "пусто"){
+      return `Убрал игрока «${oldText}». ${placeText}`;
+    }
+
+    return `Заменил игрока «${oldText}» на «${newText}». ${placeText}`;
   }
 
   if(change.path.includes("manualScores")){
-    return `Изменил счёт с «${oldText}» на «${newText}» (${change.path})`;
+    const playerText = playerName
+      ? ` Игрок: «${playerName}».`
+      : "";
+
+    return `Изменил счёт: ${oldText} → ${newText}.${playerText} ${placeText}`;
   }
 
   if(change.path.includes("winners")){
-    return `Изменил победителя с «${oldText}» на «${newText}» (${change.path})`;
+    return `Изменил победителя: «${oldText}» → «${newText}». ${placeText}`;
   }
 
   if(change.path.includes("outPlayers")){
-    return `Изменил список выбывших игроков: «${oldText}» → «${newText}» (${change.path})`;
+    return `Изменил список выбывших игроков: «${oldText}» → «${newText}»`;
+  }
+
+  if(change.path.includes("swissRoundsState.rounds")){
+    const swissMatch = change.path.match(
+      /rounds\.(\d+)\.matches\.(\d+)/
+    );
+
+    if(swissMatch){
+      const swissRound = Number(swissMatch[1]) + 1;
+      const swissPair = Number(swissMatch[2]) + 1;
+
+      return `Изменил данные матча: тур ${swissRound}, пара №${swissPair}. «${oldText}» → «${newText}»`;
+    }
   }
 
   if(change.path.includes("swiss")){
-    return `Изменил данные швейцарской системы: «${oldText}» → «${newText}» (${change.path})`;
+    return `Изменил данные швейцарской системы: «${oldText}» → «${newText}»`;
   }
 
-  return `Изменил «${change.path}»: «${oldText}» → «${newText}»`;
+  return `Изменил данные турнира: «${oldText}» → «${newText}»`;
 }
 
 async function saveTournamentAuditChanges(
@@ -3450,7 +3553,7 @@ async function saveTournamentAuditChanges(
         req.user.username,
         req.user.role || "user",
         actionType,
-        tournamentAuditText(change),
+        tournamentAuditText(change, newData),
         JSON.stringify({
           path: change.path,
           value: change.oldValue
