@@ -3673,19 +3673,24 @@ html body .bracket-cell.alive{
   id="auditModal"
   aria-hidden="true"
 >
-  <button
-  type="button"
-  class="modal-close audit-close-button"
-  id="closeAuditModalButton"
->
-  ×
-</button>
+  <div class="audit-box">
+    <button
+      type="button"
+      class="modal-close audit-close-button"
+      id="closeAuditModalButton"
+    >
+      ×
+    </button>
 
-    <h2>История изменений турнира</h2>
+    <div class="audit-header">
+      <div>
+        <h2>История изменений турнира</h2>
 
-    <p class="audit-subtitle">
-      Кто, когда и что изменил в сетке.
-    </p>
+        <p class="audit-subtitle">
+          Кто, когда и что изменил в сетке.
+        </p>
+      </div>
+    </div>
 
     <div
       id="auditLogList"
