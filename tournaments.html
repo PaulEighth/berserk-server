@@ -4225,7 +4225,7 @@ function authHeaders(extra = {}){
       }).format(new Date(value));
     }
 
-    async function openTournamentAuditLog(tournamentId){
+        async function openTournamentAuditLog(tournamentId){
       if(!isAdmin()){
         return;
       }
@@ -4249,6 +4249,212 @@ function authHeaders(extra = {}){
           Загрузка истории...
         </div>
       `;
+
+      function formatAuditLogAction(log){
+        const originalText =
+          String(
+            log?.action_text ||
+            "Изменение турнира"
+          );
+
+        let oldData = {};
+        let newData = {};
+
+        try{
+          oldData =
+            typeof log?.old_value === "object"
+              ? (log.old_value || {})
+              : JSON.parse(
+                  log?.old_value || "{}"
+                );
+        }catch(error){
+          oldData = {};
+        }
+
+        try{
+          newData =
+            typeof log?.new_value === "object"
+              ? (log.new_value || {})
+              : JSON.parse(
+                  log?.new_value || "{}"
+                );
+        }catch(error){
+          newData = {};
+        }
+
+        const path = String(
+          newData.path ||
+          oldData.path ||
+          ""
+        );
+
+        const oldValue =
+          oldData.value === null ||
+          oldData.value === undefined ||
+          oldData.value === ""
+            ? "пусто"
+            : String(oldData.value);
+
+        const newValue =
+          newData.value === null ||
+          newData.value === undefined ||
+          newData.value === ""
+            ? "пусто"
+            : String(newData.value);
+
+        if(
+          path ===
+          "swiss_data.swissRoundsState.current"
+        ){
+          return `Перевёл турнир с ${oldValue}-го на ${newValue}-й раунд швейцарской системы`;
+        }
+
+        const cellMatch = path.match(
+          /(?:manualScores|manualCells)\.([^.]+)_r(\d+)_s(\d+)$/
+        );
+
+        if(cellMatch){
+          const sectionKey = cellMatch[1];
+          const round = Number(cellMatch[2]);
+          const slot = Number(cellMatch[3]);
+          const pair =
+            Math.floor(slot / 2) + 1;
+
+          const playerPosition =
+            slot % 2 === 0
+              ? "первый игрок"
+              : "второй игрок";
+
+          const sectionNames = {
+            main_left:
+              "Левая часть сетки",
+
+            main_right:
+              "Правая часть сетки",
+
+            main_final:
+              "Финал",
+
+            main_third:
+              "Матч за 3 место",
+
+            groupA_left:
+              "Группа A, левая часть",
+
+            groupA_right:
+              "Группа A, правая часть",
+
+            groupA_final:
+              "Финал группы A",
+
+            groupB_left:
+              "Группа B, левая часть",
+
+            groupB_right:
+              "Группа B, правая часть",
+
+            groupB_final:
+              "Финал группы B",
+
+            groupC_left:
+              "Группа C, левая часть",
+
+            groupC_right:
+              "Группа C, правая часть",
+
+            groupC_final:
+              "Финал группы C",
+
+            groupD_left:
+              "Группа D, левая часть",
+
+            groupD_right:
+              "Группа D, правая часть",
+
+            groupD_final:
+              "Финал группы D",
+
+            tournament_final:
+              "Финал турнира",
+
+            tournament64_left:
+              "Левый полуфинал",
+
+            tournament64_right:
+              "Правый полуфинал",
+
+            tournament64_final:
+              "Финал турнира"
+          };
+
+          const section =
+            sectionNames[sectionKey] ||
+            "Турнирная сетка";
+
+          if(
+            path.includes("manualScores")
+          ){
+            return `Изменил счёт с ${oldValue} на ${newValue}. ${section}, раунд ${round}, пара №${pair}, ${playerPosition}`;
+          }
+
+          if(oldValue === "пусто"){
+            return `Добавил игрока «${newValue}». ${section}, раунд ${round}, пара №${pair}, ${playerPosition}`;
+          }
+
+          if(newValue === "пусто"){
+            return `Убрал игрока «${oldValue}». ${section}, раунд ${round}, пара №${pair}, ${playerPosition}`;
+          }
+
+          return `Заменил игрока «${oldValue}» на «${newValue}». ${section}, раунд ${round}, пара №${pair}, ${playerPosition}`;
+        }
+
+        const winnerMatch = path.match(
+          /winners\.([^.]+)_r(\d+)_m(\d+)$/
+        );
+
+        if(winnerMatch){
+          const round =
+            Number(winnerMatch[2]);
+
+          const pair =
+            Number(winnerMatch[3]) + 1;
+
+          return `Изменил победителя. Раунд ${round}, пара №${pair}: «${oldValue}» → «${newValue}»`;
+        }
+
+        const swissMatch = path.match(
+          /swissRoundsState\.rounds\.(\d+)\.matches\.(\d+)/
+        );
+
+        if(swissMatch){
+          const round =
+            Number(swissMatch[1]) + 1;
+
+          const pair =
+            Number(swissMatch[2]) + 1;
+
+          return `Изменил матч швейцарской системы. Тур ${round}, пара №${pair}: «${oldValue}» → «${newValue}»`;
+        }
+
+        if(
+          path.includes("outPlayers")
+        ){
+          return `Изменил список выбывших игроков: «${oldValue}» → «${newValue}»`;
+        }
+
+        if(
+          originalText.includes(
+            "swiss_data."
+          )
+        ){
+          return originalText.replace(
+            /\s*\(swiss_data\.[^)]+\)\s*$/,
+            ""
+          );
+        }
+
+        return originalText;
+      }
 
       try{
         const response = await fetch(
@@ -4306,8 +4512,7 @@ function authHeaders(extra = {}){
 
               <div class="audit-log-action">
                 ${escapeHtml(
-                  log.action_text ||
-                  "Изменение турнира"
+                  formatAuditLogAction(log)
                 )}
               </div>
 
