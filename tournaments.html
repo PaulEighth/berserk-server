@@ -9399,32 +9399,24 @@ window.randomizeSwissPlayoff = randomizeSwissPlayoff;
       const playoffSize =
         Number(data.playoffSize) === 16 ? 16 : 8;
 
-      // Игроки, которые реально прошли по таблице.
+            // Игроки, которые прошли в плей-офф по итоговой таблице.
       const qualifiedPlayers = standingsPlayers.slice(
         0,
         playoffSize
       );
 
-      const qualifiedNames = new Set(
-        qualifiedPlayers.map(player =>
-          String(player || "").trim().toLowerCase()
-        )
-      );
-
-      // Проверяем ранее сохранённый рандом.
+      // После создания плей-офф сохранённый состав является
+      // единственным источником правды и больше не пересчитывается.
       const savedPlayoffPlayers =
         Array.isArray(data.playoffPlayers)
-          ? data.playoffPlayers.filter(player =>
-              qualifiedNames.has(
-                String(player || "").trim().toLowerCase()
-              )
+          ? data.playoffPlayers.slice(
+              0,
+              playoffSize
             )
           : [];
 
-      // Если сохранённый список правильный — используем его.
-      // Иначе используем обычный порядок таблицы.
       const playoffPlayers =
-        savedPlayoffPlayers.length === qualifiedPlayers.length
+        savedPlayoffPlayers.length === playoffSize
           ? savedPlayoffPlayers
           : qualifiedPlayers;
 
