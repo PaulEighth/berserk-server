@@ -10143,8 +10143,58 @@ function getTournamentWinnerBlock(t){
   if(!t || getTournamentVisualStatus(t) !== "finished") return "";
 
   const id = t.id;
-  const players = getPlayers(id);
-  const bracketSize = getTournamentBracketSize(t);
+
+  let players = getPlayers(id);
+  let bracketSize = getTournamentBracketSize(t);
+
+  if(String(t.format || "").toLowerCase() === "swiss"){
+    const data = ensureSwissData(t,id);
+
+    const maxRounds = Math.min(
+      10,
+      Math.max(1, Number(t.swissRounds || 3))
+    );
+
+    const visibleRounds = Array.isArray(data.rounds)
+      ? data.rounds.slice(0,maxRounds)
+      : [];
+
+    const standingsPlayers = sortedSwissTable(
+      players,
+      visibleRounds,
+      id
+    ).map(item => item.player);
+
+    bracketSize =
+      Number(data.playoffSize) === 16
+        ? 16
+        : 8;
+
+    const qualifiedPlayers = standingsPlayers.slice(
+      0,
+      bracketSize
+    );
+
+    const qualifiedNames = new Set(
+      qualifiedPlayers.map(player =>
+        String(player || "").trim().toLowerCase()
+      )
+    );
+
+    const savedPlayoffPlayers =
+      Array.isArray(data.playoffPlayers)
+        ? data.playoffPlayers.filter(player =>
+            qualifiedNames.has(
+              String(player || "").trim().toLowerCase()
+            )
+          )
+        : [];
+
+    players =
+      savedPlayoffPlayers.length === qualifiedPlayers.length
+        ? savedPlayoffPlayers
+        : qualifiedPlayers;
+  }
 
   let winner = null;
 

@@ -2281,14 +2281,14 @@ app.get("/api/tournaments", async (req, res) => {
 
     const participantsResult = await pool.query(`
       SELECT
-        tournament_id,
-        user_id,
-        username,
-        role,
-        is_partner,
-        joined_at
-      FROM tournament_participants
-      ORDER BY joined_at ASC
+        p.*,
+        COALESCE(u.medals, '{}'::jsonb) AS medals,
+        COALESCE(u.role, 'user') AS role,
+        COALESCE(u.is_partner, false) AS is_partner,
+        COALESCE(u.status, 'none') AS status
+      FROM tournament_participants p
+      LEFT JOIN users u ON u.id = p.user_id
+      ORDER BY p.joined_at ASC
     `);
 
     res.json({
