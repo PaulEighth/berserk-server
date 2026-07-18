@@ -226,15 +226,27 @@ async function canManageTournament(req, tournamentId){
 
   const tournament = tournamentResult.rows[0];
 
-  if(
-  isStaff(req.user) ||
-  Number(tournament.organizer_id) === Number(req.user.id) ||
-  isTournamentCoOrganizer(req,tournament)
-){
-  return { ok: true, tournament };
-}
+  if(req.user?.role === "admin"){
+    return { ok: true, tournament };
+  }
 
-return { ok: false, status: 403, error: "Недостаточно прав" };
+  if(String(tournament.status || "") === "finished"){
+    return {
+      ok: false,
+      status: 403,
+      error: "Завершённый турнир может редактировать только администратор"
+    };
+  }
+
+  if(
+    isStaff(req.user) ||
+    Number(tournament.organizer_id) === Number(req.user.id) ||
+    isTournamentCoOrganizer(req,tournament)
+  ){
+    return { ok: true, tournament };
+  }
+
+  return { ok: false, status: 403, error: "Недостаточно прав" };
 }
 
 async function canDeleteTournament(req, tournamentId){
@@ -249,15 +261,27 @@ async function canDeleteTournament(req, tournamentId){
 
   const tournament = tournamentResult.rows[0];
 
-  if(
-  isDeleteStaff(req.user) ||
-  Number(tournament.organizer_id) === Number(req.user.id) ||
-  isTournamentCoOrganizer(req,tournament)
-){
-  return { ok: true, tournament };
-}
+  if(req.user?.role === "admin"){
+    return { ok: true, tournament };
+  }
 
-return { ok: false, status: 403, error: "Недостаточно прав" };
+  if(String(tournament.status || "") === "finished"){
+    return {
+      ok: false,
+      status: 403,
+      error: "Завершённый турнир может удалить только администратор"
+    };
+  }
+
+  if(
+    isDeleteStaff(req.user) ||
+    Number(tournament.organizer_id) === Number(req.user.id) ||
+    isTournamentCoOrganizer(req,tournament)
+  ){
+    return { ok: true, tournament };
+  }
+
+  return { ok: false, status: 403, error: "Недостаточно прав" };
 }
 
 async function canEditTournamentPlay(req, tournamentId){
@@ -277,6 +301,60 @@ async function canEditTournamentPlay(req, tournamentId){
   }
 
   const tournament = tournamentResult.rows[0];
+
+  const playersCanEdit =
+    tournament.players_can_edit === true ||
+    tournament.players_can_edit === "true" ||
+    tournament.players_can_edit === 1 ||
+    tournament.players_can_edit === "1";
+
+  if(!playersCanEdit){
+    return {
+      ok: false,
+      status: 403,
+      error: "Редактировать может только организатор или админ"
+    };
+  }
+
+  const participantResult = await pool.query(
+    "SELECT id FROM tournament_participants WHERE tournament_id = $1 AND user_id = $2",
+    [tournamentId, req.user.id]
+  );
+
+  if(participantResult.rows.length === 0){
+    return {
+      ok: false,
+      status: 403,
+      error: "Редактировать могут только участники турнира"
+    };
+  }
+
+  return { ok: true, tournament };
+}async function canEditTournamentPlay(req, tournamentId){
+  const access = await canManageTournament(req, tournamentId);
+
+  if(access.ok){
+    return access;
+  }
+
+  const tournamentResult = await pool.query(
+    "SELECT * FROM tournaments WHERE id = $1",
+    [tournamentId]
+  );
+
+  if(tournamentResult.rows.length === 0){
+    return { ok: false, status: 404, error: "Турнир не найден" };
+  }
+
+  const tournament = tournamentResult.rows[0];
+
+  if(String(tournament.status || "") === "finished"){
+    return {
+      ok: false,
+      status: 403,
+      error: "Завершённый турнир может редактировать только администратор"
+    };
+  }
 
   const playersCanEdit =
     tournament.players_can_edit === true ||

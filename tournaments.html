@@ -4887,25 +4887,35 @@ function isTournamentCoOrganizer(t,nick){
     }
 
     function canManageTournament(id){
-      const t = tournaments.find(item => String(item.id) === String(id));
-      if(!t) return false;
+  const t = tournaments.find(item => String(item.id) === String(id));
+  if(!t) return false;
 
-      const user = getLoggedUser();
-      const nick = user?.username || getCurrentUserNick();
+  const user = getLoggedUser();
+  const nick = user?.username || getCurrentUserNick();
+  const visualStatus = getTournamentVisualStatus(t);
 
-      if(isAdmin()) return true;
-      if(["admin","developer","moderator","creator"].includes(getUserRole())) return true;
+  if(isAdmin()) return true;
 
-      const rights = t.editRights || "organizer";
-const isOrganizer = nick && isTournamentCoOrganizer(t,nick);
-const isParticipant = getPlayers(id).some(p => String(p).toLowerCase() === String(nick).toLowerCase());
+  if(visualStatus === "finished"){
+    return false;
+  }
 
-if(rights === "admin") return false;
-if(rights === "organizer") return isOrganizer;
-if(rights === "participants") return isOrganizer || isParticipant;
+  if(["developer","moderator","creator"].includes(getUserRole())){
+    return true;
+  }
 
-      return false;
-    }
+  const rights = t.editRights || "organizer";
+  const isOrganizer = nick && isTournamentCoOrganizer(t,nick);
+  const isParticipant = getPlayers(id).some(
+    p => String(p).toLowerCase() === String(nick).toLowerCase()
+  );
+
+  if(rights === "admin") return false;
+  if(rights === "organizer") return isOrganizer;
+  if(rights === "participants") return isOrganizer || isParticipant;
+
+  return false;
+}
 
     function getTournamentDeckSettings(t, isFinal=false){
       return {
@@ -6546,7 +6556,12 @@ async function saveTournamentPlayToServer(id){
   try{
     const t = tournaments.find(x => String(x.id) === String(id));
     if(!t) return;
-
+if(
+  getTournamentVisualStatus(t) === "finished" &&
+  !isAdmin()
+){
+  return;
+}
     const response = await fetch(`/api/tournaments/${id}/play`, {
       method: "PATCH",
       headers: authHeaders(),
@@ -6607,6 +6622,18 @@ window.forceUploadSwissToServer = async function(id){
     }
 
     function setManualScore(id,group,side,round,slot,score){
+      const tournament = tournaments.find(
+  t => String(t.id) === String(id)
+);
+
+if(
+  tournament &&
+  getTournamentVisualStatus(tournament) === "finished" &&
+  !isAdmin()
+){
+  showAlert("Завершённый турнир нельзя изменять.");
+  return;
+}
       const key=String(id);
       if(!tournamentManualScores[key]) tournamentManualScores[key]={};
       const cKey=cellKey(group,side,round,slot);
@@ -6710,6 +6737,18 @@ renderTrackModal(id);
     }
 
     function setManualCell(id,group,side,round,slot,nick){
+      const tournament = tournaments.find(
+  t => String(t.id) === String(id)
+);
+
+if(
+  tournament &&
+  getTournamentVisualStatus(tournament) === "finished" &&
+  !isAdmin()
+){
+  showAlert("Завершённый турнир нельзя изменять.");
+  return;
+}
       const key=String(id);
       if(!tournamentManualCells[key]) tournamentManualCells[key]={};
 
@@ -6909,6 +6948,18 @@ renderTrackModal(id);
     }
 
     function setWinner(id,side,round,matchIndex,winner,loser,winnerSeed){
+      const tournament = tournaments.find(
+  t => String(t.id) === String(id)
+);
+
+if(
+  tournament &&
+  getTournamentVisualStatus(tournament) === "finished" &&
+  !isAdmin()
+){
+  showAlert("Завершённый турнир нельзя изменять.");
+  return;
+}
       const key=String(id);
       if(!tournamentWinners[key]) tournamentWinners[key]={};
       tournamentWinners[key][winnerKey(side,round,matchIndex)] = {nick:winner, seed:Number(winnerSeed) || null};
@@ -9342,6 +9393,19 @@ function openTournamentStatusModal(id){
   modal.classList.add("show");
 }
 async function updateTournamentStatus(id, status){
+  const t = tournaments.find(
+    item => String(item.id) === String(id)
+  );
+
+  if(
+    t &&
+    getTournamentVisualStatus(t) === "finished" &&
+    !isAdmin()
+  ){
+    showAlert("Завершённый турнир может редактировать только администратор");
+    return;
+  }
+
   const response = await fetch(`/api/tournaments/${id}/status`, {
     method:"PATCH",
     headers:authHeaders(),
@@ -9412,19 +9476,41 @@ const players = getPlayers(id);
 
       const bracketSizeRow = document.querySelector('.bracket-size-row');
       if(bracketSizeRow) bracketSizeRow.style.display = 'none';
-if($('deleteTournamentBtn')){
-  $('deleteTournamentBtn').onclick = () => openDeleteTournamentModal(id);
-}
 const canManageThisTournament = canManageTournament(id);
 
+if($('deleteTournamentBtn')){
+  const canDeleteTournament =
+    getTournamentVisualStatus(t) === "finished"
+      ? isAdmin()
+      : canManageThisTournament;
+
+  $('deleteTournamentBtn').style.display =
+    canDeleteTournament ? "inline-flex" : "none";
+
+  $('deleteTournamentBtn').onclick =
+    () => openDeleteTournamentModal(id);
+}
+
+const isFinishedTournament = getTournamentVisualStatus(t) === "finished";
+
 if($('changeStatusBtn')){
-  $('changeStatusBtn').style.display = canManageThisTournament ? "inline-flex" : "none";
+  $('changeStatusBtn').style.display =
+    canManageThisTournament && !isFinishedTournament
+      ? "inline-flex"
+      : "none";
+
   $('changeStatusBtn').onclick = () => openTournamentStatusModal(id);
 }
 
 if($('toggleRegistrationBtn')){
-  $('toggleRegistrationBtn').style.display = canManageThisTournament ? "inline-flex" : "none";
-  $('toggleRegistrationBtn').textContent = t.registrationOpen ? "Турнир открыт" : "Турнир закрыт";
+  $('toggleRegistrationBtn').style.display =
+    canManageThisTournament && !isFinishedTournament
+      ? "inline-flex"
+      : "none";
+
+  $('toggleRegistrationBtn').textContent =
+    t.registrationOpen ? "Турнир открыт" : "Турнир закрыт";
+
   $('toggleRegistrationBtn').onclick = () => toggleTournamentRegistration(id);
 }
 if($('myTournamentDecksBtn')){
@@ -9445,7 +9531,10 @@ if($('leaveTournamentBtn')){
       if(t.format === 'swiss'){
   $('fullBracket').innerHTML = `
     <div style="display:flex;justify-content:flex-start;gap:10px;flex-wrap:wrap;margin:0 0 14px">
-      <button type="button" class="btn gold" data-random-tournament="${escapeHtml(String(id))}">🎲 Рандом</button>
+      ${canRandomizeTournamentClient(t)
+        ? `<button type="button" class="btn gold" data-random-tournament="${escapeHtml(String(id))}">🎲 Рандом</button>`
+        : ""
+      }
       <button type="button" class="btn ghost" data-tournament-chat-id="${escapeHtml(String(id))}">💬 Чат турнира</button>
     </div>
     ${renderSwissMode(t,id,swissPlayersForTournament(t,id))}
@@ -9464,7 +9553,10 @@ if($('leaveTournamentBtn')){
 
       $('fullBracket').innerHTML = `
   <div style="display:flex;justify-content:flex-start;gap:10px;flex-wrap:wrap;margin:0 0 14px">
-    <button type="button" class="btn gold" data-random-tournament="${escapeHtml(String(id))}">🎲 Рандом</button>
+    ${canRandomizeTournamentClient(t)
+      ? `<button type="button" class="btn gold" data-random-tournament="${escapeHtml(String(id))}">🎲 Рандом</button>`
+      : ""
+    }
     <button type="button" class="btn ghost" data-tournament-chat-id="${escapeHtml(String(id))}">💬 Чат турнира</button>
   </div>
   ${renderFullBracket(id,players,bracketSize)}
@@ -9546,6 +9638,11 @@ function openEditTournament(id){
     return;
   }
 
+  if(getTournamentVisualStatus(t) === "finished" && !isAdmin()){
+    showAlert("Завершённый турнир может редактировать только администратор");
+    return;
+  }
+
   window.editingTournamentId = id;
 
   if($("requestTitle")) $("requestTitle").value = t.title || "";
@@ -9606,7 +9703,15 @@ function canRandomizeTournamentClient(t){
   const user = getLoggedUser();
   if(!user) return false;
 
-  if(["admin", "developer", "moderator"].includes(user.role)){
+  if(user.role === "admin"){
+    return true;
+  }
+
+  if(getTournamentVisualStatus(t) === "finished"){
+    return false;
+  }
+
+  if(["developer", "moderator"].includes(user.role)){
     return true;
   }
 
@@ -9615,7 +9720,7 @@ function canRandomizeTournamentClient(t){
   }
 
   const nick = user.username || getCurrentUserNick();
-return !!nick && isTournamentCoOrganizer(t,nick);
+  return !!nick && isTournamentCoOrganizer(t,nick);
 }
 function canDeleteTournamentClient(t){
   const user = getLoggedUser();
@@ -9750,6 +9855,18 @@ async function confirmRemoveTournamentPlayer(){
 
   try{
     const id = pendingRemovePlayerTournamentId;
+    const tournament = tournaments.find(
+  t => String(t.id) === String(id)
+);
+
+if(
+  tournament &&
+  getTournamentVisualStatus(tournament) === "finished" &&
+  !isAdmin()
+){
+  showAlert("Завершённый турнир нельзя изменять.");
+  return;
+}
     const nick = pendingRemovePlayerNick;
 
     const response = await fetch(`/api/tournaments/${id}/participants/${encodeURIComponent(nick)}`, {
