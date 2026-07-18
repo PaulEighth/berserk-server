@@ -1212,11 +1212,13 @@ function updateAuthUI(){
 
     const nameColor = getNickColor(user);
 
-    authLink.innerHTML =
+        authLink.innerHTML =
       userStarHtml(user) +
       userStatusHtml(user) +
       medalsHtml(user) +
-      (user.username || "Профиль");
+      `
+      <span class="nick">${user.username || "Профиль"}</span>
+      `;
 
     authLink.classList.remove("gold");
     authLink.classList.add("ghost");
