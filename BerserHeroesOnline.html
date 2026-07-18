@@ -1472,17 +1472,12 @@ function setupAuthButton(user){
   const authBtn = findAuthButton();
   if(!user || !authBtn) return;
 
-  authBtn.innerHTML =
+    authBtn.innerHTML =
   userStarHtml(user) +
   userStatusHtml(user) +
   medalsHtml(user) +
   `
-  <span class="nick-wrap">
-    <span class="particle">
-      <span>♥</span><span>♡</span><span>♥</span><span>♡</span><span>♥</span>
-    </span>
-    <span class="nick special-valentine">${user.username}</span>
-  </span>
+  <span class="nick">${user.username}</span>
   `;
 
   authBtn.href = "#";
