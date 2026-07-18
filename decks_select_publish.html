@@ -2681,9 +2681,13 @@ if(currentUser && authBtn){
     authBtn.style.border = "1px solid rgba(232,194,112,.35)";
     authBtn.style.boxShadow = "none";
     const nameColor =
-  statusColors[user.status] && user.status !== "none"
-    ? statusColors[user.status]
-    : (roleColors[user.role] || "#ffffff");
+  user.role !== "user" && roleColors[user.role]
+    ? roleColors[user.role]
+    : (
+        user.status !== "none" && statusColors[user.status]
+          ? statusColors[user.status]
+          : "#ffffff"
+      );
 
 authBtn.style.color = nameColor;
 
