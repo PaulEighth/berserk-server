@@ -2259,6 +2259,7 @@ app.get("/api/tournaments", async (req, res) => {
         t.end_date,
         t.telegram_link,
         t.bracket,
+        t.swiss_data,
         t.status,
         t.registration_open,
         t.is_private,
