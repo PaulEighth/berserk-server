@@ -2728,11 +2728,74 @@ function closeLogoutModal(){
       <textarea class="textarea" id="editDeckTextInput" rows="6"></textarea>
     </label>
 
-    <div class="confirm-actions" style="margin-top:18px">
+        <div class="confirm-actions" style="margin-top:18px">
       <button class="btn gold" onclick="savePublishedDeckText()">Сохранить</button>
       <button class="btn ghost" onclick="closeEditDeckTextModal()">Отмена</button>
     </div>
   </div>
 </div>
+
+<script>
+async function checkCurrentUserBan(){
+  const token = localStorage.getItem("token");
+
+  if(!token){
+    return;
+  }
+
+  try{
+    const response = await fetch(
+      "/api/me",
+      {
+        headers:{
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    );
+
+    let data = {};
+
+    try{
+      data = await response.json();
+    }catch(error){
+      data = {};
+    }
+
+    if(
+      response.status === 403 &&
+      String(data.error || "")
+        .toLowerCase()
+        .includes("заблокирован")
+    ){
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      alert("Ваш аккаунт заблокирован");
+
+      window.location.replace("auth.html");
+      return;
+    }
+
+    if(response.ok && data.user){
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
+    }
+  }catch(error){
+    console.error(
+      "Ошибка проверки блокировки:",
+      error
+    );
+  }
+}
+
+checkCurrentUserBan();
+
+setInterval(
+  checkCurrentUserBan,
+  3000
+);
+</script>
 </body>
 </html>
