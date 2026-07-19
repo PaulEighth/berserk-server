@@ -3463,9 +3463,13 @@ html body .bracket-cell.alive{
 }
 
 .active-tournament-status{
+  display:grid;
+  grid-template-columns:150px 1fr;
+  align-items:center;
+  column-gap:12px;
   margin-top:8px;
   color:#fff;
-  font-size:22px;
+  font-size:18px;
   font-weight:900;
   line-height:1.1;
 }
@@ -10748,30 +10752,34 @@ return '<article class="tournament-card">'
             <div class="active-tournament-row">
               <div class="active-tournament-card">
                 <div>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+
+    <div class="active-tournament-organizer">
         <span class="active-tournament-label">НАЗВАНИЕ</span>
-        <span class="active-tournament-title">🏆 ${escapeHtml(tournament.title || 'Турнир')}</span>
+        <span class="active-tournament-title">
+            🏆 ${escapeHtml(tournament.title || 'Турнир')}
+        </span>
     </div>
 
-                  <div class="active-tournament-organizer">
-  <span class="active-tournament-organizer-label">ОРГАНИЗАТОРЫ</span>
+    <div class="active-tournament-organizer">
+        <span class="active-tournament-organizer-label">ОРГАНИЗАТОРЫ</span>
 
-  ${(
-    rememberUserRole(
-      tournament.organizer,
-      tournament.organizer_role,
-      tournament.organizer_is_partner,
-      tournament.organizer_medals,
-      tournament.organizer_status
-    ),
-    roleNickHtml(tournament.organizer)
-  )}
+        ${(
+          rememberUserRole(
+            tournament.organizer,
+            tournament.organizer_role,
+            tournament.organizer_is_partner,
+            tournament.organizer_medals,
+            tournament.organizer_status
+          ),
+          roleNickHtml(tournament.organizer)
+        )}
+    </div>
+
+    <div class="active-tournament-status">
+        Активен
+    </div>
+
 </div>
-                </div>
-
-                <div class="active-tournament-status">
-                  Активен
-                </div>
               </div>
 
               <div class="active-tournament-card">
