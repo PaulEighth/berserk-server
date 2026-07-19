@@ -3343,6 +3343,118 @@ html body .bracket-cell.alive{
   font-size:12px;
   overflow-wrap:anywhere;
 }
+/* ===== НОВАЯ СТАТИСТИКА ТУРНИРОВ ===== */
+
+.stats-dashboard{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  margin:20px auto 14px;
+}
+
+.stats-dashboard-card{
+  min-height:120px;
+  padding:22px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  border-radius:24px;
+  background:linear-gradient(
+    180deg,
+    rgba(255,255,255,.075),
+    rgba(255,255,255,.045)
+  );
+  border:1px solid rgba(232,194,112,.15);
+  box-shadow:0 22px 60px rgba(0,0,0,.22);
+  backdrop-filter:blur(10px);
+}
+
+.stats-dashboard-label{
+  color:var(--muted);
+  font-size:14px;
+  font-weight:850;
+}
+
+.stats-dashboard-value{
+  color:var(--gold2);
+  font-size:clamp(30px,4vw,46px);
+  font-weight:950;
+  line-height:1;
+}
+
+.active-tournament-dashboard{
+  display:grid;
+  gap:12px;
+  margin:0 auto 20px;
+}
+
+.active-tournament-row{
+  display:grid;
+  grid-template-columns:1.5fr repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+
+.active-tournament-card{
+  min-height:128px;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  border-radius:22px;
+  background:linear-gradient(
+    180deg,
+    rgba(255,255,255,.075),
+    rgba(255,255,255,.04)
+  );
+  border:1px solid rgba(232,194,112,.15);
+  box-shadow:0 18px 45px rgba(0,0,0,.20);
+}
+
+.active-tournament-label{
+  color:var(--muted);
+  font-size:13px;
+  font-weight:850;
+}
+
+.active-tournament-value{
+  color:var(--gold2);
+  font-size:26px;
+  font-weight:950;
+  line-height:1.15;
+}
+
+.active-tournament-title{
+  margin:0 0 9px;
+  color:var(--text);
+  font-size:21px;
+  font-weight:950;
+  line-height:1.2;
+}
+
+.active-tournament-organizer{
+  color:var(--muted);
+  font-size:13px;
+}
+
+.active-tournament-status{
+  margin-top:12px;
+  color:#bdf6ca;
+  font-size:13px;
+  font-weight:950;
+}
+
+@media(max-width:1000px){
+  .active-tournament-row{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:680px){
+  .stats-dashboard,
+  .active-tournament-row{
+    grid-template-columns:1fr;
+  }
+}
 </style>
 </head>
 <body>
@@ -3412,12 +3524,23 @@ html body .bracket-cell.alive{
 </div>
   </div>
 
-  <section class="wrap stats" aria-label="Статистика турниров">
-    <div class="stats-card"><b id="totalTournaments">0</b><span>турниров в списке</span></div>
-    <div class="stats-card"><b id="openTournaments">0</b><span>открыта регистрация</span></div>
-    <div class="stats-card"><b id="freePlaces">0</b><span>свободных мест</span></div>
-    <div class="stats-card"><b id="totalPrize">—</b><span>общий призовой фонд</span></div>
+    <section class="wrap stats-dashboard" aria-label="Статистика турниров">
+    <div class="stats-dashboard-card">
+      <div class="stats-dashboard-label">Всего турниров</div>
+      <div class="stats-dashboard-value" id="totalTournaments">0</div>
+    </div>
+
+    <div class="stats-dashboard-card">
+      <div class="stats-dashboard-label">Общий призовой фонд</div>
+      <div class="stats-dashboard-value" id="totalPrize">0 ₽</div>
+    </div>
   </section>
+
+  <section
+    class="wrap active-tournament-dashboard"
+    id="activeTournamentDashboard"
+    aria-label="Активные турниры"
+  ></section>
 
   <section class="wrap panel" aria-label="Фильтры турниров">
     <div class="filters-title"><h2>Фильтры</h2><button class="btn ghost" id="resetFilters">Сбросить</button></div>
@@ -3944,7 +4067,7 @@ async function loadMatchRoomFromServer(tournamentId, roomKey) {
     clearTimeout(timeoutId);
   }
 }
-function getMoneyPrizeValue(text){
+ gefunctiontMoneyPrizeValue(text){
   const value = String(text || "").toLowerCase();
 
   if(!value.trim()) return 0;
@@ -4109,47 +4232,39 @@ organizer_is_partner: !!t.organizer_is_partner,
 organizer_medals: t.organizer_medals || {},
 coOrganizers: Array.isArray(parsedSwissData.coOrganizers) ? parsedSwissData.coOrganizers : [],
 
-                prize: t.prize_1 || "Без приза",
-    prizeValue:
-      getMoneyPrizeValue(t.prize_1) +
-      getMoneyPrizeValue(t.prize_2) +
-      getMoneyPrizeValue(t.prize_3) +
-      getMoneyPrizeValue(t.prize_4) +
-      getMoneyPrizeValue(t.prize_5) +
-      getMoneyPrizeValue(t.prize_6) +
-      getMoneyPrizeValue(t.prize_7) +
-      getMoneyPrizeValue(t.prize_8),
+                                prize: t.prize_1 || "Без приза",
+
     prizes: Array.isArray(parsedSwissData.prizes) && parsedSwissData.prizes.length
-  ? parsedSwissData.prizes
-  : [
-      t.prize_1 || "-",
-      t.prize_2 || "-",
-      t.prize_3 || "-",
-      t.prize_4 || "-"
-    ],                prize: t.prize_1 || "Без приза",
+      ? parsedSwissData.prizes.slice(0, 8)
+      : [
+          t.prize_1 || "-",
+          t.prize_2 || "-",
+          t.prize_3 || "-",
+          t.prize_4 || "-",
+          t.prize_5 || "-",
+          t.prize_6 || "-",
+          t.prize_7 || "-",
+          t.prize_8 || "-"
+        ],
+
     prizeValue: (
       Array.isArray(parsedSwissData.prizes) && parsedSwissData.prizes.length
-        ? parsedSwissData.prizes
+        ? parsedSwissData.prizes.slice(0, 8)
         : [
             t.prize_1 || "-",
             t.prize_2 || "-",
             t.prize_3 || "-",
-            t.prize_4 || "-"
+            t.prize_4 || "-",
+            t.prize_5 || "-",
+            t.prize_6 || "-",
+            t.prize_7 || "-",
+            t.prize_8 || "-"
           ]
-    )
-      .slice(0, 8)
-      .reduce(
-        (total, prizeText) => total + getMoneyPrizeValue(prizeText),
-        0
-      ),
-    prizes: Array.isArray(parsedSwissData.prizes) && parsedSwissData.prizes.length
-  ? parsedSwissData.prizes
-  : [
-      t.prize_1 || "-",
-      t.prize_2 || "-",
-      t.prize_3 || "-",
-      t.prize_4 || "-"
-    ],
+    ).reduce(
+      (total, prizeText) =>
+        total + getMoneyPrizeValue(prizeText),
+      0
+    ),
 
     prize1: t.prize_1 || "",
     prize2: t.prize_2 || "",
@@ -6450,7 +6565,11 @@ deckRequired: deckMode === 'required',
         bansFinal,
         prize:prize || 'Без приза',
         prizes,
-        prizeValue:Number((prize || '').replace(/[^0-9]/g,'')) || 0,
+                prizeValue:prizes.reduce(
+          (total, prizeText) =>
+            total + getMoneyPrizeValue(prizeText),
+          0
+        ),
         places,
         bracketSize,
         bracket: bracketSize,
@@ -10555,13 +10674,100 @@ return '<article class="tournament-card">'
     }
 
 
-    function updateStats(){
-      $('totalTournaments').textContent = tournaments.length;
-      $('openTournaments').textContent = tournaments.filter(t => t.status === 'open' && t.free > 0).length;
-      $('freePlaces').textContent = tournaments.filter(t => t.status === 'open' || t.status === 'soon').reduce((s,t) => s + Math.max(0, t.free), 0);
-      $('totalPrize').textContent = tournaments.reduce((s,t) => s + t.prizeValue, 0).toLocaleString('ru-RU') + ' ₽';
+        function updateStats(){
+      const totalPrizeValue = tournaments.reduce(
+        (total, tournament) =>
+          total + (Number(tournament.prizeValue) || 0),
+        0
+      );
+
+      $('totalTournaments').textContent =
+        tournaments.length.toLocaleString('ru-RU');
+
+      $('totalPrize').textContent =
+        totalPrizeValue.toLocaleString('ru-RU') + ' ₽';
+
+      const activeTournaments = tournaments.filter(tournament =>
+        tournament.status === 'open' ||
+        tournament.status === 'soon'
+      );
+
+      const dashboard = $('activeTournamentDashboard');
+
+      if(dashboard){
+        dashboard.innerHTML = activeTournaments.map(tournament => {
+          const freePlaces = Math.max(
+            0,
+            Number(tournament.free) || 0
+          );
+
+          const registrationIsOpen =
+            tournament.registrationOpen !== false &&
+            tournament.status === 'open' &&
+            freePlaces > 0;
+
+          const prizeValue =
+            Number(tournament.prizeValue) || 0;
+
+          return `
+            <div class="active-tournament-row">
+              <div class="active-tournament-card">
+                <div>
+                  <div class="active-tournament-title">
+                    🏆 ${escapeHtml(tournament.title || 'Турнир')}
+                  </div>
+
+                  <div class="active-tournament-organizer">
+                    Организатор:
+                    ${escapeHtml(tournament.organizer || 'Организатор')}
+                  </div>
+                </div>
+
+                <div class="active-tournament-status">
+                  Активен
+                </div>
+              </div>
+
+              <div class="active-tournament-card">
+                <div class="active-tournament-label">
+                  Регистрация
+                </div>
+
+                <div class="active-tournament-value">
+                  ${registrationIsOpen ? 'Открыта' : 'Закрыта'}
+                </div>
+              </div>
+
+              <div class="active-tournament-card">
+                <div class="active-tournament-label">
+                  Свободных мест
+                </div>
+
+                <div class="active-tournament-value">
+                  ${freePlaces.toLocaleString('ru-RU')}
+                </div>
+              </div>
+
+              <div class="active-tournament-card">
+                <div class="active-tournament-label">
+                  Призовой фонд
+                </div>
+
+                <div class="active-tournament-value">
+                  ${prizeValue.toLocaleString('ru-RU')} ₽
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
       updateCountdown();
-      if(countdownTimer) clearInterval(countdownTimer);
+
+      if(countdownTimer){
+        clearInterval(countdownTimer);
+      }
+
       countdownTimer = setInterval(updateCountdown, 1000);
     }
 
