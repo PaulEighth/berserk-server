@@ -3432,14 +3432,16 @@ html body .bracket-cell.alive{
 }
 
 .active-tournament-organizer{
-  color:var(--muted);
-  font-size:13px;
+  margin-top:10px;
+  font-size:19px;
+  font-weight:900;
+  line-height:1.45;
 }
 
 .active-tournament-status{
-  margin-top:12px;
-  color:#bdf6ca;
-  font-size:13px;
+  margin-top:16px;
+  color:#7bd88f;
+  font-size:18px;
   font-weight:950;
 }
 
@@ -10718,9 +10720,16 @@ return '<article class="tournament-card">'
                   </div>
 
                   <div class="active-tournament-organizer">
-                    Организатор:
-                    ${escapeHtml(tournament.organizer || 'Организатор')}
-                  </div>
+  <span style="color:#a8b0be;">Организатор:</span><br>
+
+  ${getUserBadges({
+    username: tournament.organizer,
+    role: tournament.organizer_role,
+    status: tournament.organizer_status,
+    is_partner: tournament.organizer_is_partner,
+    medals: tournament.organizer_medals
+  })}
+</div>
                 </div>
 
                 <div class="active-tournament-status">
