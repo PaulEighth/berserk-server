@@ -6563,10 +6563,14 @@ deckRequired: deckMode === 'required',
         bansBeforeFinal,
         decksFinal,
         bansFinal,
-        prize: prize || "Без приза",
-prizes,
-prizeValue: 0,
-places,
+        prize:prize || 'Без приза',
+        prizes,
+                prizeValue:prizes.reduce(
+          (total, prizeText) =>
+            total + getMoneyPrizeValue(prizeText),
+          0
+        ),
+        places,
         bracketSize,
         bracket: bracketSize,
         grid: bracketSize,
