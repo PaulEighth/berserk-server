@@ -3945,12 +3945,35 @@ async function loadMatchRoomFromServer(tournamentId, roomKey) {
   }
 }
 function getMoneyPrizeValue(text){
-  const value = String(text || "");
+  const value = String(text || "").toLowerCase();
 
-  const rubMatch = value.match(/(\d[\d\s]*)\s*(р|руб|₽)/i);
-  if(!rubMatch) return 0;
+  if(!value.trim()) return 0;
 
-  return Number(rubMatch[1].replace(/\s/g, "")) || 0;
+  // Если есть слова, означающие не денежный приз — не считаем.
+  if(
+    /(бустер|бустера|коврик|промо|промо-карт|карта|жетон|жетоны|дайс|кубик|кубики|мерч|футболк|сертификат|колода)/i.test(value)
+  ){
+    return 0;
+  }
+
+  let total = 0;
+
+  // Ищем все денежные суммы:
+  // 500
+  // 500р
+  // 500 руб
+  // 500 рублей
+  // 500₽
+  const matches = value.matchAll(/(\d[\d\s]*)(?:\s*(?:₽|р\b|руб\b|руб\.|рублей\b))?/gi);
+
+  for(const match of matches){
+    const number = Number(match[1].replace(/\s/g, ""));
+    if(Number.isFinite(number) && number > 0){
+      total += number;
+    }
+  }
+
+  return total;
 }
     async function loadTournamentsFromServer(silent = false){
   try{
@@ -4046,8 +4069,16 @@ organizer_is_partner: !!t.organizer_is_partner,
 organizer_medals: t.organizer_medals || {},
 coOrganizers: Array.isArray(parsedSwissData.coOrganizers) ? parsedSwissData.coOrganizers : [],
 
-        prize: t.prize_1 || "Без приза",
-    prizeValue: getMoneyPrizeValue(t.prize_1 || ""),
+                prize: t.prize_1 || "Без приза",
+    prizeValue:
+      getMoneyPrizeValue(t.prize_1) +
+      getMoneyPrizeValue(t.prize_2) +
+      getMoneyPrizeValue(t.prize_3) +
+      getMoneyPrizeValue(t.prize_4) +
+      getMoneyPrizeValue(t.prize_5) +
+      getMoneyPrizeValue(t.prize_6) +
+      getMoneyPrizeValue(t.prize_7) +
+      getMoneyPrizeValue(t.prize_8),
     prizes: Array.isArray(parsedSwissData.prizes) && parsedSwissData.prizes.length
   ? parsedSwissData.prizes
   : [
