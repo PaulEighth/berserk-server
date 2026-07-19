@@ -3974,6 +3974,46 @@ function getMoneyPrizeValue(text){
   }
 
   return total;
+}function getMoneyPrizeValue(text){
+  const value = String(text || "")
+    .toLowerCase()
+    .replace(/\u00a0/g, " ")
+    .trim();
+
+  if(!value || value === "-") return 0;
+
+  let total = 0;
+
+  const moneyMatches = value.matchAll(
+    /(\d{1,3}(?:[ .]\d{3})+|\d+)\s*(?:₽|руб(?:\.|ля|лей)?|р(?:\.|\b))/gi
+  );
+
+  for(const match of moneyMatches){
+    const number = Number(
+      String(match[1]).replace(/[ .]/g, "")
+    );
+
+    if(Number.isFinite(number) && number > 0){
+      total += number;
+    }
+  }
+
+  if(total > 0){
+    return total;
+  }
+
+  const nonMoneyWords =
+    /(бустер|бустера|бустеров|коврик|промо|карт|жетон|дайс|кубик|мерч|футболк|сертификат|колода|набор|пак)/i;
+
+  if(nonMoneyWords.test(value)){
+    return 0;
+  }
+
+  if(/^\d[\d .]*$/.test(value)){
+    return Number(value.replace(/[ .]/g, "")) || 0;
+  }
+
+  return 0;
 }
     async function loadTournamentsFromServer(silent = false){
   try{
@@ -4079,6 +4119,29 @@ coOrganizers: Array.isArray(parsedSwissData.coOrganizers) ? parsedSwissData.coOr
       getMoneyPrizeValue(t.prize_6) +
       getMoneyPrizeValue(t.prize_7) +
       getMoneyPrizeValue(t.prize_8),
+    prizes: Array.isArray(parsedSwissData.prizes) && parsedSwissData.prizes.length
+  ? parsedSwissData.prizes
+  : [
+      t.prize_1 || "-",
+      t.prize_2 || "-",
+      t.prize_3 || "-",
+      t.prize_4 || "-"
+    ],                prize: t.prize_1 || "Без приза",
+    prizeValue: (
+      Array.isArray(parsedSwissData.prizes) && parsedSwissData.prizes.length
+        ? parsedSwissData.prizes
+        : [
+            t.prize_1 || "-",
+            t.prize_2 || "-",
+            t.prize_3 || "-",
+            t.prize_4 || "-"
+          ]
+    )
+      .slice(0, 8)
+      .reduce(
+        (total, prizeText) => total + getMoneyPrizeValue(prizeText),
+        0
+      ),
     prizes: Array.isArray(parsedSwissData.prizes) && parsedSwissData.prizes.length
   ? parsedSwissData.prizes
   : [
