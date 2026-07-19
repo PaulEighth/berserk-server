@@ -10747,31 +10747,24 @@ return '<article class="tournament-card">'
                   </div>
 
                   <div class="active-tournament-organizer">
-  <span class="active-tournament-organizer-label">
-    ${(tournament.coOrganizers?.length || 0) > 0 ? 'Организаторы' : 'Организатор'}
-  </span>
+  <span class="active-tournament-organizer-label">Организатор</span>
 
-  <div>
-    ${(
-      rememberUserRole(
-        tournament.organizer,
-        tournament.organizer_role,
-        tournament.organizer_is_partner,
-        tournament.organizer_medals,
-        tournament.organizer_status
-      ),
-      roleNickHtml(tournament.organizer)
-    )}
-
-    ${(tournament.coOrganizers || [])
-      .map(name => `<div>${roleNickHtml(name)}</div>`)
-      .join('')}
-  </div>
+  ${(
+    rememberUserRole(
+      tournament.organizer,
+      tournament.organizer_role,
+      tournament.organizer_is_partner,
+      tournament.organizer_medals,
+      tournament.organizer_status
+    ),
+    roleNickHtml(tournament.organizer)
+  )}
 </div>
+                </div>
 
-<div class="active-tournament-status">
-  Открыта
-</div>
+                <div class="active-tournament-status">
+                  Активен
+                </div>
               </div>
 
               <div class="active-tournament-card">
