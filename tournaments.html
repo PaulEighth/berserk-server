@@ -10722,13 +10722,16 @@ return '<article class="tournament-card">'
                   <div class="active-tournament-organizer">
   <span style="color:#a8b0be;">Организатор:</span><br>
 
-  ${getUserBadges({
-    username: tournament.organizer,
-    role: tournament.organizer_role,
-    status: tournament.organizer_status,
-    is_partner: tournament.organizer_is_partner,
-    medals: tournament.organizer_medals
-  })}
+  ${(
+    rememberUserRole(
+        tournament.organizer,
+        tournament.organizer_role,
+        tournament.organizer_is_partner,
+        tournament.organizer_medals,
+        tournament.organizer_status
+    ),
+    roleNickHtml(tournament.organizer)
+)}
 </div>
                 </div>
 
