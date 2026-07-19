@@ -6563,14 +6563,10 @@ deckRequired: deckMode === 'required',
         bansBeforeFinal,
         decksFinal,
         bansFinal,
-        prize:prize || 'Без приза',
-        prizes,
-                prizeValue:prizes.reduce(
-          (total, prizeText) =>
-            total + getMoneyPrizeValue(prizeText),
-          0
-        ),
-        places,
+        prize: prize || "Без приза",
+prizes,
+prizeValue: 0,
+places,
         bracketSize,
         bracket: bracketSize,
         grid: bracketSize,
@@ -6605,7 +6601,7 @@ createdAt:new Date().toISOString()
       start_date: request.date,
       telegram_link: "",
       bracket: request.bracketSize,
-end_date: request.endDate || request.date,
+end_date: request.endDate || null,
 swiss_data: {
   swissRounds: request.swissRounds || 3,
   rules: request.deckRules || "",
