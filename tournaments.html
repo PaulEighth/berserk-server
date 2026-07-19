@@ -3431,35 +3431,29 @@ html body .bracket-cell.alive{
   line-height:1.2;
 }
 
-.active-tournament-organizer{
-  margin-top:10px;
-  font-size:19px;
-  font-weight:900;
-  line-height:1.45;
+.active-tournament-organizer,
+.active-tournament-status{
+  display:grid;
+  grid-template-columns:150px 1fr;
+  align-items:start;
+  column-gap:12px;
 }
 
-.active-tournament-status{
+.active-tournament-organizer{
   margin-top:8px;
-  color:#ffffff;
-  font-size:22px;
-  font-weight:900;
-  line-height:1;
 }
 
 .active-tournament-organizer-label{
-  display:block;
   color:#b8ae9f;
   font-size:15px;
   font-weight:900;
-  line-height:1.1;
+  text-transform:uppercase;
 }
 
 .active-tournament-organizer .role-colored-nick{
-  display:inline-block;
-  margin-top:4px;
   font-size:18px;
   font-weight:900;
-  line-height:1.2;
+  line-height:1.25;
 }
 
 .active-tournament-status{
@@ -3468,6 +3462,14 @@ html body .bracket-cell.alive{
   font-size:22px;
   font-weight:900;
   line-height:1.1;
+}
+
+.active-tournament-status::before{
+  content:"Статус";
+  color:#b8ae9f;
+  font-size:15px;
+  font-weight:900;
+  text-transform:uppercase;
 }
 
 @media(max-width:1000px){
@@ -10745,24 +10747,31 @@ return '<article class="tournament-card">'
                   </div>
 
                   <div class="active-tournament-organizer">
-  <span class="active-tournament-organizer-label">Организатор</span>
+  <span class="active-tournament-organizer-label">
+    ${(tournament.coOrganizers?.length || 0) > 0 ? 'Организаторы' : 'Организатор'}
+  </span>
 
-  ${(
-    rememberUserRole(
-      tournament.organizer,
-      tournament.organizer_role,
-      tournament.organizer_is_partner,
-      tournament.organizer_medals,
-      tournament.organizer_status
-    ),
-    roleNickHtml(tournament.organizer)
-  )}
+  <div>
+    ${(
+      rememberUserRole(
+        tournament.organizer,
+        tournament.organizer_role,
+        tournament.organizer_is_partner,
+        tournament.organizer_medals,
+        tournament.organizer_status
+      ),
+      roleNickHtml(tournament.organizer)
+    )}
+
+    ${(tournament.coOrganizers || [])
+      .map(name => `<div>${roleNickHtml(name)}</div>`)
+      .join('')}
+  </div>
 </div>
-                </div>
 
-                <div class="active-tournament-status">
-                  Активен
-                </div>
+<div class="active-tournament-status">
+  Открыта
+</div>
               </div>
 
               <div class="active-tournament-card">
