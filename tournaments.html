@@ -3442,7 +3442,33 @@ html body .bracket-cell.alive{
   margin-top:16px;
   color:#7bd88f;
   font-size:18px;
-  font-weight:950;
+  fon.active-tournament-organizer{
+  margin-top:6px;
+  line-height:1.2;
+}
+
+.active-tournament-organizer-label{
+  display:block;
+  color:#b8ae9f;
+  font-size:15px;
+  font-weight:900;
+  line-height:1.1;
+}
+
+.active-tournament-organizer .role-colored-nick{
+  display:inline-block;
+  margin-top:4px;
+  font-size:18px;
+  font-weight:900;
+  line-height:1.2;
+}
+
+.active-tournament-status{
+  margin-top:8px;
+  color:#fff;
+  font-size:22px;
+  font-weight:900;
+  line-height:1.1;
 }
 
 @media(max-width:1000px){
@@ -10720,18 +10746,18 @@ return '<article class="tournament-card">'
                   </div>
 
                   <div class="active-tournament-organizer">
-  <span style="color:#a8b0be;">Организатор:</span><br>
+  <span class="active-tournament-organizer-label">Организатор</span>
 
   ${(
     rememberUserRole(
-        tournament.organizer,
-        tournament.organizer_role,
-        tournament.organizer_is_partner,
-        tournament.organizer_medals,
-        tournament.organizer_status
+      tournament.organizer,
+      tournament.organizer_role,
+      tournament.organizer_is_partner,
+      tournament.organizer_medals,
+      tournament.organizer_status
     ),
     roleNickHtml(tournament.organizer)
-)}
+  )}
 </div>
                 </div>
 
