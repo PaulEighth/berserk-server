@@ -6605,7 +6605,7 @@ createdAt:new Date().toISOString()
       start_date: request.date,
       telegram_link: "",
       bracket: request.bracketSize,
-end_date: request.endDate || null,
+end_date: request.endDate || request.date,
 swiss_data: {
   swissRounds: request.swissRounds || 3,
   rules: request.deckRules || "",
