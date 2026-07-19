@@ -5264,7 +5264,7 @@ function organizerUserHtml(org){
 }
 
 function organizersHtml(t){
-  return getTournamentOrganizers(t).map(org => organizerUserHtml(org)).join("<br>");
+  return getTournamentOrganizers(t).map(org => organizerUserHtml(org)).join(" &nbsp;&nbsp; ");
 }
 
 function isTournamentCoOrganizer(t,nick){
