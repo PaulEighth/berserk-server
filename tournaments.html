@@ -3468,10 +3468,10 @@ html body .bracket-cell.alive{
   align-items:center;
   column-gap:12px;
   margin-top:8px;
-  color:#fff;
-  font-size:18px;
-  font-weight:900;
-  line-height:1.1;
+  color:var(--gold2);
+  font-size:26px;
+  font-weight:950;
+  line-height:1.15;
 }
 
 .active-tournament-status::before{
@@ -5250,7 +5250,7 @@ function organizerUserHtml(org){
   if(!org?.username) return "";
 
   if(org.id === null){
-  return `<span style="color:#fff">${escapeHtml(org.username)}</span>`;
+  return `<span style="color:#fff;font-size:inherit;font-weight:900;">${escapeHtml(org.username)}</span>`;
 }
 
   rememberUserRole(
