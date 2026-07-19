@@ -10763,16 +10763,7 @@ return '<article class="tournament-card">'
     <div class="active-tournament-organizer">
         <span class="active-tournament-organizer-label">ОРГАНИЗАТОРЫ</span>
 
-        ${(
-          rememberUserRole(
-            tournament.organizer,
-            tournament.organizer_role,
-            tournament.organizer_is_partner,
-            tournament.organizer_medals,
-            tournament.organizer_status
-          ),
-          roleNickHtml(tournament.organizer)
-        )}
+        ${organizersHtml(tournament)}
     </div>
 
     <div class="active-tournament-status">
