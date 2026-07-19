@@ -3430,7 +3430,7 @@ html body .bracket-cell.alive{
   text-transform:uppercase;
 }
 .active-tournament-title{
-  margin:0 0 9px;
+  margin:0;
   color:var(--text);
   font-size:16px;
   font-weight:950;
@@ -3473,7 +3473,6 @@ html body .bracket-cell.alive{
 .active-tournament-status::before{
   content:"СТАТУС";
   font-size:16px;
-  font-size:30px;
   font-weight:900;
   text-transform:uppercase;
 }
@@ -10748,13 +10747,10 @@ return '<article class="tournament-card">'
             <div class="active-tournament-row">
               <div class="active-tournament-card">
                 <div>
-                  <div class="active-tournament-label">
-  НАЗВАНИЕ
-</div>
-
-<div class="active-tournament-title">
-  🏆 ${escapeHtml(tournament.title || 'Турнир')}
-</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+        <span class="active-tournament-label">НАЗВАНИЕ</span>
+        <span class="active-tournament-title">🏆 ${escapeHtml(tournament.title || 'Турнир')}</span>
+    </div>
 
                   <div class="active-tournament-organizer">
   <span class="active-tournament-organizer-label">ОРГАНИЗАТОРЫ</span>
